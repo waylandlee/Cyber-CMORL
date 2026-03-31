@@ -34,6 +34,22 @@ class EvalConfig:
 
 
 @dataclass
+class IPOHyperConfig:
+    clip_param: float = 0.2
+    ppo_epochs: int = 4
+    num_mini_batch: int = 4
+    value_loss_coef: float = 0.5
+    entropy_coef: float = 0.01
+    learning_rate: float = 3e-4
+    max_grad_norm: float = 0.5
+    barrier_coef: float = 20.0
+    beta: float = 0.9
+    gamma: float = 0.995
+    gae_lambda: float = 0.95
+    eps: float = 1e-8
+
+
+@dataclass
 class Stage1Config:
     seed: int = 7
     total_timesteps: int = 1024
@@ -63,6 +79,7 @@ class Stage2Config:
     model: ModelConfig = field(default_factory=ModelConfig)
     rollout: RolloutConfig = field(default_factory=RolloutConfig)
     eval: EvalConfig = field(default_factory=EvalConfig)
+    ipo: IPOHyperConfig = field(default_factory=IPOHyperConfig)
 
 
 @dataclass

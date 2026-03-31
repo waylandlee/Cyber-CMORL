@@ -1,11 +1,11 @@
 seed: 19
-stage1_buffer: ""
-num_extension_policies: 6
+stage1_buffer: cmorl_minicage/outputs/p1_stage1_check/run_29deaae7/solution_buffer.json
+num_extension_policies: 4
 extension_rounds: 2
-constrained_updates: 2
-constraint_tolerance: 1.0e-6
-total_timesteps_per_update: 512
-output_dir: cmorl_minicage/outputs/stage2
+constrained_updates: 1
+constraint_tolerance: -0.25
+total_timesteps_per_update: 64
+output_dir: cmorl_minicage/outputs/ablation/local_search/stage2_tol_025
 env:
   num_envs: 8
   red_policy: bline
@@ -21,15 +21,15 @@ eval:
   eval_episodes: 3
   preference_step:
 ipo:
-  clip_param: 0.2
-  ppo_epochs: 4
+  clip_param: 0.1
+  ppo_epochs: 1
   num_mini_batch: 4
   value_loss_coef: 0.5
   entropy_coef: 0.01
-  learning_rate: 3.0e-4
+  learning_rate: 1.0e-4
   max_grad_norm: 0.5
-  barrier_coef: 20.0
-  beta: 0.9
+  barrier_coef: 50.0
+  beta: 1.01
   gamma: 0.995
   gae_lambda: 0.95
   eps: 1.0e-8

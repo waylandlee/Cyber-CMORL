@@ -1,10 +1,10 @@
 seed: 19
-stage1_buffer: ""
+stage1_buffer: cmorl_minicage/outputs/p1_stage1_check/run_29deaae7/solution_buffer.json
 num_extension_policies: 4
 extension_rounds: 2
-constrained_updates: 2
-constraint_tolerance: -0.05
-total_timesteps_per_update: 1024
+constrained_updates: 1
+constraint_tolerance: -2.0
+total_timesteps_per_update: 128
 output_dir: cmorl_minicage/outputs/ablation/stage2_relaxed
 env:
   num_envs: 8
@@ -20,3 +20,16 @@ rollout:
 eval:
   eval_episodes: 3
   preference_step:
+ipo:
+  clip_param: 0.1
+  ppo_epochs: 2
+  num_mini_batch: 4
+  value_loss_coef: 0.5
+  entropy_coef: 0.01
+  learning_rate: 1.0e-4
+  max_grad_norm: 0.5
+  barrier_coef: 100.0
+  beta: 1.10
+  gamma: 0.995
+  gae_lambda: 0.95
+  eps: 1.0e-8

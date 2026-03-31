@@ -44,7 +44,20 @@ def train_stage2(config: Stage2Config) -> Path:
         seed=config.env.seed,
     )
 
-    ipo_config = IPOConfig()
+    ipo_config = IPOConfig(
+        clip_param=config.ipo.clip_param,
+        ppo_epochs=config.ipo.ppo_epochs,
+        num_mini_batch=config.ipo.num_mini_batch,
+        value_loss_coef=config.ipo.value_loss_coef,
+        entropy_coef=config.ipo.entropy_coef,
+        learning_rate=config.ipo.learning_rate,
+        max_grad_norm=config.ipo.max_grad_norm,
+        barrier_coef=config.ipo.barrier_coef,
+        beta=config.ipo.beta,
+        gamma=config.ipo.gamma,
+        gae_lambda=config.ipo.gae_lambda,
+        eps=config.ipo.eps,
+    )
     policy_counter = 0
     round_summaries: list[dict] = []
     num_updates = max(
