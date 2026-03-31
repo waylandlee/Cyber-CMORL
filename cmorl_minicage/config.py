@@ -57,6 +57,7 @@ class Stage1Config:
     preference_strategy: str = "dirichlet_extremes"
     preference_step: float = 0.5
     preference_dirichlet_alpha: float = 1.0
+    explicit_preferences: list[list[float]] = field(default_factory=list)
     save_interval_updates: int = 0
     output_dir: str = "cmorl_minicage/outputs/stage1"
     env: EnvConfig = field(default_factory=EnvConfig)

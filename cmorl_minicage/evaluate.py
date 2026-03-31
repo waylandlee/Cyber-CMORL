@@ -6,12 +6,23 @@ from pathlib import Path
 from typing import Sequence
 
 import numpy as np
+import torch
 
 from cmorl_minicage.algorithms.assignment import assign_policy
 from cmorl_minicage.algorithms.selection import nondominated_filter
 from cmorl_minicage.buffer import load_policy_buffer
 from cmorl_minicage.config import DEFAULT_EVALUATE_CONFIG, load_evaluate_config
+from cmorl_minicage.env import MiniCageMORLEnv
+from cmorl_minicage.models import ActorCritic
 from cmorl_minicage.utils import save_json, simplex_grid
+
+
+def _repo_root_from_path(path: str | Path) -> Path:
+    path = Path(path).resolve()
+    for candidate in (path, *path.parents):
+        if (candidate / "cmorl_minicage").exists():
+            return candidate
+    raise ValueError(f"Could not infer repository root from {path}")
 
 
 def _prepare_hv_points(points: np.ndarray, reference_point: Sequence[float]) -> np.ndarray:
@@ -142,6 +153,166 @@ def sparsity(records: Sequence[dict]) -> float:
     return total / max(len(records) - 1, 1)
 
 
+def _resolve_checkpoint_path(buffer_path: str | Path, checkpoint_path: str | Path) -> Path:
+    checkpoint = Path(checkpoint_path)
+    if checkpoint.is_absolute():
+        return checkpoint
+    return (_repo_root_from_path(buffer_path) / checkpoint).resolve()
+
+
+def _sleep_actions(env: MiniCageMORLEnv) -> np.ndarray:
+    return np.zeros(env.num_envs, dtype=np.int32)
+
+
+def _random_valid_actions(env: MiniCageMORLEnv) -> np.ndarray:
+    blue_mask = env.sim.get_mask(env.sim.state, env.sim.current_decoys)["Blue"]
+    actions = np.zeros(env.num_envs, dtype=np.int32)
+    for idx in range(env.num_envs):
+        valid_actions = np.flatnonzero(blue_mask[idx] > 0)
+        actions[idx] = int(np.random.choice(valid_actions))
+    return actions
+
+
+def _semantic_metrics_for_record(
+    record: dict,
+    metadata: dict,
+    buffer_path: str | Path,
+    *,
+    eval_batches: int,
+) -> dict[str, float]:
+    env_config = metadata.get("env", {})
+    model_config = metadata.get("model", {})
+    env = MiniCageMORLEnv(
+        num_envs=int(env_config.get("num_envs", 8)),
+        red_policy=env_config.get("red_policy", "bline"),
+        remove_bugs=bool(env_config.get("remove_bugs", True)),
+        max_steps=int(env_config.get("max_episode_steps", 100)),
+        seed=int(env_config.get("seed", 7)),
+    )
+    baseline_kind = record.get("notes", {}).get("baseline_kind")
+    actor_critic = None
+    if record.get("source") != "baseline_heuristic":
+        actor_critic = ActorCritic(
+            obs_dim=env.obs_dim,
+            action_dim=env.action_dim,
+            obj_dim=int(model_config.get("obj_dim", 3)),
+            hidden_sizes=(int(model_config.get("hidden_size", 128)), int(model_config.get("hidden_size", 128))),
+        ).to(torch.device("cpu"))
+        checkpoint = torch.load(
+            _resolve_checkpoint_path(buffer_path, record["checkpoint_path"]),
+            map_location="cpu",
+            weights_only=True,
+        )
+        actor_critic.load_state_dict(checkpoint)
+        actor_critic.eval()
+
+    totals: dict[str, list[float]] = {
+        "final_compromised_hosts": [],
+        "final_critical_compromised_hosts": [],
+        "critical_impact_count": [],
+        "recovered_hosts": [],
+        "analyse_count": [],
+        "remove_count": [],
+        "restore_count": [],
+        "high_disruption_action_count": [],
+        "total_action_count": [],
+    }
+
+    base_seed = int(env_config.get("seed", 7))
+    with torch.no_grad():
+        for batch_idx in range(max(eval_batches, 1)):
+            env.seed = base_seed + batch_idx
+            obs, _ = env.reset()
+            done = np.zeros(env.num_envs, dtype=bool)
+            episode_totals = {
+                "critical_impact_count": np.zeros(env.num_envs, dtype=np.float32),
+                "recovered_hosts": np.zeros(env.num_envs, dtype=np.float32),
+                "analyse_count": np.zeros(env.num_envs, dtype=np.float32),
+                "remove_count": np.zeros(env.num_envs, dtype=np.float32),
+                "restore_count": np.zeros(env.num_envs, dtype=np.float32),
+                "high_disruption_action_count": np.zeros(env.num_envs, dtype=np.float32),
+                "total_action_count": np.zeros(env.num_envs, dtype=np.float32),
+            }
+            final_compromised_hosts = np.zeros(env.num_envs, dtype=np.float32)
+            final_critical_compromised_hosts = np.zeros(env.num_envs, dtype=np.float32)
+
+            while not np.all(done):
+                if actor_critic is None:
+                    if baseline_kind == "sleep":
+                        actions = _sleep_actions(env).reshape(env.num_envs, 1)
+                    elif baseline_kind == "random_valid":
+                        actions = _random_valid_actions(env).reshape(env.num_envs, 1)
+                    else:
+                        raise ValueError(f"Unsupported baseline_kind: {baseline_kind}")
+                else:
+                    obs_tensor = torch.as_tensor(obs, dtype=torch.float32, device=torch.device("cpu"))
+                    actions = actor_critic.act(obs_tensor).actions.cpu().numpy().reshape(env.num_envs, 1)
+                obs, _, done, _, info = env.step(actions)
+                semantic_info = info["semantic_info"]
+                final_compromised_hosts = np.asarray(
+                    semantic_info["final_compromised_hosts"], dtype=np.float32
+                )
+                final_critical_compromised_hosts = np.asarray(
+                    semantic_info["final_critical_compromised_hosts"], dtype=np.float32
+                )
+                for key in episode_totals:
+                    episode_totals[key] += np.asarray(semantic_info[key], dtype=np.float32)
+
+            totals["final_compromised_hosts"].extend(final_compromised_hosts.tolist())
+            totals["final_critical_compromised_hosts"].extend(
+                final_critical_compromised_hosts.tolist()
+            )
+            for key in episode_totals:
+                totals[key].extend(episode_totals[key].tolist())
+
+    total_action_sum = max(float(np.sum(totals["total_action_count"])), 1.0)
+    return {
+        "final_compromised_hosts": float(np.mean(totals["final_compromised_hosts"])),
+        "final_critical_compromised_hosts": float(
+            np.mean(totals["final_critical_compromised_hosts"])
+        ),
+        "critical_impact_count": float(np.mean(totals["critical_impact_count"])),
+        "recovered_hosts": float(np.mean(totals["recovered_hosts"])),
+        "analyse_count": float(np.mean(totals["analyse_count"])),
+        "remove_count": float(np.mean(totals["remove_count"])),
+        "restore_count": float(np.mean(totals["restore_count"])),
+        "high_disruption_action_rate": float(
+            np.sum(totals["high_disruption_action_count"]) / total_action_sum
+        ),
+        "semantic_eval_episodes": int(len(totals["final_compromised_hosts"])),
+    }
+
+
+def _assignment_weighted_semantic_metrics(
+    assignment_counts: dict[str, int],
+    per_policy_semantics: dict[str, dict[str, float]],
+) -> dict[str, float]:
+    if not assignment_counts or not per_policy_semantics:
+        return {}
+    weighted_metrics: dict[str, float] = {}
+    total_weight = float(sum(assignment_counts.values()))
+    metric_keys = [
+        "final_compromised_hosts",
+        "final_critical_compromised_hosts",
+        "critical_impact_count",
+        "recovered_hosts",
+        "analyse_count",
+        "remove_count",
+        "restore_count",
+        "high_disruption_action_rate",
+    ]
+    for key in metric_keys:
+        weighted_metrics[key] = float(
+            sum(
+                assignment_counts[policy_id] * per_policy_semantics[policy_id][key]
+                for policy_id in assignment_counts
+                if policy_id in per_policy_semantics
+            )
+            / total_weight
+        )
+    return weighted_metrics
+
+
 def evaluate_policy_buffer(
     buffer_path: str | Path,
     preference_step: float | None = None,
@@ -151,6 +322,7 @@ def evaluate_policy_buffer(
     reference_point: Sequence[float] | None = None,
     hv_max_exact_points: int = 18,
     hv_mc_samples: int = 50000,
+    semantic_eval_batches: int | None = None,
 ) -> dict:
     payload = load_policy_buffer(buffer_path)
     records = payload["records"]
@@ -213,6 +385,24 @@ def evaluate_policy_buffer(
             for policy_id in assignment_counts
         },
     }
+    if semantic_eval_batches is None:
+        semantic_eval_batches = int(payload.get("metadata", {}).get("evaluation", {}).get("eval_episodes", 1))
+    policy_lookup = {record["policy_id"]: record for record in records}
+    assigned_policy_ids = sorted(assignment_counts)
+    per_policy_semantic_metrics = {
+        policy_id: _semantic_metrics_for_record(
+            policy_lookup[policy_id],
+            payload.get("metadata", {}),
+            buffer_path,
+            eval_batches=semantic_eval_batches,
+        )
+        for policy_id in assigned_policy_ids
+        if policy_id in policy_lookup
+    }
+    semantic_metrics = _assignment_weighted_semantic_metrics(
+        assignment_counts,
+        per_policy_semantic_metrics,
+    )
     metrics = {
         "num_records": len(records),
         "num_pareto_records": len(pareto_records),
@@ -225,6 +415,7 @@ def evaluate_policy_buffer(
         "reference_margin": reference_margin,
         "preference_step": preference_step,
         "obj_dim": obj_dim,
+        "semantic_eval_batches": semantic_eval_batches,
     }
     return {
         "schema_version": payload.get("schema_version"),
@@ -234,6 +425,8 @@ def evaluate_policy_buffer(
         "assignments": assignments,
         "assignment_counts": assignment_counts,
         "assignment_summary": assignment_summary,
+        "semantic_metrics": semantic_metrics,
+        "semantic_policy_metrics": per_policy_semantic_metrics,
     }
 
 

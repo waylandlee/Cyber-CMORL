@@ -27,7 +27,7 @@
 | Section 5.3 Pareto Extension | 约束形式 `G_i^pi >= beta * G_i^pi_r` | `cmorl_minicage.algorithms.ipo` | Done | Target | No | barrier margin 已按 `beta * G_i^pi_r` 构造。 |
 | Section 5.4 Policy Assignment / Definition 3.1 | SMP（Set Max Policy）策略分配 | `cmorl_minicage.algorithms.assignment` | Done | Target | No | 给定任意 preference 返回 utility 最大策略。 |
 | Definition E.1 / E.2 / E.3 | Hypervolume / Expected Utility / Sparsity 评估 | `cmorl_minicage.evaluate` | Done | Target | Yes | 已支持任意目标维的 HV / EU / SP、reference point 配置与 assignment summary；HV 当前对小 Pareto set 用 exact inclusion-exclusion，大集合回退 Monte Carlo。 |
-| 本地环境适配 | MiniCAGE MORL reward vector wrapper | `cmorl_minicage.env` | Done | Target | Yes | 已做与 MiniCAGE 标量 reward 严格对账的 3 目标拆分。 |
+| 本地环境适配 | MiniCAGE MORL reward vector wrapper | `cmorl_minicage.env` | Done | Target | Yes | 当前已采用 `security / business / cost` 三目标，并选择方案 A：MORL 总回报与 MiniCAGE 原始标量 reward 双口径并存，不再强制严格对账。 |
 | 本地环境适配 | Blue-only 训练接口，red 为脚本对手 | `cmorl_minicage.env` | Done | Target | Yes | 默认 `bline`，保留 `meander` 开关。 |
 | 本地实验管理 | solution buffer / policy pool / checkpoint index | `cmorl_minicage.buffer`、`cmorl_minicage.train_stage1`、`cmorl_minicage.train_stage2` | Done | Target | Yes | 已统一到 `schema_version 0.3.0` 的 buffer metadata / record 格式，并补充 `stage1_summary` / `stage2_summary` 与更细的保存时统计。 |
 | 本地实验管理 | 配置文件驱动训练与评估入口 | `cmorl_minicage.config`、`cmorl_minicage/configs/*.yaml` | Done | Yes | Yes | 训练/评估已优先使用 YAML 配置文件，CLI 仅保留少量路径覆盖项。 |

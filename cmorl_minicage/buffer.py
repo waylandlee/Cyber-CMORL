@@ -20,14 +20,17 @@ def buffer_metadata(
     eval_config,
     extra: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    def _serialise_config(value: Any) -> Any:
+        return asdict(value) if hasattr(value, "__dataclass_fields__") else value
+
     metadata = {
         "schema_version": SCHEMA_VERSION,
         "stage": stage,
-        "env": asdict(env_config),
-        "model": asdict(model_config),
-        "rollout": asdict(rollout_config),
-        "optimizer": asdict(optimizer_config),
-        "evaluation": asdict(eval_config),
+        "env": _serialise_config(env_config),
+        "model": _serialise_config(model_config),
+        "rollout": _serialise_config(rollout_config),
+        "optimizer": _serialise_config(optimizer_config),
+        "evaluation": _serialise_config(eval_config),
     }
     if extra:
         metadata.update(extra)

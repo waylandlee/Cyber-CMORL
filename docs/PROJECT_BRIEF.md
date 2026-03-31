@@ -2,20 +2,20 @@
 
 ## 项目目标
 
-本项目当前的独立主线是：在不干扰 `CybORG_plus_plus` 其他研究路径的前提下，在 [cmorl_minicage](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage) 中复现论文 *Efficient Discovery of Pareto Front for Multi-Objective Reinforcement Learning (C-MORL)* 的核心训练流程，并将其迁移到 MiniCAGE 场景。
+本项目当前的主线是：在 [cmorl_minicage](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage) 中复现论文 *Efficient Discovery of Pareto Front for Multi-Objective Reinforcement Learning (C-MORL)* 的核心训练流程，并将其迁移到 MiniCAGE 网络安全场景。
 
 当前目标聚焦在四件事：
 
-- 做出一条可运行、可验证、可对照的 MiniCAGE C-MORL 复现线。
-- 尽量向论文训练细节收紧，同时明确记录与原论文 benchmark 的差异。
-- 建立稳定的配置、输出、文档和可视化体系，支持后续正式实验和写作。
-- 基于 Stage-2 的调参结果，明确当前最有效的扩展配置和后续优化方向。
+- 保持一条可运行、可验证、可对照的 `Stage-1 -> Stage-2 -> evaluate -> visualize` 主线。
+- 用 `security / business / cost` 三目标在 MiniCAGE 中建立可解释的 MORL 训练与评估口径。
+- 用统一参考点、统一评估步长和统一语义指标比较主方法与 baseline。
+- 沉淀可直接用于写作和汇报的图、表、文档与实验记录。
 
 ## 当前定位
 
 当前实现最准确的定位是：
 
-**“论文 C-MORL 算法思想在 MiniCAGE 上的高保真迁移复现版”**
+**“论文 C-MORL 方法在 MiniCAGE 上的高保真迁移复现版”**
 
 而不是：
 
@@ -23,135 +23,167 @@
 
 这意味着：
 
-- 算法骨架已经和论文高度对齐：
+- 算法主骨架已经与论文对齐：
   - Stage-1 Pareto initialization
   - Stage-2 policy selection + constrained extension
   - SMP assignment
   - HV / EU / SP evaluation
-- 但实验环境、reward/objective 定义、IPO 数值实现和 Stage-2 工程门控仍然存在本地适配。
+- 但环境、奖励定义、IPO 数值实现和工程化 gate 仍然是本地适配。
 
-## 范围
+## 当前范围
 
 当前范围包括：
 
 - MiniCAGE 多目标环境包装
+- `security / business / cost` 三目标奖励建模
 - Stage-1 Pareto initialization
-- Stage-2 selection + IPO-style Pareto extension
+- Stage-2 IPO-style constrained extension
 - SMP assignment
-- HV / EU / SP evaluation
-- YAML 配置驱动训练与评估
-- 统一 buffer / summary / experiment logging
-- 可视化脚本与论文风格对比图输出
+- HV / EU / SP + 网络安全语义评估
+- baseline 套餐与统一公平比较
+- 图像与文档输出
 
 当前不包含：
 
-- 论文原 benchmark 的逐任务原样复刻
-- CPO 分支实现
-- 多进程/多 GPU 的 Stage-1 并行初始化训练
-- 与仓库其他训练主线的深度整合
-- 论文结果的数值级一比一复现声明
+- 论文原 benchmark 的逐任务复刻
+- CPO 分支
+- 多 GPU / 多 worker Stage-1 并行训练
+- 论文结果的一比一数值复现声明
 
-## 当前主线
-
-当前主线代码位于：
+## 当前主线代码
 
 - [cmorl_minicage/env.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/env.py)
 - [cmorl_minicage/train_stage1.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/train_stage1.py)
 - [cmorl_minicage/train_stage2.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/train_stage2.py)
 - [cmorl_minicage/evaluate.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/evaluate.py)
 - [cmorl_minicage/visualize.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/visualize.py)
+- [cmorl_minicage/baselines.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/baselines.py)
+- [cmorl_minicage/select_policy.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/select_policy.py)
 
-当前默认实验入口：
+正式配置入口：
 
-- [cmorl_minicage/configs/stage1.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/stage1.yaml)
-- [cmorl_minicage/configs/stage2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/stage2.yaml)
-- [cmorl_minicage/configs/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/evaluate.yaml)
+- [cmorl_minicage/configs/formal/stage1_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2.yaml)
+- [cmorl_minicage/configs/formal/stage2_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2.yaml)
+- [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/evaluate.yaml)
 
-## 配置层次
+## 当前三目标定义
 
-为避免把“冒烟验证”和“正式实验”混在一起，配置模板分为三层：
+当前环境正式采用三目标：
 
-- `smoke`
-  - 用于最小链路验证，预算小，优先确认训练和评估流程不报错。
-- `formal`
-  - 用于较完整的论文式运行，预算更高，统计更稳定。
-- `ablation`
-  - 用于单点对比，例如 Stage-2 约束强度、`beta`、`constraint_tolerance`、每次扩展 timesteps 等。
+- `security`
+  - 刻画失陷主机、关键资产 impact、关键残留失陷和 no-op under compromise 的安全后果。
+- `business`
+  - 刻画蓝方动作及 no-op under compromise 对业务扰动造成的代价。
+- `cost`
+  - 刻画动作本身和 no-op under compromise 的操作成本。
 
-当前额外已经积累出一组 `local_search` 风格的 Stage-2 配置，用于围绕当前最敏感的超参数做局部扫描。
+三目标统一按“越大越好”解释；由于数值通常为负，实际阅读上等价于“越接近 0 越好”。
 
-## 当前结果概况
+当前默认 reward 已固化为 `C2 / cand_g` 校准版本，其目的有两个：
 
-截至 2026-03-31，当前主线已经具备：
+- 消除 `sleep` 在统一 HV / EU 下的异常占优问题。
+- 保留 `Weighted-Sum` 等强 baseline 的非支配前沿结构。
 
-- 可独立运行的 `stage1 -> stage2 -> evaluate -> visualize` 完整链路。
-- 稳定的结构化产物：
-  - `solution_buffer.json`
-  - `stage1_summary.json`
-  - `stage2_summary.json`
-  - `pareto_front_*.json`
-  - `metrics.json`
-- 针对 Stage-2 的一轮较完整调参实验和可视化解释。
+## 当前正式结果概况
 
-当前最重要的实验结论如下：
+截至 2026-03-31，当前保留并可直接引用的正式结果分为两层。
 
-- Stage-1 已经能在 MiniCAGE 上产生有 trade-off 结构的 Pareto front。
-- 默认严格 Stage-2 配置经常会被 feasibility gate 过早截断。
-- 当前最好的一组综合 Stage-2 配置是：
-  - `beta=1.005`
-  - 或等价现象下的 `constraint_tolerance=-0.25`
-- 当前最好的一组“整体 front 扩展”结果来自：
-  - [stage2_beta_1005/run_89adf296](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_beta_1005/run_89adf296)
-  - 关键指标：
-    - `HV = 2873.94`
-    - `EU = -125.33`
-    - `Pareto Count = 9`
-- 当前最好的一组“高 expected utility 但偏集中化”的结果来自：
-  - [stage2_steps_1536/run_28007b1b](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_steps_1536/run_28007b1b)
-  - 关键指标：
-    - `HV = 2757.88`
-    - `EU = -103.23`
-    - `Pareto Count = 7`
-    - `Assigned Policy Variety = 2`
+### Formal 主线
+
+- `Stage-1`
+  - [run_446acb6c](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage1/run_446acb6c)
+- `Stage-2`
+  - [run_46e57616](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616)
+
+统一参考点下：
+
+- `Stage-1`
+  - `HV = 362094.86`
+  - `EU = -170.55`
+  - `Pareto Count = 4`
+- `Stage-2`
+  - `HV = 601513.12`
+  - `EU = -114.70`
+  - `Pareto Count = 6`
+
+这说明在当前正式 reward 口径下，`Stage-2` 已经显著优于 `Stage-1`。
+
+### 5-Baseline Suite
+
+当前已重跑并统一评估的 baseline 套餐包括：
+
+- `sleep`
+- `random-valid`
+- `stage1-only`
+- `single-objective`
+- `weighted-sum`
+
+统一参考点下的关键结果：
+
+- `Stage-2`
+  - `HV = 1699877.00`
+  - `EU = -114.69`
+  - `Pareto Count = 6`
+- `Stage-1 Only`
+  - `HV = 1436297.75`
+  - `EU = -170.55`
+  - `Pareto Count = 4`
+- `Single-Objective`
+  - `HV = 1412946.75`
+  - `EU = -170.83`
+  - `Pareto Count = 3`
+- `Sleep`
+  - `HV = 714105.19`
+  - `EU = -229.84`
+  - `Pareto Count = 1`
+- `Weighted-Sum`
+  - `HV = 618307.75`
+  - `EU = -189.66`
+  - `Pareto Count = 3`
+- `Random Valid`
+  - `HV = 26100.41`
+  - `EU = -454.18`
+  - `Pareto Count = 1`
+
+## 当前主结果判断
+
+截至当前代码和实验状态，最稳妥的判断是：
+
+- `Stage-2` 是当前项目里表现最强的正式主方法结果。
+- `Stage-2` 不仅优于 formal `Stage-1`，也优于当前保留的 5 个 baseline。
+- `Stage-2` 的优势不仅体现在 `HV / EU / Pareto Count`，也体现在核心网络安全语义指标上。
+- 当前最需要推进的工作，已经从“证明方法能工作”转向“继续让前沿更满、更均匀、更贴近论文式数值实现”。
+
+## 当前保留的关键图
+
+主结果图：
+
+- [formal_c2_mainline_metrics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_mainline_metrics.png)
+- [formal_c2_mainline_semantics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_mainline_semantics.png)
+- [formal_c2_core_security.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_core_security.png)
+
+目标空间图：
+
+- [formal_c2_compact_objective_map.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_compact_objective_map.png)
+- [formal_c2_objective_3d_comparison.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_objective_3d_comparison.png)
+- [formal_c2_pairwise_objectives.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_pairwise_objectives.png)
+
+6 方法公平比较图：
+
+- [formal_c2_suite_metrics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_suite_metrics.png)
+- [formal_c2_suite_3d.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_suite_3d.png)
+- [formal_c2_suite_pairwise.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_suite_pairwise.png)
 
 ## 当前最关键的差异点
 
 当前实现与论文真正拉开差距的地方主要有四个：
 
-1. Stage-1 现在是串行训练，不是论文强调的并行初始化。
-2. IPO 是 PPO-compatible 的近似实现，barrier 作用在 surrogate return 近似上，而不是真实 `G_i^π` 本体。
-3. Stage-2 增加了工程化 feasibility gate，并且每条扩展路径只保留 `best_feasible` 结果。
-4. 实验环境、reward/objective 定义和任务形式已经被 MiniCAGE 本地适配。
-
-这些差异不会否定当前工作的算法价值，但会影响：
-
-- 与论文原结果的严格可比性
-- Stage-2 的数值行为
-- Stage-1 的工程效率
-- 调参时对 feasibility 的敏感度
-
-## 输出约定
-
-所有复现线输出默认写入 [cmorl_minicage/outputs](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs)，每次 run 目录下至少关注：
-
-- `solution_buffer.json`
-- `stage1_summary.json` 或 `stage2_summary.json`
-- `pareto_front_*.json`
-- `metrics*.json`
-- `plots/*.png`
-
-当前已经支持自动生成的图包括：
-
-- Pareto 2D projections
-- 3D Pareto scatter
-- Stage-1 vs Stage-2 overlay
-- assignment counts
-- Stage-2 round summary
-- 论文风格总对比图
+1. Stage-1 仍是串行训练，不是论文默认的并行初始化。
+2. IPO 是 PPO-compatible 的近似实现，barrier 仍作用在 surrogate return 上。
+3. Stage-2 使用工程化 feasibility gate，且每条扩展路径只保留 `best_feasible`。
+4. 环境、奖励和任务形式均为 MiniCAGE 适配版，而非论文原 benchmark。
 
 ## 推荐阅读顺序
-
-如果是第一次接手当前复现线，建议按以下顺序阅读：
 
 1. [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md)
 2. [docs/PROJECT_BRIEF.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/PROJECT_BRIEF.md)
@@ -159,9 +191,3 @@
 4. [docs/DECISIONS.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/DECISIONS.md)
 5. [docs/TASKS.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/TASKS.md)
 6. [docs/EXPERIMENT_LOG.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/EXPERIMENT_LOG.md)
-
-如果是直接想复现实验，建议优先看：
-
-- [cmorl_minicage/configs/ablation](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation)
-- [cmorl_minicage/outputs/plots/paper_style_ablation_summary.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/paper_style_ablation_summary.png)
-- [docs/EXPERIMENT_LOG.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/EXPERIMENT_LOG.md)

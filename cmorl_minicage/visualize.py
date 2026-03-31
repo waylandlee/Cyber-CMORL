@@ -8,6 +8,24 @@ import numpy as np
 
 from cmorl_minicage.utils import ensure_dir, load_json
 
+OBJECTIVE_LABELS = ("Security", "Business", "Cost")
+COMPACT_MARKERS = ("o", "^", "s", "D", "P", "X", "v", "<", ">")
+SEMANTIC_METRIC_PANELS = [
+    ("final_compromised_hosts", "Final Compromised Hosts", "#4c78a8"),
+    ("final_critical_compromised_hosts", "Final Critical Compromised", "#e45756"),
+    ("critical_impact_count", "Critical Impact Count", "#f58518"),
+    ("recovered_hosts", "Recovered Hosts", "#54a24b"),
+    ("analyse_count", "Analyse Count", "#72b7b2"),
+    ("remove_count", "Remove Count", "#b279a2"),
+    ("restore_count", "Restore Count", "#ff9da6"),
+    ("high_disruption_action_rate", "High Disruption Rate", "#9d755d"),
+]
+CORE_SECURITY_METRIC_PANELS = [
+    ("final_compromised_hosts", "Final Compromised Hosts", "#4c78a8"),
+    ("final_critical_compromised_hosts", "Final Critical Compromised", "#e45756"),
+    ("critical_impact_count", "Critical Impact Count", "#f58518"),
+]
+
 
 def _import_matplotlib():
     try:
@@ -96,6 +114,12 @@ def _plot_stage_scatter_3d(axis, points: np.ndarray, *, label: str, color: str, 
     )
 
 
+def _objective_label(index: int) -> str:
+    if index < len(OBJECTIVE_LABELS):
+        return OBJECTIVE_LABELS[index]
+    return f"Objective {index}"
+
+
 def _plot_run_projections(
     plt,
     run_dir: Path,
@@ -137,8 +161,8 @@ def _plot_run_projections(
                 edgecolor="white",
                 linewidth=0.35,
             )
-        axis.set_xlabel(f"Objective {x_idx}")
-        axis.set_ylabel(f"Objective {y_idx}")
+        axis.set_xlabel(_objective_label(x_idx))
+        axis.set_ylabel(_objective_label(y_idx))
         axis.set_title(f"Projection ({x_idx}, {y_idx})")
         axis.grid(True, alpha=0.22)
     handles, labels = axes[0].get_legend_handles_labels()
@@ -191,8 +215,8 @@ def _plot_run_overlay(
             color="#e45756",
             marker="^",
         )
-        axis.set_xlabel(f"Objective {x_idx}")
-        axis.set_ylabel(f"Objective {y_idx}")
+        axis.set_xlabel(_objective_label(x_idx))
+        axis.set_ylabel(_objective_label(y_idx))
         axis.set_title(f"Stage-1 vs Stage-2 ({x_idx}, {y_idx})")
         axis.grid(True, alpha=0.22)
     handles, labels = axes[0].get_legend_handles_labels()
@@ -236,9 +260,9 @@ def _plot_run_3d(
         color="#e45756",
         marker="^",
     )
-    axis.set_xlabel("Objective 0")
-    axis.set_ylabel("Objective 1")
-    axis.set_zlabel("Objective 2")
+    axis.set_xlabel(_objective_label(0))
+    axis.set_ylabel(_objective_label(1))
+    axis.set_zlabel(_objective_label(2))
     axis.set_title(f"3D Pareto Scatter: {run_dir.name}")
     axis.view_init(elev=22, azim=38)
     axis.legend(frameon=False, loc="upper left")
@@ -426,6 +450,482 @@ def plot_metrics_comparison(
     return output_path
 
 
+def plot_semantic_comparison(
+    metrics_paths: Sequence[str | Path],
+    labels: Sequence[str] | None = None,
+    output_path: str | Path | None = None,
+) -> Path:
+    if not metrics_paths:
+        raise ValueError("At least one metrics file is required")
+    plt = _import_matplotlib()
+
+    resolved_paths = [Path(path) for path in metrics_paths]
+    if labels is None:
+        labels = [_label_from_path(path) for path in resolved_paths]
+    if len(labels) != len(resolved_paths):
+        raise ValueError("labels length must match metrics_paths length")
+
+    rows = []
+    for path in resolved_paths:
+        payload = load_json(path)
+        semantic_metrics = payload.get("semantic_metrics")
+        if not semantic_metrics:
+            raise ValueError(f"Missing semantic_metrics in {path}")
+        rows.append(semantic_metrics)
+
+    cols = 4
+    rows_count = int(np.ceil(len(SEMANTIC_METRIC_PANELS) / cols))
+    fig, axes = plt.subplots(rows_count, cols, figsize=(18, 8.5))
+    axes = np.asarray(axes).reshape(-1)
+    x = np.arange(len(labels))
+
+    for axis, (metric_key, title, color) in zip(axes, SEMANTIC_METRIC_PANELS):
+        values = [row[metric_key] for row in rows]
+        bars = axis.bar(x, values, color=color, alpha=0.92)
+        best_idx = int(np.argmin(values)) if metric_key != "recovered_hosts" else int(np.argmax(values))
+        bars[best_idx].set_edgecolor("black")
+        bars[best_idx].set_linewidth(1.4)
+        axis.set_title(title)
+        axis.set_xticks(x)
+        axis.set_xticklabels(labels, rotation=25, ha="right")
+        axis.grid(True, axis="y", alpha=0.22)
+        _style_bar_annotations(axis, values)
+
+    for axis in axes[len(SEMANTIC_METRIC_PANELS):]:
+        axis.axis("off")
+
+    fig.suptitle("Cyber Semantics Comparison", fontsize=16, y=0.98)
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+
+    if output_path is None:
+        output_path = Path("cmorl_minicage/outputs/plots/semantic_comparison.png")
+    output_path = Path(output_path)
+    ensure_dir(output_path.parent)
+    fig.savefig(output_path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    return output_path
+
+
+def plot_core_security_comparison(
+    metrics_paths: Sequence[str | Path],
+    labels: Sequence[str] | None = None,
+    output_path: str | Path | None = None,
+) -> Path:
+    if not metrics_paths:
+        raise ValueError("At least one metrics file is required")
+    plt = _import_matplotlib()
+
+    resolved_paths = [Path(path) for path in metrics_paths]
+    if labels is None:
+        labels = [_label_from_path(path) for path in resolved_paths]
+    if len(labels) != len(resolved_paths):
+        raise ValueError("labels length must match metrics_paths length")
+
+    rows = []
+    for path in resolved_paths:
+        payload = load_json(path)
+        semantic_metrics = payload.get("semantic_metrics")
+        if not semantic_metrics:
+            raise ValueError(f"Missing semantic_metrics in {path}")
+        rows.append(semantic_metrics)
+
+    fig, axes = plt.subplots(1, len(CORE_SECURITY_METRIC_PANELS), figsize=(14.5, 4.8))
+    axes = np.asarray(axes).reshape(-1)
+    x = np.arange(len(labels))
+
+    for axis, (metric_key, title, color) in zip(axes, CORE_SECURITY_METRIC_PANELS):
+        values = [row[metric_key] for row in rows]
+        bars = axis.bar(x, values, color=color, alpha=0.92)
+        best_idx = int(np.argmin(values))
+        bars[best_idx].set_edgecolor("black")
+        bars[best_idx].set_linewidth(1.4)
+        axis.set_title(title)
+        axis.set_xticks(x)
+        axis.set_xticklabels(labels, rotation=20, ha="right")
+        axis.grid(True, axis="y", alpha=0.22)
+        _style_bar_annotations(axis, values)
+        axis.set_ylabel("Lower is better")
+
+    fig.suptitle("Core Cyber Security Outcomes", fontsize=16, y=0.98)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+
+    if output_path is None:
+        output_path = Path("cmorl_minicage/outputs/plots/core_security_comparison.png")
+    output_path = Path(output_path)
+    ensure_dir(output_path.parent)
+    fig.savefig(output_path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    return output_path
+
+
+def _compact_method_style(label: str, default_marker: str) -> dict:
+    lowered = label.lower()
+    if "stage-1" in lowered or "stage1" in lowered:
+        return {
+            "marker": "o",
+            "size": 105,
+            "alpha": 0.38,
+            "edgecolor": "#1f4e79",
+            "linewidth": 1.2,
+            "zorder": 2,
+            "centroid_color": "#1f4e79",
+        }
+    if "stage-2" in lowered or "stage2" in lowered:
+        return {
+            "marker": "^",
+            "size": 165,
+            "alpha": 0.98,
+            "edgecolor": "#111111",
+            "linewidth": 1.15,
+            "zorder": 4,
+            "centroid_color": "#b22222",
+        }
+    if "weighted" in lowered:
+        return {
+            "marker": "s",
+            "size": 120,
+            "alpha": 0.75,
+            "edgecolor": "#4a4a4a",
+            "linewidth": 0.9,
+            "zorder": 3,
+            "centroid_color": "#4a4a4a",
+        }
+    return {
+        "marker": default_marker,
+        "size": 100,
+        "alpha": 0.86,
+        "edgecolor": "white",
+        "linewidth": 0.45,
+        "zorder": 3,
+        "centroid_color": "#666666",
+    }
+
+
+def plot_compact_objective_map(
+    buffer_paths: Sequence[str | Path],
+    labels: Sequence[str] | None = None,
+    output_path: str | Path | None = None,
+) -> Path:
+    if not buffer_paths:
+        raise ValueError("At least one solution_buffer.json path is required")
+    plt = _import_matplotlib()
+
+    resolved_paths = [Path(path) for path in buffer_paths]
+    if labels is None:
+        labels = [_label_from_path(path) for path in resolved_paths]
+    if len(labels) != len(resolved_paths):
+        raise ValueError("labels length must match buffer_paths length")
+
+    payloads = [load_json(path) for path in resolved_paths]
+    pareto_sets = [payload.get("pareto_front", []) for payload in payloads]
+    if any(not pareto for pareto in pareto_sets):
+        raise ValueError("Every buffer_path must contain a non-empty pareto_front")
+
+    all_points = np.vstack([_objective_array(records) for records in pareto_sets])
+    mins = np.min(all_points, axis=0)
+    maxs = np.max(all_points, axis=0)
+    ranges = np.maximum(maxs - mins, 1e-6)
+
+    fig, axis = plt.subplots(figsize=(10.4, 7.8))
+    fig.patch.set_facecolor("#f7f8fb")
+    axis.set_facecolor("#fbfcfe")
+    background = np.linspace(0.0, 1.0, 256)
+    background = np.outer(np.ones(256), background)
+    axis.imshow(
+        background,
+        extent=(0.0, 1.0, 0.0, 1.0),
+        origin="lower",
+        cmap="Greys",
+        alpha=0.06,
+        zorder=0,
+        aspect="auto",
+    )
+    last_scatter = None
+    legend_handles = []
+
+    for idx, (label, records) in enumerate(zip(labels, pareto_sets)):
+        points = _objective_array(records)
+        norm_points = (points - mins) / ranges
+        style = _compact_method_style(label, COMPACT_MARKERS[idx % len(COMPACT_MARKERS)])
+        order = np.argsort(norm_points[:, 0])
+        axis.plot(
+            norm_points[order, 0],
+            norm_points[order, 1],
+            color=style["centroid_color"],
+            linewidth=1.25,
+            alpha=0.28,
+            zorder=max(style["zorder"] - 1, 1),
+        )
+        last_scatter = axis.scatter(
+            norm_points[:, 0],
+            norm_points[:, 1],
+            c=norm_points[:, 2],
+            cmap="viridis",
+            vmin=0.0,
+            vmax=1.0,
+            marker=style["marker"],
+            s=style["size"],
+            alpha=style["alpha"],
+            edgecolor=style["edgecolor"],
+            linewidth=style["linewidth"],
+            zorder=style["zorder"],
+            label=label,
+        )
+        legend_handles.append(
+            plt.Line2D(
+                [0],
+                [0],
+                marker=style["marker"],
+                color="none",
+                markerfacecolor="white",
+                markeredgecolor="#4b5563",
+                markeredgewidth=max(float(style["linewidth"]) * 0.8, 0.6),
+                markersize=7,
+                linestyle="None",
+                label=label,
+            )
+        )
+
+    axis.set_xlabel(f"Normalized {_objective_label(0)}")
+    axis.set_ylabel(f"Normalized {_objective_label(1)}")
+    axis.set_title("Pareto Front Comparison in Normalized Objective Space", fontsize=14, pad=12)
+    axis.grid(True, alpha=0.18, color="#94a3b8", linestyle="--", linewidth=0.8)
+    axis.set_xlim(-0.03, 1.03)
+    axis.set_ylim(-0.03, 1.03)
+    axis.set_xticks(np.linspace(0.0, 1.0, 5))
+    axis.set_yticks(np.linspace(0.0, 1.0, 5))
+    for spine in axis.spines.values():
+        spine.set_color("#cbd5e1")
+        spine.set_linewidth(1.0)
+
+    if last_scatter is not None:
+        colorbar = fig.colorbar(last_scatter, ax=axis, pad=0.025, shrink=0.94)
+        colorbar.set_label(f"Normalized {_objective_label(2)}")
+        colorbar.outline.set_edgecolor("#cbd5e1")
+        colorbar.outline.set_linewidth(0.8)
+
+    legend = axis.legend(
+        handles=legend_handles,
+        frameon=True,
+        fancybox=True,
+        framealpha=0.9,
+        loc="lower right",
+    )
+    legend.get_frame().set_edgecolor("#d8dee9")
+    legend.get_frame().set_facecolor("white")
+    fig.tight_layout()
+
+    if output_path is None:
+        output_path = Path("cmorl_minicage/outputs/plots/compact_objective_map.png")
+    output_path = Path(output_path)
+    ensure_dir(output_path.parent)
+    fig.savefig(output_path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    return output_path
+
+
+def plot_objective_3d_comparison(
+    buffer_paths: Sequence[str | Path],
+    labels: Sequence[str] | None = None,
+    output_path: str | Path | None = None,
+) -> Path:
+    if not buffer_paths:
+        raise ValueError("At least one solution_buffer.json path is required")
+    plt = _import_matplotlib()
+
+    resolved_paths = [Path(path) for path in buffer_paths]
+    if labels is None:
+        labels = [_label_from_path(path) for path in resolved_paths]
+    if len(labels) != len(resolved_paths):
+        raise ValueError("labels length must match buffer_paths length")
+
+    payloads = [load_json(path) for path in resolved_paths]
+    pareto_sets = [payload.get("pareto_front", []) for payload in payloads]
+    if any(not pareto for pareto in pareto_sets):
+        raise ValueError("Every buffer_path must contain a non-empty pareto_front")
+
+    all_points = np.vstack([_objective_array(records) for records in pareto_sets])
+    mins = np.min(all_points, axis=0)
+    maxs = np.max(all_points, axis=0)
+    ranges = np.maximum(maxs - mins, 1e-6)
+    paper_colors = ["#4C78A8", "#F58518", "#54A24B", "#E45756", "#B279A2", "#9D755D"]
+
+    fig = plt.figure(figsize=(10.6, 8.0))
+    axis = fig.add_subplot(111, projection="3d")
+    fig.patch.set_facecolor("white")
+    try:
+        axis.xaxis.pane.set_facecolor((1.0, 1.0, 1.0, 1.0))
+        axis.yaxis.pane.set_facecolor((1.0, 1.0, 1.0, 1.0))
+        axis.zaxis.pane.set_facecolor((1.0, 1.0, 1.0, 1.0))
+        axis.xaxis.pane.set_edgecolor("#d1d5db")
+        axis.yaxis.pane.set_edgecolor("#d1d5db")
+        axis.zaxis.pane.set_edgecolor("#d1d5db")
+    except Exception:
+        pass
+    legend_handles = []
+
+    for idx, (label, records) in enumerate(zip(labels, pareto_sets)):
+        points = _objective_array(records)
+        norm_points = (points - mins) / ranges
+        style = _compact_method_style(label, COMPACT_MARKERS[idx % len(COMPACT_MARKERS)])
+        color = paper_colors[idx % len(paper_colors)]
+
+        axis.scatter(
+            norm_points[:, 0],
+            norm_points[:, 1],
+            norm_points[:, 2],
+            marker="o",
+            s=110,
+            alpha=0.96,
+            color=color,
+            edgecolor="white",
+            linewidth=0.7,
+            depthshade=True,
+            label=label,
+            zorder=3 + idx,
+        )
+
+        legend_handles.append(
+            plt.Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="none",
+                markerfacecolor=color,
+                markeredgecolor="white",
+                markeredgewidth=0.7,
+                markersize=8,
+                linestyle="None",
+                label=label,
+            )
+        )
+
+    axis.set_xlabel(f"Normalized {_objective_label(0)}", labelpad=10)
+    axis.set_ylabel(f"Normalized {_objective_label(1)}", labelpad=10)
+    axis.set_zlabel(f"Normalized {_objective_label(2)}", labelpad=8)
+    axis.set_title("Three-Dimensional Pareto Front Comparison", pad=12, fontsize=14)
+    axis.view_init(elev=20, azim=38)
+    axis.set_xlim(-0.03, 1.03)
+    axis.set_ylim(-0.03, 1.03)
+    axis.set_zlim(-0.03, 1.03)
+    axis.set_xticks(np.linspace(0.0, 1.0, 5))
+    axis.set_yticks(np.linspace(0.0, 1.0, 5))
+    axis.set_zticks(np.linspace(0.0, 1.0, 5))
+    axis.grid(True, alpha=0.14, color="#cbd5e1")
+    legend = axis.legend(handles=legend_handles, frameon=True, loc="upper left")
+    legend.get_frame().set_facecolor("white")
+    legend.get_frame().set_edgecolor("#d1d5db")
+    legend.get_frame().set_alpha(0.96)
+    fig.tight_layout()
+
+    if output_path is None:
+        output_path = Path("cmorl_minicage/outputs/plots/objective_3d_comparison.png")
+    output_path = Path(output_path)
+    ensure_dir(output_path.parent)
+    fig.savefig(output_path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    return output_path
+
+
+def plot_pairwise_objective_panels(
+    buffer_paths: Sequence[str | Path],
+    labels: Sequence[str] | None = None,
+    output_path: str | Path | None = None,
+) -> Path:
+    if not buffer_paths:
+        raise ValueError("At least one solution_buffer.json path is required")
+    plt = _import_matplotlib()
+
+    resolved_paths = [Path(path) for path in buffer_paths]
+    if labels is None:
+        labels = [_label_from_path(path) for path in resolved_paths]
+    if len(labels) != len(resolved_paths):
+        raise ValueError("labels length must match buffer_paths length")
+
+    payloads = [load_json(path) for path in resolved_paths]
+    pareto_sets = [payload.get("pareto_front", []) for payload in payloads]
+    if any(not pareto for pareto in pareto_sets):
+        raise ValueError("Every buffer_path must contain a non-empty pareto_front")
+
+    all_points = np.vstack([_objective_array(records) for records in pareto_sets])
+    mins = np.min(all_points, axis=0)
+    maxs = np.max(all_points, axis=0)
+    spans = np.maximum(maxs - mins, 1e-6)
+    margins = 0.06 * spans
+    paper_colors = ["#4C78A8", "#F58518", "#54A24B", "#E45756", "#B279A2", "#9D755D"]
+
+    pairs = [(0, 1), (0, 2), (1, 2)]
+    fig, axes = plt.subplots(1, len(pairs), figsize=(17.8, 5.4))
+    fig.patch.set_facecolor("white")
+
+    legend_handles = []
+    for method_idx, (label, pareto_records) in enumerate(zip(labels, pareto_sets)):
+        pareto_points = _objective_array(pareto_records)
+        color = paper_colors[method_idx % len(paper_colors)]
+        style = _compact_method_style(label, "o")
+        legend_handles.append(
+            plt.Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="none",
+                markerfacecolor=color,
+                markeredgecolor="#222222",
+                markeredgewidth=0.9,
+                markersize=9,
+                linestyle="None",
+                label=label,
+            )
+        )
+        for axis, (x_idx, y_idx) in zip(axes, pairs):
+            axis.scatter(
+                pareto_points[:, x_idx],
+                pareto_points[:, y_idx],
+                s=max(style["size"] * 1.02, 118),
+                color=color,
+                alpha=0.95,
+                edgecolor="#222222",
+                linewidth=1.0,
+                marker="o",
+                zorder=4 + method_idx,
+            )
+
+    for axis, (x_idx, y_idx) in zip(axes, pairs):
+        axis.set_title(f"{_objective_label(x_idx)} vs {_objective_label(y_idx)}", fontsize=14, pad=8)
+        axis.set_xlabel(f"{_objective_label(x_idx)} Return")
+        axis.set_ylabel(f"{_objective_label(y_idx)} Return")
+        axis.set_xlim(mins[x_idx] - margins[x_idx], maxs[x_idx] + margins[x_idx])
+        axis.set_ylim(mins[y_idx] - margins[y_idx], maxs[y_idx] + margins[y_idx])
+        axis.grid(True, alpha=0.22, color="#d1d5db", linestyle="-", linewidth=0.9)
+        axis.set_facecolor("#fafafa")
+        for spine in axis.spines.values():
+            spine.set_color("#444444")
+            spine.set_linewidth(1.0)
+
+    fig.suptitle("Pareto Scatter Overview", fontsize=22, y=0.975)
+    legend = axes[0].legend(
+        handles=legend_handles,
+        loc="lower right",
+        frameon=True,
+        fancybox=True,
+        framealpha=0.96,
+        borderpad=0.6,
+        labelspacing=0.35,
+        handletextpad=0.6,
+    )
+    legend.get_frame().set_facecolor("white")
+    legend.get_frame().set_edgecolor("#d1d5db")
+    fig.subplots_adjust(left=0.055, right=0.99, top=0.84, bottom=0.11, wspace=0.16)
+
+    if output_path is None:
+        output_path = Path("cmorl_minicage/outputs/plots/pairwise_objective_panels.png")
+    output_path = Path(output_path)
+    ensure_dir(output_path.parent)
+    fig.savefig(output_path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    return output_path
+
+
 def _latest_run_dir(experiment_dir: Path) -> Path:
     runs = sorted(
         [path for path in experiment_dir.iterdir() if path.is_dir() and path.name.startswith("run_")],
@@ -549,6 +1049,45 @@ def main() -> None:
     compare_parser.add_argument("--labels", nargs="*", default=None)
     compare_parser.add_argument("--output-path", default=None)
 
+    semantic_parser = subparsers.add_parser(
+        "compare-semantics", help="Plot semantic metric comparison across multiple metrics files."
+    )
+    semantic_parser.add_argument("--metrics", nargs="+", required=True)
+    semantic_parser.add_argument("--labels", nargs="*", default=None)
+    semantic_parser.add_argument("--output-path", default=None)
+
+    core_security_parser = subparsers.add_parser(
+        "compare-core-security",
+        help="Plot only Final Compromised Hosts, Final Critical Compromised, and Critical Impact Count.",
+    )
+    core_security_parser.add_argument("--metrics", nargs="+", required=True)
+    core_security_parser.add_argument("--labels", nargs="*", default=None)
+    core_security_parser.add_argument("--output-path", default=None)
+
+    compact_parser = subparsers.add_parser(
+        "compare-compact-objectives",
+        help="Plot Security/Business as 2D scatter and encode Cost as color using solution buffers.",
+    )
+    compact_parser.add_argument("--buffers", nargs="+", required=True)
+    compact_parser.add_argument("--labels", nargs="*", default=None)
+    compact_parser.add_argument("--output-path", default=None)
+
+    objective_3d_parser = subparsers.add_parser(
+        "compare-3d-objectives",
+        help="Plot normalized 3D Pareto scatter across multiple solution buffers.",
+    )
+    objective_3d_parser.add_argument("--buffers", nargs="+", required=True)
+    objective_3d_parser.add_argument("--labels", nargs="*", default=None)
+    objective_3d_parser.add_argument("--output-path", default=None)
+
+    pairwise_parser = subparsers.add_parser(
+        "compare-pairwise-objectives",
+        help="Plot three pairwise objective panels across multiple solution buffers.",
+    )
+    pairwise_parser.add_argument("--buffers", nargs="+", required=True)
+    pairwise_parser.add_argument("--labels", nargs="*", default=None)
+    pairwise_parser.add_argument("--output-path", default=None)
+
     ablation_parser = subparsers.add_parser(
         "all-ablation", help="Generate a paper-style summary figure for all ablation experiments."
     )
@@ -565,6 +1104,31 @@ def main() -> None:
 
     if args.command == "compare":
         output_path = plot_metrics_comparison(args.metrics, args.labels, args.output_path)
+        print(output_path)
+        return
+
+    if args.command == "compare-semantics":
+        output_path = plot_semantic_comparison(args.metrics, args.labels, args.output_path)
+        print(output_path)
+        return
+
+    if args.command == "compare-core-security":
+        output_path = plot_core_security_comparison(args.metrics, args.labels, args.output_path)
+        print(output_path)
+        return
+
+    if args.command == "compare-compact-objectives":
+        output_path = plot_compact_objective_map(args.buffers, args.labels, args.output_path)
+        print(output_path)
+        return
+
+    if args.command == "compare-3d-objectives":
+        output_path = plot_objective_3d_comparison(args.buffers, args.labels, args.output_path)
+        print(output_path)
+        return
+
+    if args.command == "compare-pairwise-objectives":
+        output_path = plot_pairwise_objective_panels(args.buffers, args.labels, args.output_path)
         print(output_path)
         return
 

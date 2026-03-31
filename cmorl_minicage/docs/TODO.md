@@ -18,7 +18,8 @@
 - `Done` 已确定文档落点为 `CybORG_plus_plus/cmorl_minicage/docs/`。
 - `Done` 已初始化 `PAPER_MAPPING.md`、`TODO.md`、`NOTES.md`。
 - `Done` 已完成 `cmorl_minicage` 首版代码骨架，包括环境包装、模型、storage、Stage-1、Stage-2、selection、IPO、assignment、evaluation。
-- `Done` 已完成 reward decomposition 与 MiniCAGE 标量奖励严格对账，并修复了 probe 过程对 `numpy` 随机状态的扰动问题。
+- `Done` 已完成旧版 reward decomposition 与 MiniCAGE 标量奖励严格对账，并修复了 probe 过程对 `numpy` 随机状态的扰动问题。
+- `Done` 已将环境奖励口径切换为 `security / business / cost`，并采用方案 A 保留 MORL 总回报与 MiniCAGE 原始标量 reward 的双口径记录。
 - `Done` 已统一 Stage-1 / Stage-2 的 buffer schema 与 metadata，当前版本为 `schema_version 0.3.0`。
 - `Done` 已跑通最小 `stage1 -> stage2 -> evaluate` smoke test。
 - `Done` 已将训练与评估入口收敛为 YAML 配置文件驱动，并补齐 `cmorl_minicage/configs/stage1.yaml`、`stage2.yaml`、`evaluate.yaml`。

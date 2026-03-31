@@ -51,9 +51,30 @@
 
 当前实验现状可以概括为：
 
-- Stage-1 已经能在 MiniCAGE 上产生有 trade-off 结构的 Pareto front
-- Stage-2 的约束扩展链路已经打通，但在当前超参数下仍然偏严格，常出现 feasibility gate 过早截断的情况
-- evaluation 链路已经稳定可用，并支持新的 HV / EU / SP 评估输出
+- 已经完成 `formal_c2` 主线重跑，并保留当前正式 `Stage-1 / Stage-2` 结果
+- 已经完成 5 个 baseline 的正式重跑：
+  - `sleep`
+  - `random-valid`
+  - `stage1-only`
+  - `single-objective`
+  - `weighted-sum`
+- 已经完成统一 reference point 下的公平评估与成套图像输出
+- 当前 formal `Stage-2` 在统一评估口径下优于 `Stage-1` 和当前保留 baseline
+
+当前正式主结果可以概括为：
+
+- `Stage-1`
+  - `HV = 362094.86`
+  - `EU = -170.55`
+  - `Pareto Count = 4`
+- `Stage-2`
+  - `HV = 601513.12`
+  - `EU = -114.70`
+  - `Pareto Count = 6`
+- 6 方法 suite 公平比较中，`Stage-2` 仍为最优：
+  - `HV = 1699877.00`
+  - `EU = -114.69`
+  - `Pareto Count = 6`
 
 ## 论文算法流程 vs 当前代码流程
 
@@ -228,6 +249,20 @@ conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/confi
 
 - `cmorl_minicage/configs/formal/`
 - `cmorl_minicage/configs/ablation/`
+
+当前正式主线默认建议直接使用：
+
+```bash
+conda run -n cc4 python -m cmorl_minicage.train_stage1 --config cmorl_minicage/configs/formal/stage1_c2.yaml
+conda run -n cc4 python -m cmorl_minicage.train_stage2 --config cmorl_minicage/configs/formal/stage2_c2.yaml --stage1-buffer <stage1_solution_buffer>
+conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/configs/formal/evaluate.yaml --buffer-path <solution_buffer>
+```
+
+如果想直接做 baseline，对应入口是：
+
+```bash
+conda run -n cc4 python -m cmorl_minicage.baselines weighted-sum --stage1-config cmorl_minicage/configs/formal/stage1_c2.yaml --evaluate-config cmorl_minicage/configs/formal/evaluate.yaml --output-dir cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum
+```
 
 ## 输出与实验记录
 

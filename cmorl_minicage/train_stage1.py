@@ -86,15 +86,25 @@ def train_stage1(config: Stage1Config) -> Path:
         seed=config.env.seed,
     )
 
-    preferences = sample_preferences(
-        num_policies=config.num_policies,
-        dimensions=env.obj_dim,
-        strategy=config.preference_strategy,
-        seed=config.seed,
-        step=config.preference_step,
-        dirichlet_alpha=config.preference_dirichlet_alpha,
-    )
+    if config.explicit_preferences:
+        preferences = [
+            list(map(float, preference)) for preference in config.explicit_preferences
+        ]
+        if any(len(preference) != env.obj_dim for preference in preferences):
+            raise ValueError(
+                f"All explicit_preferences must have length {env.obj_dim}"
+            )
+    else:
+        preferences = sample_preferences(
+            num_policies=config.num_policies,
+            dimensions=env.obj_dim,
+            strategy=config.preference_strategy,
+            seed=config.seed,
+            step=config.preference_step,
+            dirichlet_alpha=config.preference_dirichlet_alpha,
+        )
 
+    num_policies = len(preferences)
     ppo_config = PPOConfig()
     records: list[dict] = []
     policy_id_counter = 0
@@ -206,15 +216,16 @@ def train_stage1(config: Stage1Config) -> Path:
             eval_config=config.eval,
             extra={
                 "seed": config.seed,
-                "num_policies": config.num_policies,
+                "num_policies": num_policies,
                 "preference_strategy": config.preference_strategy,
                 "preference_step": config.preference_step,
                 "preference_dirichlet_alpha": config.preference_dirichlet_alpha,
+                "explicit_preferences": config.explicit_preferences,
                 "preferences": preferences,
                 "total_timesteps": config.total_timesteps,
                 "timesteps_per_policy": int(num_updates * config.rollout.num_steps * config.env.num_envs),
                 "total_stage_timesteps": int(
-                    config.num_policies * num_updates * config.rollout.num_steps * config.env.num_envs
+                    num_policies * num_updates * config.rollout.num_steps * config.env.num_envs
                 ),
                 "stage1_summary": stage1_summary,
             },

@@ -29,22 +29,32 @@
   - 会显著增加环境搭建和实验组织成本。
   - 与当前仓库已有资产复用度较低。
 
-## D-003 把 MiniCAGE 标量 reward 严格拆成 3 目标 reward vector
+## D-003 采用 `security / business / cost` 三目标，并选择方案 A 保留双口径
 
-- 决策：通过 [env.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/env.py) 将 MiniCAGE 的单一 reward 分解为：
-  - `threat_containment`
-  - `business_critical_loss`
-  - `defense_cost`
+- 决策：通过 [env.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/env.py) 将环境目标明确重构为：
+  - `security`
+  - `business`
+  - `cost`
 - 原因：
-  - 必须把任务明确变成 MORL 形式，才能迁移论文算法。
-  - 三目标划分贴近当前网络安全场景中的防御收益、业务损失和操作代价。
-  - 当前实现已经加入严格对账，保证三目标和原始标量 reward 一致。
+  - 当前项目想表达的三目标语义，不再是“两个安全损失 + 一个动作成本”，而是更清楚地区分：
+    - 安全风险与修复收益
+    - 防御动作造成的业务扰动
+    - 防御动作自身的操作成本
+  - 旧定义里 `threat_containment` 和 `business_critical_loss` 本质上都属于安全面，缺少独立的 business 目标。
+  - 方案 A 允许我们引入新的 `business` 维度，同时把 MiniCAGE 原始标量 reward 作为对照信息保留，避免把两套口径混在一起。
+- 采用的数学口径：
+  - `security = final_state_security_risk + repair_bonus`
+  - `business = action_disturbance_weight * host_priority_multiplier`
+  - `cost = action_operation_cost`
+- 额外约定：
+  - `reward_vec.sum()` 作为 MORL 内部总回报
+  - `mini_cage_scalar_reward` 单独保存在 `info["reward_terms"]`
 - 备选方案：
-  - 只做二目标拆分。
-  - 直接人为重写 reward，而不对账原标量 reward。
+  - 保持旧的三目标定义不变，只在文档层重命名。
+  - 继续要求三目标严格对账 MiniCAGE 原始标量 reward。
 - 未选原因：
-  - 二目标表达不够丰富。
-  - 不对账会让实验解释失去可靠性。
+  - 只改命名会造成语义与真实优化目标不一致。
+  - 严格对账会限制 `business` 的单独建模空间，不利于表达当前任务重点。
 
 ## D-004 保持默认配置入口稳定，新增分层模板目录
 
@@ -144,6 +154,93 @@
 - 备选方案：只保留数值表和 JSON。
 - 未选原因：
   - 很难快速理解 front 形状和 assignment 结构。
+
+## D-013 把 baseline 套餐纳入主线，而不是只保留 Stage-1 / Stage-2 主方法
+
+- 决策：把以下 baseline 作为当前正式对照组固定下来：
+  - `sleep`
+  - `random-valid`
+  - `stage1-only`
+  - `single-objective`
+  - `weighted-sum`
+- 原因：
+  - 当前项目已经进入“解释主方法是否真正优于合理 baseline”的阶段。
+  - 仅有 Stage-1 / Stage-2 自我对照，不足以支持正式结论。
+  - `weighted-sum` 已经成为当前新三目标下的强 baseline，必须进入主结果视野。
+- 备选方案：继续只保留 Stage-1 / Stage-2 和旧 ablation。
+- 未选原因：
+  - 会让结论停留在“方法内部有效”，而不是“相对强基线是否有效”。
+
+## D-014 把 8 个网络安全语义指标纳入正式评估
+
+- 决策：在 [evaluate.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/evaluate.py) 中固定输出以下语义指标：
+  - `final_compromised_hosts`
+  - `final_critical_compromised_hosts`
+  - `critical_impact_count`
+  - `recovered_hosts`
+  - `analyse_count`
+  - `remove_count`
+  - `restore_count`
+  - `high_disruption_action_rate`
+- 原因：
+  - 仅用 `HV / EU / SP` 难以解释网络安全含义。
+  - 当前项目已经明确转向 `security / business / cost` 语义，需要更贴近安全结果的解释层。
+  - 可以更直观看出策略是“稳健守住了关键资产”，还是“高扰动地反复救火”。
+- 备选方案：只保留 MORL 指标，不引入额外语义评估。
+- 未选原因：
+  - 很难向安全语义解释实验结果。
+  - 不利于发现当前 reward 设计中的偏差，如 `sleep` 在统一 HV 下异常占优。
+
+## D-015 采用 `C2 / cand_g` 作为当前默认正式 reward 口径
+
+- 决策：把当前 reward 默认值固定为 `C2 / cand_g` 校准版本。
+- 原因：
+  - 该版本已经同时满足：
+    - `sleep` 不再在公平 `HV / EU` 上占优
+    - `weighted-sum` 仍保留 `Pareto >= 2` 的结构
+  - 在此口径下，formal `Stage-2` 已能稳定优于 `Stage-1` 与当前保留 baseline。
+- 备选方案：
+  - 保留更早的 `B1 / B2 / B2-lite / B2-mid` 版本。
+- 未选原因：
+  - `B1` 只能削弱 `sleep`，无法真正扭转其异常优势。
+  - `B2` 会把前沿压得过紧，导致 baseline 结构塌缩。
+  - `B2-lite / B2-mid` 则没法同时满足“压住 sleep”和“保留 baseline 结构”。
+
+## D-016 把 5-baseline suite 固定为当前正式对照组
+
+- 决策：在当前 formal 主线之外，固定保留以下 5 个 baseline 的重跑结果与统一评估结果：
+  - `sleep`
+  - `random-valid`
+  - `stage1-only`
+  - `single-objective`
+  - `weighted-sum`
+- 原因：
+  - 这 5 个 baseline 已覆盖：
+    - 弱下界
+    - 随机策略
+    - 主方法内部对照
+    - 极端单目标策略
+    - 学习型强 baseline
+  - 组合起来足以支撑当前正式主结果结论。
+- 备选方案：
+  - 只保留 `sleep` 和 `weighted-sum`
+  - 或保留更大批的历史 baseline / ablation 输出
+- 未选原因：
+  - 只保留两个 baseline 解释力不足。
+  - 保留过多历史输出会让当前正式结论变得不清晰。
+
+## D-017 把图像输出分成“主线图”和“suite 图”两层
+
+- 决策：当前可视化固定分为两层：
+  - 主线图：`Stage-1 / Stage-2 / Weighted-Sum`
+  - suite 图：`Stage-2 + 5 baselines`
+- 原因：
+  - 主线图更适合解释论文方法自身前后变化。
+  - suite 图更适合做正式 baseline 套餐对照。
+  - 两层图各自信息密度更合理，不会把一张图塞得过满。
+- 备选方案：只保留一种总图。
+- 未选原因：
+  - 单图难以同时兼顾论文主线解释和 baseline 套餐比较。
 
 ## D-012 README 只提供高层入口，细节下沉到 `docs/`
 
