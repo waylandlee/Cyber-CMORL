@@ -517,7 +517,113 @@
   - [formal Stage-2 run_46e57616](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616)
   - 统一评估结果：
     - [sleep metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/sleep/run_162d138e/metrics_compare_suite.json)
-    - [random_valid metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/random_valid/run_c52c29c6/metrics_compare_suite.json)
+  - [random_valid metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/random_valid/run_c52c29c6/metrics_compare_suite.json)
+
+### 2026-04-01 / P6-Formal-C2-Independent-Protocol
+
+- 实验 ID：
+  - `run_39a19d00` independent `Stage-1`
+  - `run_0a44c361` independent `Stage-2`
+- 阶段：Independent Protocol Branch / Formal Re-run
+- 目标：
+  - 在 `Stage-1` 启用 `independent_env_per_preference = true` 与 `reseed_mode = per_preference`，建立一条与当前 `legacy formal_c2` 平行的新协议分支。
+  - 验证去除串行随机耦合后，`Stage-1 -> Stage-2 -> evaluate` 是否仍然成立。
+  - 在统一参考点下，把这条新协议主线与当前 formal `Weighted-Sum` 做公平比较。
+- 配置文件：
+  - [cmorl_minicage/configs/formal/stage1_c2_independent.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
+  - [cmorl_minicage/configs/formal/stage2_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2.yaml)
+  - [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/evaluate.yaml)
+- 输入与输出：
+  - `Stage-1` 输出：
+    - [run_39a19d00](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00)
+    - [solution_buffer.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/solution_buffer.json)
+    - [metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/metrics_compare_independent.json)
+  - `Stage-2` 输出：
+    - [run_0a44c361](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361)
+    - [solution_buffer.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/solution_buffer.json)
+    - [stage2_summary.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/stage2_summary.json)
+    - [metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/metrics_compare_independent.json)
+  - 统一参考点 baseline：
+    - [weighted_sum metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/metrics_compare_independent.json)
+  - 可视化：
+    - [formal_c2_independent_mainline_metrics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_mainline_metrics.png)
+    - [formal_c2_independent_mainline_semantics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_mainline_semantics.png)
+    - [formal_c2_independent_core_security.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_core_security.png)
+    - [formal_c2_independent_compact_objective_map.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_compact_objective_map.png)
+    - [formal_c2_independent_objective_3d_comparison.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_objective_3d_comparison.png)
+    - [formal_c2_independent_pairwise_objectives.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_pairwise_objectives.png)
+- 协议说明：
+  - `stage1_protocol_name = independent`
+  - `reseed_mode = per_preference`
+  - `independent_env_per_preference = true`
+  - `parallel_workers = 1`
+  - 每个 preference 使用独立 `preference_seed` 与独立 `env_seed`
+- 统一参考点：
+  - `[-629.5512, -55.7766, -45.1607]`
+- 关键指标：
+  - `Stage-1 Independent`
+    - `HV = 329240.44`
+    - `EU = -134.57`
+    - `Pareto Count = 3`
+    - `final_compromised_hosts = 1.454`
+    - `final_critical_compromised_hosts = 0.119`
+    - `critical_impact_count = 0.142`
+    - `high_disruption_action_rate = 0.227`
+  - `Stage-2 Independent`
+    - `HV = 371786.02`
+    - `EU = -121.66`
+    - `Pareto Count = 4`
+    - `final_compromised_hosts = 1.508`
+    - `final_critical_compromised_hosts = 0.165`
+    - `critical_impact_count = 0.226`
+    - `high_disruption_action_rate = 0.297`
+  - `Weighted-Sum`
+    - `HV = 67776.62`
+    - `EU = -189.66`
+    - `Pareto Count = 3`
+- 现象：
+  - 新协议下，`Stage-1` 的初始 Pareto front 从 `legacy formal_c2` 的 `4` 个点收缩为 `3` 个点，说明独立 reseed 与独立 env 去除了部分串行随机耦合带来的额外前沿厚度。
+  - 尽管初始 front 变薄，`Stage-2` 仍然能把前沿从 `3` 个点扩到 `4` 个点，并同时提升 `HV` 与 `EU`。
+  - 相对当前 `Weighted-Sum` baseline，这条独立协议主线仍然保持明显优势，说明去耦后的 `Stage-1 -> Stage-2` 链路并未失效。
+  - 但与 `legacy formal_c2` 不同，新协议下 `Stage-2` 的语义指标没有同步优于 `Stage-1`：其 `final_compromised_hosts`、`final_critical_compromised_hosts`、`critical_impact_count` 和 `high_disruption_action_rate` 都更高。
+- 机制解释：
+  - `Stage-1` 最终只保留了 3 个互补角色：
+    - [stage1_pref_003_ckpt_008](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/pareto_front_stage1.json) 更偏安全端；
+    - [stage1_pref_002_ckpt_015](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/pareto_front_stage1.json) 更偏 `cost` / 折中；
+    - [stage1_pref_005_ckpt_015](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/pareto_front_stage1.json) 更偏业务友好端。
+  - `Stage-2` 第 0 轮直接选中了这 3 个点作为父策略；第 1 轮继续围绕扩展后的 `4` 点局部修复前沿。
+  - 最终 front 中真正被 assignment 使用的 3 个点是：
+    - `stage2_ext_000_obj_1`
+    - `stage2_ext_006_obj_1`
+    - `stage2_ext_003_obj_0`
+  - 其中：
+    - `stage2_ext_006_obj_1` 是语义最好、相对平衡的点：
+      - `final_compromised_hosts = 1.275`
+      - `critical_impact_count = 0.125`
+      - `high_disruption_action_rate = 0.196`
+    - `stage2_ext_000_obj_1` 明显更激进：
+      - `restore_count = 29.05`
+      - `high_disruption_action_rate = 0.447`
+    - `stage2_ext_003_obj_0` 在 `business / cost` 上更友好，但安全后果最差：
+      - `final_compromised_hosts = 1.975`
+      - `critical_impact_count = 0.35`
+  - assignment 统计显示：
+    - `stage2_ext_000_obj_1` 被分配 `28` 次
+    - `stage2_ext_006_obj_1` 被分配 `27` 次
+    - `stage2_ext_003_obj_0` 被分配 `11` 次
+  - 因而当前 `Stage-2` 的平均语义表现被两个方向同时拉动：
+    - 一部分 preference 由更安全的 `stage2_ext_006_obj_1` 服务；
+    - 另一部分 preference 则落到高恢复、高扰动的 `stage2_ext_000_obj_1`，导致整体 `restore_count` 和 `high_disruption_action_rate` 上升。
+- 结论：
+  - `independent` 协议验证成功：去除 `Stage-1` 串行随机耦合后，主线仍然能形成有效初始 front，并继续被 `Stage-2` 扩展。
+  - 这轮结果说明 `Stage-2` 在新协议下主要改善了 Pareto 几何质量与 preference 服务能力，但没有自动带来更优的安全语义均值。
+  - 因此，新协议分支的下一步重点不应再是验证“Stage-2 能不能工作”，而应转向解释和控制其扩展方向，尤其是避免高恢复、高扰动策略在 assignment 中占比过高。
+- 下一步：
+  - 以这轮 `formal_c2_independent` 为新协议正式记录，保留与 `legacy formal_c2` 并行的两条主线。
+  - 继续推进 `AdaCS-DCS-CMORL` 升级，重点改善：
+    - Stage-2 的候选选择逻辑
+    - 约束强度的动态调度
+    - 使前沿扩展更多落向低风险、低扰动且仍具 utility 的区域
     - [stage1_only metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/stage1_only/metrics_compare_suite.json)
     - [single_objective metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/single_objective/run_cc1669d6/metrics_compare_suite.json)
     - [weighted_sum metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/metrics_compare_suite.json)
@@ -561,3 +667,171 @@
 - 结论：
   - 当前 `formal_c2` 主线的正式结论已经足够稳固：`Stage-2` 是现阶段最强方法，不只是“优于某一个 baseline”，而是优于整套 5-baseline suite。
   - 当前 `Stage-2` 最需要继续改进的方向，不再是“先证明自己能赢”，而是“把当前更强但偏稀的前沿进一步加密，并把 IPO 数值过程继续向论文靠拢”。
+
+### 2026-04-01 / P6-Formal-C2-Independent-Rerun
+
+- 实验 ID：
+  - `run_39a19d00` `formal Stage-1 independent`
+  - `run_0a44c361` `formal Stage-2 independent`
+  - `run_19ca174c` `weighted-sum` fair compare reuse
+- 阶段：Formal C2 Independent Mainline + Fair Evaluation Refresh
+- 目标：
+  - 用 [stage1_c2_independent.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2_independent.yaml) 重跑新的正式 `Stage-1`。
+  - 把新的 `Stage-1` buffer 接到 `Stage-2`，生成新的 independent 主线结果。
+  - 以 `Stage-1 / Stage-2 / Weighted-Sum` 的联合前沿重新计算统一参考点，刷新 independent 主线公平评估与图像。
+- 输出目录：
+  - [formal_c2_independent/stage1/run_39a19d00](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00)
+  - [formal_c2_independent/stage2/run_0a44c361](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361)
+  - 公平评估结果：
+    - [stage1 metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/metrics_compare_independent.json)
+    - [stage2 metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/metrics_compare_independent.json)
+    - [weighted_sum metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/metrics_compare_independent.json)
+- 训练摘要：
+  - `Stage-1` 共完成 `6` 个 preference，写出 `30` 条 records，最终 Pareto Count 为 `3`。
+  - `Stage-2` 在 `2` 个 extension rounds 中共生成 `7` 条新 policy，最终 records 数为 `37`，Pareto Count 提升到 `4`。
+- 统一参考点：
+  - `[-629.55121, -55.77656, -45.16069]`
+- 关键指标：
+  - `Stage-1`
+    - `HV = 329240.44`
+    - `EU = -134.57`
+    - `Pareto Count = 3`
+  - `Stage-2`
+    - `HV = 371786.02`
+    - `EU = -121.66`
+    - `Pareto Count = 4`
+  - `Weighted-Sum`
+    - `HV = 67776.62`
+    - `EU = -189.66`
+    - `Pareto Count = 3`
+- 图文件：
+  - [formal_c2_independent_mainline_metrics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_mainline_metrics.png)
+  - [formal_c2_independent_mainline_semantics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_mainline_semantics.png)
+  - [formal_c2_independent_core_security.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_core_security.png)
+  - [formal_c2_independent_compact_objective_map.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_compact_objective_map.png)
+  - [formal_c2_independent_objective_3d_comparison.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_objective_3d_comparison.png)
+  - [formal_c2_independent_pairwise_objectives.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_pairwise_objectives.png)
+- 现象：
+  - 新的 independent `Stage-2` 仍然稳定优于同轮 `Stage-1`，在 `HV / EU / Pareto Count` 三项核心指标上都继续领先。
+  - 在这轮 unified reference point 下，`Weighted-Sum` 明显落后于 independent `Stage-1 / Stage-2`，说明新的独立协议主线仍保留了明显的几何与 utility 优势。
+  - 这轮 `Stage-2` 的 front 仍然是“更外扩但不算特别满”的形态，Pareto Count 只从 `3` 提升到 `4`，说明 independent 协议带来的收益目前更多体现在质量提升而不是大规模补 front。
+  - 语义指标在这轮 compare refresh 中没有形成“所有维度都同步变好”的单调改善，说明当前 independent `Stage-2` 仍然值得继续做更细的语义稳定性检查。
+- 结论：
+  - `formal_c2_independent` 主线已经完成新一轮 `Stage-1 -> Stage-2 -> fair evaluate -> visualize` 闭环，当前可直接作为独立协议分支的最新正式结果。
+  - 下一步更适合做的是：继续围绕 independent `Stage-2` 的 IPO 数值行为与语义指标波动做定向排查，而不是再重复基础链路重跑。
+
+### 2026-04-01 / P7-Independent-E3-Stage1-Baseline
+
+- 实验 ID：
+  - `run_ea5423c5` `Stage-1 E3`
+- 阶段：Independent Protocol / Stage-1 Baseline Upgrade
+- 目标：
+  - 把 independent 协议下的 `Stage-1` 默认基线从 `6-policy dirichlet_extremes` 切到 `E3` explicit preference 设计。
+  - 验证更密的中间 preference 是否能在不增加前沿点数的情况下提升 front 质量。
+- 配置文件：
+  - [stage1_c2_independent.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
+- 输出目录：
+  - [run_ea5423c5](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_ea5423c5)
+- 关键指标：
+  - `HV = 333840.66`
+  - `EU = -128.39`
+  - `Pareto Count = 3`
+- 现象：
+  - `Pareto Count` 仍是 `3`，说明当前 independent 协议下的 Stage-1 仍容易收缩成粗粒度三角壳。
+  - 但 `HV / EU` 都优于先前 independent `Stage-1`，说明中间 preference 设计确实改善了 front 质量。
+- 结论：
+  - `E3` 更适合作为当前 independent `Stage-1` 的正式基线。
+  - 下一步应把 AdaCS-DCS 消融全部接到这条 `E3 Stage-1` 上，而不是继续沿用更弱的 6-policy 基线。
+
+### 2026-04-01 / P7-AdaCS-DCS-Initial-Formal
+
+- 实验 ID：
+  - `run_df327d5c` `adaptive + dynamic beta`
+- 阶段：AdaCS-DCS 正式首轮验证
+- 目标：
+  - 在新的 `E3 Stage-1` 基线上直接跑一版正式 `AdaCS-DCS Stage-2`。
+- 配置文件：
+  - [stage2_c2_adacs_dcs.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
+- 输入 buffer：
+  - [run_ea5423c5/solution_buffer.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_ea5423c5/solution_buffer.json)
+- 输出目录：
+  - [run_df327d5c](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent_adacs_dcs/stage2/run_df327d5c)
+- 关键指标：
+  - 与 `Stage-1 E3` 完全相同：
+    - `HV = 333840.66`
+    - `EU = -128.39`
+    - `Pareto Count = 3`
+- 现象：
+  - 两轮 `extension_rounds` 中 `generated = 0`
+  - `selection_mode = adaptive`
+  - `beta_schedule_mode = dynamic`
+  - 说明 AdaCS 和 DCS 的逻辑都进入了运行路径，但所有扩展都在 feasibility gate 前被截断
+- 结论：
+  - 首轮失败原因不在 AdaCS，而在 DCS 过严。
+  - 下一步应该只调 `dynamic beta` 区间，不应先否定 AdaCS 机制。
+
+### 2026-04-01 / P7-DCS-Gentle-Tuning
+
+- 实验 ID：
+  - `run_eb9ccfe5` `crowding_dcs_gentle`
+  - `run_c6fbdb3d` `adacs_dcs_gentle`
+  - `run_9fdb7d98` `crowding_dcs_verygentle`
+  - `run_60072400` `adacs_dcs_verygentle`
+- 阶段：AdaCS-DCS 调参与公平评估
+- 目标：
+  - 仅调 `dynamic beta` 区间，验证 DCS 是否能从“完全卡死”恢复为可行扩展。
+  - 在统一参考点下，与 `Stage-1 E3`、`fixed beta`、`Weighted-Sum` 公平比较。
+- 配置文件：
+  - [stage2_crowding_dcs_gentle.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_crowding_dcs_gentle.yaml)
+  - [stage2_adacs_dcs_gentle.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_adacs_dcs_gentle.yaml)
+  - [stage2_crowding_dcs_verygentle.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_crowding_dcs_verygentle.yaml)
+  - [stage2_adacs_dcs_verygentle.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_adacs_dcs_verygentle.yaml)
+- 关键机制结果：
+  - `crowding_dcs_gentle`: `generated = 7`, `pareto_after = 5`
+  - `adacs_dcs_gentle`: `generated = 7`, `pareto_after = 5`
+  - `crowding_dcs_verygentle`: `generated = 7`, `pareto_after = 5`
+  - `adacs_dcs_verygentle`: `generated = 8`, `pareto_after = 5`
+  - 动态 beta 实际落点：
+    - `gentle`: 约 `1.000 ~ 1.008`
+    - `verygentle`: 约 `1.004 ~ 1.010`
+- 统一参考点：
+  - `[-1943.3051, -60.5772, -50.7002]`
+- 公平评估结果：
+  - `Stage-1 E3`
+    - `HV = 2707020.25`
+    - `EU = -128.39`
+    - `Pareto Count = 3`
+  - `crowding + fixed beta`
+    - `HV = 2859955.50`
+    - `EU = -112.68`
+    - `Pareto Count = 5`
+  - `adacs + fixed beta`
+    - `HV = 2859955.50`
+    - `EU = -112.68`
+    - `Pareto Count = 5`
+  - `crowding_dcs_gentle`
+    - `HV = 2859955.50`
+    - `EU = -112.68`
+    - `Pareto Count = 5`
+  - `adacs_dcs_gentle`
+    - `HV = 2859955.50`
+    - `EU = -112.68`
+    - `Pareto Count = 5`
+  - `crowding_dcs_verygentle`
+    - `HV = 2859955.50`
+    - `EU = -112.68`
+    - `Pareto Count = 5`
+  - `adacs_dcs_verygentle`
+    - `HV = 2859955.50`
+    - `EU = -112.68`
+    - `Pareto Count = 5`
+  - `Weighted-Sum`
+    - `HV = 1269090.06`
+    - `EU = -189.66`
+    - `Pareto Count = 3`
+- 现象：
+  - 温和 DCS 已经完全恢复可行扩展，且几何结果追平 `fixed beta`。
+  - 当前 `AdaCS` 仍没有独立收益，因为在 `E3 Stage-1` 的 `3` 点前沿上，`keep_extremes=true` 时父策略集合与 `crowding` 路径相同。
+- 结论：
+  - 当前 DCS 的主要问题已经解决。
+  - 当前升级线的下一步瓶颈不再是 beta 调度，而是要先把 `Stage-1` 做成更厚的 candidate-rich front，再比较 `crowding` 与 `adaptive`。

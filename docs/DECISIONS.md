@@ -81,6 +81,32 @@
   - 候选池过小。
   - 不利于后续多样性分析。
 
+## D-005A Stage-1 先做独立 reseed / 独立 env，再做 preference 级并行
+
+- 决策：Stage-1 的升级按两步走：
+  - `S1`: 独立 reseed + 独立 env，保持串行
+  - `S2`: preference 级 process 并行
+- 原因：
+  - 先消除串行随机耦合，再把并行加速作为独立变量引入。
+  - 更容易判断前沿变化来自随机去耦还是来自执行模型变化。
+  - 对当前 `formal_c2` 主线解释破坏更小。
+- 备选方案：直接一步到位把 Stage-1 改成并行。
+- 未选原因：
+  - 会同时混入随机语义变化和执行模型变化，不利于后续论文比较。
+
+## D-005B Stage-1 使用稳定命名，而不是完成顺序命名
+
+- 决策：Stage-1 的 `policy_id` 和 checkpoint 文件名改为稳定命名：
+  - `policy_id = stage1_pref_{pref_idx}_ckpt_{update_idx}`
+  - `checkpoint = policy_pref_{pref_idx}_ckpt_{update_idx}.pt`
+- 原因：
+  - 为并行 worker 做准备。
+  - 避免不同执行顺序导致策略身份漂移。
+  - 便于下游 `evaluate.py`、`visualize.py`、`select_policy.py` 稳定引用。
+- 备选方案：继续使用全局递增的 `policy_000.pt` 风格。
+- 未选原因：
+  - 在并行或重排场景下不稳定，后续比较困难。
+
 ## D-006 Stage-2 当前采用 IPO 分支，不实现 CPO 分支
 
 - 决策：当前只实现 IPO-style constrained extension，不实现 CPO。
@@ -241,6 +267,41 @@
 - 备选方案：只保留一种总图。
 - 未选原因：
   - 单图难以同时兼顾论文主线解释和 baseline 套餐比较。
+
+## D-018 把 Stage-2 升级为可回退的 AdaCS-DCS-CMORL
+
+- 决策：在不删除旧 `crowding + fixed beta` 路径的前提下，把当前 Stage-2 升级为支持：
+  - `AdaCS` 自适应候选选择
+  - `DCS` 动态 beta 调度
+- 原因：
+  - 当前 independent 协议下，Stage-2 已表现出“几何有效但语义更激进”的倾向，需要更细的候选选择与约束调度。
+  - 选择模块和 beta 调度都是当前 `train_stage2.py` 的天然插拔点，适合原位升级。
+  - 保留旧模式有助于做回归测试和正式消融。
+- 采用方式：
+  - `selection.mode = crowding | adaptive`
+  - `ipo.beta_mode = fixed | dynamic`
+  - 新增 `method_diagnostics.json` 输出方法内部诊断
+- 备选方案：
+  - 继续只围绕 `beta / tolerance / timesteps` 做 Stage-2 调参
+  - 一次性改成更重的算法分支，例如重新实现更接近论文附录 F.2 的完整数值过程
+- 未选原因：
+  - 继续只调参不能解释也不能约束当前 Stage-2 的激进扩展点来源。
+  - 一次性重写整个 Stage-2 数值过程会把变量改得过多，不利于当前项目节奏。
+
+## D-019 把温和 DCS 视为当前可用的动态 beta 口径
+
+- 决策：当前 `dynamic beta` 不再默认采用最早的 `0.88~0.98` 试探区间，而是把围绕 `fixed beta≈1.005` 的温和区间视为可用口径：
+  - `gentle`: `1.000 ~ 1.010`
+  - `verygentle`: `1.004 ~ 1.012`
+- 原因：
+  - 原始 `0.88~0.98` 在当前 `independent + E3 Stage-1` 条件下会导致 `generated = 0`。
+  - 温和 DCS 已经恢复可行扩展，并把 `HV / EU / Pareto Count` 拉回到与 `fixed beta` 同水平。
+- 备选方案：
+  - 继续沿用原始低 beta 区间
+  - 直接放弃 DCS，只保留 `fixed beta`
+- 未选原因：
+  - 原始区间过严，实证上已经失效。
+  - 直接放弃 DCS 会让 AdaCS-DCS 升级线失去一半方法内容，也不利于后续继续改进动态调度。
 
 ## D-012 README 只提供高层入口，细节下沉到 `docs/`
 

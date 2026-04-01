@@ -23,10 +23,20 @@
 - MiniCAGE 的多目标环境包装
 - Stage-1 Pareto initialization
 - Stage-2 selection + IPO-style Pareto extension
+- AdaCS-DCS-CMORL 升级骨架
+  - `adaptive selection`
+  - `dynamic beta scheduling`
 - SMP assignment
 - HV / EU / SP evaluation
 - YAML 配置驱动训练与评估
 - 统一的 buffer / summary / metrics 输出格式
+
+当前 Stage-2 已支持四种模式：
+
+- `crowding + fixed beta`
+- `adaptive selection + fixed beta`
+- `crowding + dynamic beta`
+- `adaptive selection + dynamic beta`
 
 当前实现更适合被理解为：
 
@@ -49,19 +59,17 @@
   - `stage2_summary.json`
   - `metrics.json`
 
-当前实验现状可以概括为：
+当前实验现状建议分成两条线理解：
 
-- 已经完成 `formal_c2` 主线重跑，并保留当前正式 `Stage-1 / Stage-2` 结果
-- 已经完成 5 个 baseline 的正式重跑：
-  - `sleep`
-  - `random-valid`
-  - `stage1-only`
-  - `single-objective`
-  - `weighted-sum`
-- 已经完成统一 reference point 下的公平评估与成套图像输出
-- 当前 formal `Stage-2` 在统一评估口径下优于 `Stage-1` 和当前保留 baseline
+- `legacy formal_c2`
+  - 这是当前已经发布、图表与 baseline suite 最完整的一条正式结果线
+  - `Stage-2` 在统一评估口径下优于 `Stage-1` 和 5 个 baseline
+- `independent + AdaCS-DCS`
+  - 这是当前正在推进的升级线
+  - `Stage-1` 已切到 `independent` 协议，并把 `E3` explicit preference 设计固化为新基线
+  - `Stage-2` 已支持 `AdaCS-DCS-CMORL` 四种模式，并完成了初步消融与温和 DCS 调参
 
-当前正式主结果可以概括为：
+当前已发布的正式主结果仍以 `legacy formal_c2` 为准：
 
 - `Stage-1`
   - `HV = 362094.86`
@@ -75,6 +83,18 @@
   - `HV = 1699877.00`
   - `EU = -114.69`
   - `Pareto Count = 6`
+
+当前升级线的最新状态是：
+
+- `independent Stage-1` 在 `E3` 基线上目前稳定形成 `3` 点初始 Pareto front
+- 原始 `AdaCS + DCS(0.88~0.98)` 在 independent 协议下过严，曾导致 `generated = 0`
+- 把 DCS 调整到围绕 `beta≈1.005` 的温和区间后，`dynamic beta` 已恢复可行扩展：
+  - `crowding_dcs_gentle`
+  - `adacs_dcs_gentle`
+  - `crowding_dcs_verygentle`
+  - `adacs_dcs_verygentle`
+- 这些温和 DCS 结果在 `HV / EU / Pareto Count` 上已追平 `fixed beta`
+- 当前 `AdaCS` 还没有显出独立增益，主要原因是 `E3 Stage-1` 前沿太薄，`keep_extremes=true` 时父策略集合与 `crowding` 路径一致
 
 ## 论文算法流程 vs 当前代码流程
 
@@ -248,6 +268,15 @@ conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/confi
 如果要跑更正式的实验，可以切换到：
 
 - `cmorl_minicage/configs/formal/`
+
+如果要直接复现实验升级线，当前最值得看的配置是：
+
+- Stage-1 independent 基线：
+  - [stage1_c2_independent.yaml](./cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
+- AdaCS-DCS formal 配置：
+  - [stage2_c2_adacs_dcs.yaml](./cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
+- AdaCS-DCS ablation 配置：
+  - [cmorl_minicage/configs/ablation](./cmorl_minicage/configs/ablation)
 - `cmorl_minicage/configs/ablation/`
 
 当前正式主线默认建议直接使用：

@@ -44,9 +44,35 @@ class IPOHyperConfig:
     max_grad_norm: float = 0.5
     barrier_coef: float = 20.0
     beta: float = 0.9
+    beta_mode: str = "fixed"
+    beta_min: float = 0.88
+    beta_max: float = 0.98
+    schedule_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "crowding": 0.25,
+            "expansion": 0.35,
+            "low_risk": 0.20,
+            "progress": 0.20,
+        }
+    )
     gamma: float = 0.995
     gae_lambda: float = 0.95
     eps: float = 1e-8
+
+
+@dataclass
+class SelectionConfig:
+    mode: str = "crowding"
+    score_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "crowding": 0.30,
+            "expansion": 0.30,
+            "low_risk": 0.20,
+            "coverage": 0.20,
+        }
+    )
+    utility_tolerance: float = 0.02
+    keep_extremes: bool = True
 
 
 @dataclass
@@ -59,6 +85,14 @@ class Stage1Config:
     preference_dirichlet_alpha: float = 1.0
     explicit_preferences: list[list[float]] = field(default_factory=list)
     save_interval_updates: int = 0
+    reseed_mode: str = "shared"
+    independent_env_per_preference: bool = False
+    preference_seed_stride: int = 1000
+    env_seed_stride: int = 1000
+    stage1_protocol_name: str = "legacy"
+    parallel_workers: int = 1
+    parallel_backend: str = "process"
+    merge_order: str = "preference_index"
     output_dir: str = "cmorl_minicage/outputs/stage1"
     env: EnvConfig = field(default_factory=EnvConfig)
     model: ModelConfig = field(default_factory=ModelConfig)
@@ -80,6 +114,7 @@ class Stage2Config:
     model: ModelConfig = field(default_factory=ModelConfig)
     rollout: RolloutConfig = field(default_factory=RolloutConfig)
     eval: EvalConfig = field(default_factory=EvalConfig)
+    selection: SelectionConfig = field(default_factory=SelectionConfig)
     ipo: IPOHyperConfig = field(default_factory=IPOHyperConfig)
 
 

@@ -1,0 +1,162 @@
+from __future__ import annotations
+
+from typing import Sequence
+
+import numpy as np
+
+from cmorl_minicage.algorithms.selection import crowding_distance, nondominated_filter
+
+
+def _objective_array(records: Sequence[dict]) -> np.ndarray:
+    return np.asarray([record["objective_vector"] for record in records], dtype=np.float32)
+
+
+def _normalize_nonnegative(values: np.ndarray) -> np.ndarray:
+    if values.size == 0:
+        return np.zeros(0, dtype=np.float32)
+    values = np.asarray(values, dtype=np.float32)
+    vmin = float(np.min(values))
+    vmax = float(np.max(values))
+    if np.isclose(vmax, vmin):
+        return np.zeros_like(values, dtype=np.float32)
+    return (values - vmin) / (vmax - vmin)
+
+
+def compute_crowding_score(records: Sequence[dict]) -> np.ndarray:
+    distances = crowding_distance(records)
+    if distances.size == 0:
+        return np.zeros(0, dtype=np.float32)
+    scores = np.zeros_like(distances, dtype=np.float32)
+    finite_mask = np.isfinite(distances)
+    if np.any(finite_mask):
+        scores[finite_mask] = _normalize_nonnegative(distances[finite_mask])
+    scores[~finite_mask] = 1.0
+    return scores
+
+
+def compute_expansion_potential(records: Sequence[dict]) -> tuple[np.ndarray, np.ndarray]:
+    if not records:
+        return np.zeros(0, dtype=np.float32), np.zeros((0, 0), dtype=np.float32)
+    points = _objective_array(records)
+    point_max = points.max(axis=0)
+    point_min = points.min(axis=0)
+    point_range = np.maximum(point_max - point_min, 1.0)
+    target_expansion = (point_max[None, :] - points) / point_range[None, :]
+    expansion = np.max(target_expansion, axis=1)
+    return expansion.astype(np.float32), target_expansion.astype(np.float32)
+
+
+def compute_constraint_risk(records: Sequence[dict]) -> np.ndarray:
+    if not records:
+        return np.zeros(0, dtype=np.float32)
+    points = _objective_array(records)
+    point_min = points.min(axis=0)
+    point_max = points.max(axis=0)
+    point_range = np.maximum(point_max - point_min, 1.0)
+    normalized = (points - point_min[None, :]) / point_range[None, :]
+    risk = np.std(normalized, axis=1)
+    return _normalize_nonnegative(risk).astype(np.float32)
+
+
+def compute_utility_coverage_gain(
+    records: Sequence[dict],
+    preferences: Sequence[Sequence[float]],
+    tolerance: float,
+) -> np.ndarray:
+    if not records or not preferences:
+        return np.zeros(len(records), dtype=np.float32)
+    points = _objective_array(records)
+    weights = np.asarray(preferences, dtype=np.float32)
+    utilities = points @ weights.T
+    best = np.max(utilities, axis=0, keepdims=True)
+    covered = utilities >= (best - float(tolerance))
+    coverage_gain = covered.mean(axis=1)
+    return coverage_gain.astype(np.float32)
+
+
+def compute_selection_components(
+    records: Sequence[dict],
+    preferences: Sequence[Sequence[float]],
+    tolerance: float,
+) -> dict[str, dict[str, float | list[float]]]:
+    if not records:
+        return {}
+    crowding = compute_crowding_score(records)
+    expansion, target_expansion = compute_expansion_potential(records)
+    risk = compute_constraint_risk(records)
+    coverage = compute_utility_coverage_gain(records, preferences, tolerance)
+
+    components: dict[str, dict[str, float | list[float]]] = {}
+    for index, record in enumerate(records):
+        components[record["policy_id"]] = {
+            "crowding_score": float(crowding[index]),
+            "expansion_potential": float(expansion[index]),
+            "target_expansion_by_objective": target_expansion[index].astype(np.float32).tolist(),
+            "constraint_risk": float(risk[index]),
+            "low_risk_score": float(1.0 - risk[index]),
+            "utility_coverage_gain": float(coverage[index]),
+        }
+    return components
+
+
+def compute_selection_score(
+    component: dict[str, float | list[float]],
+    weights: dict[str, float],
+) -> float:
+    return float(
+        weights.get("crowding", 0.0) * float(component["crowding_score"])
+        + weights.get("expansion", 0.0) * float(component["expansion_potential"])
+        + weights.get("low_risk", 0.0) * float(component["low_risk_score"])
+        + weights.get("coverage", 0.0) * float(component["utility_coverage_gain"])
+    )
+
+
+def select_top_n_adaptive(
+    records: Sequence[dict],
+    top_n: int,
+    preferences: Sequence[Sequence[float]],
+    weights: dict[str, float],
+    tolerance: float,
+    *,
+    keep_extremes: bool = True,
+) -> tuple[list[dict], dict[str, float], dict[str, dict[str, float | list[float]]]]:
+    pareto = nondominated_filter(records)
+    if top_n <= 0 or not pareto:
+        return [], {}, {}
+
+    components = compute_selection_components(pareto, preferences, tolerance)
+    scores = {
+        record["policy_id"]: compute_selection_score(components[record["policy_id"]], weights)
+        for record in pareto
+    }
+
+    selected_indices: list[int] = []
+    points = _objective_array(pareto)
+    if keep_extremes and len(pareto) > 0:
+        for objective_idx in range(points.shape[1]):
+            extreme = int(np.argmax(points[:, objective_idx]))
+            if extreme not in selected_indices:
+                selected_indices.append(extreme)
+
+    selected_ids = {pareto[index]["policy_id"] for index in selected_indices}
+    remaining = [record for record in pareto if record["policy_id"] not in selected_ids]
+    remaining.sort(
+        key=lambda record: (
+            -scores[record["policy_id"]],
+            -float(components[record["policy_id"]]["utility_coverage_gain"]),
+            -float(components[record["policy_id"]]["crowding_score"]),
+            record["policy_id"],
+        )
+    )
+
+    for record in remaining:
+        if len(selected_indices) >= top_n:
+            break
+        selected_indices.append(next(i for i, candidate in enumerate(pareto) if candidate["policy_id"] == record["policy_id"]))
+
+    selected = [dict(pareto[index]) for index in selected_indices[:top_n]]
+    selected_scores = {record["policy_id"]: scores[record["policy_id"]] for record in selected}
+    selected_components = {
+        record["policy_id"]: dict(components[record["policy_id"]]) for record in selected
+    }
+    return selected, selected_scores, selected_components

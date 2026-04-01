@@ -37,9 +37,13 @@ class IPOTrainer:
         storage: VectorRolloutStorage,
         objective_idx: int,
         reference_objectives,
+        beta_override: float | None = None,
     ) -> dict[str, float]:
         reference = torch.as_tensor(
             reference_objectives, device=storage.device, dtype=torch.float32
+        )
+        beta_value = (
+            float(beta_override) if beta_override is not None else float(self.config.beta)
         )
         value_loss_epoch = 0.0
         action_loss_epoch = 0.0
@@ -81,7 +85,7 @@ class IPOTrainer:
                         clipped_ratio * batch.advantages[:, idx],
                     )
                     surrogate_return = reference[idx] + clipped_constraint_gain.mean()
-                    margin = surrogate_return - self.config.beta * reference[idx]
+                    margin = surrogate_return - beta_value * reference[idx]
                     margin_values.append(margin.detach())
                     barrier_terms.append(
                         torch.log(torch.clamp(margin, min=self.config.eps))
@@ -135,4 +139,5 @@ class IPOTrainer:
             "min_constraint_margin": margin_epoch / updates,
             "feasible_ratio": feasible_epoch / updates,
             "entropy": entropy_epoch / updates,
+            "beta_used": beta_value,
         }

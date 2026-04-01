@@ -60,11 +60,15 @@
 - [cmorl_minicage/baselines.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/baselines.py)
 - [cmorl_minicage/select_policy.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/select_policy.py)
 
-正式配置入口：
+正式配置入口当前分为两条：
 
-- [cmorl_minicage/configs/formal/stage1_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2.yaml)
-- [cmorl_minicage/configs/formal/stage2_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2.yaml)
-- [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/evaluate.yaml)
+- 已发布 formal 主线：
+  - [cmorl_minicage/configs/formal/stage1_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2.yaml)
+  - [cmorl_minicage/configs/formal/stage2_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2.yaml)
+  - [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/evaluate.yaml)
+- 当前升级主线：
+  - [cmorl_minicage/configs/formal/stage1_c2_independent.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
+  - [cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
 
 ## 当前三目标定义
 
@@ -86,7 +90,7 @@
 
 ## 当前正式结果概况
 
-截至 2026-03-31，当前保留并可直接引用的正式结果分为两层。
+截至 2026-04-01，当前结果应分两层阅读。
 
 ### Formal 主线
 
@@ -152,7 +156,30 @@
 - `Stage-2` 是当前项目里表现最强的正式主方法结果。
 - `Stage-2` 不仅优于 formal `Stage-1`，也优于当前保留的 5 个 baseline。
 - `Stage-2` 的优势不仅体现在 `HV / EU / Pareto Count`，也体现在核心网络安全语义指标上。
-- 当前最需要推进的工作，已经从“证明方法能工作”转向“继续让前沿更满、更均匀、更贴近论文式数值实现”。
+- 当前最需要推进的工作，已经从“证明方法能工作”转向：
+  - 继续让前沿更满、更均匀
+  - 推进 `independent Stage-1 + AdaCS-DCS` 升级线
+  - 在更厚的 `Stage-1` 候选池上验证 `AdaCS` 是否能显出独立收益
+
+## 当前升级线状态
+
+当前最活跃的升级线不是直接替换 `legacy formal_c2`，而是：
+
+- `independent Stage-1`
+  - 去除串行随机耦合
+  - 当前默认基线已切到 `E3` explicit preference 设计
+- `AdaCS-DCS-CMORL`
+  - `Stage-2` 支持：
+    - `crowding + fixed beta`
+    - `adaptive selection + fixed beta`
+    - `crowding + dynamic beta`
+    - `adaptive selection + dynamic beta`
+
+当前这条升级线的最新判断是：
+
+- 原始 `DCS(0.88~0.98)` 在 independent 协议下过严，曾导致 `generated = 0`
+- 把 `dynamic beta` 调整到围绕 `1.005` 的温和区间后，DCS 已恢复到和 `fixed beta` 同水平
+- 当前 `AdaCS` 还没有显出独立收益，主要不是实现问题，而是 `E3 Stage-1` 的 Pareto front 仍然太薄
 
 ## 当前保留的关键图
 

@@ -1,0 +1,30 @@
+seed: 7
+total_timesteps: 512
+num_policies: 3
+preference_strategy: dirichlet_extremes
+preference_step: 0.5
+preference_dirichlet_alpha: 1.0
+save_interval_updates: 1
+reseed_mode: per_preference
+independent_env_per_preference: true
+preference_seed_stride: 1000
+env_seed_stride: 1000
+stage1_protocol_name: independent
+parallel_workers: 1
+parallel_backend: process
+merge_order: preference_index
+output_dir: cmorl_minicage/outputs/smoke/stage1_independent
+env:
+  num_envs: 4
+  red_policy: bline
+  remove_bugs: true
+  max_episode_steps: 50
+  seed: 7
+model:
+  hidden_size: 64
+  obj_dim: 3
+rollout:
+  num_steps: 32
+eval:
+  eval_episodes: 2
+  preference_step:

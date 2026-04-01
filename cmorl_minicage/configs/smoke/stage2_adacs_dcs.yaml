@@ -1,0 +1,52 @@
+seed: 19
+stage1_buffer: ""
+num_extension_policies: 2
+extension_rounds: 1
+constrained_updates: 1
+constraint_tolerance: 1.0e-6
+total_timesteps_per_update: 64
+output_dir: cmorl_minicage/outputs/smoke/stage2_adacs_dcs
+env:
+  num_envs: 2
+  red_policy: bline
+  remove_bugs: true
+  max_episode_steps: 100
+  seed: 19
+model:
+  hidden_size: 128
+  obj_dim: 3
+rollout:
+  num_steps: 16
+eval:
+  eval_episodes: 2
+  preference_step:
+selection:
+  mode: adaptive
+  score_weights:
+    crowding: 0.30
+    expansion: 0.30
+    low_risk: 0.20
+    coverage: 0.20
+  utility_tolerance: 0.02
+  keep_extremes: true
+ipo:
+  clip_param: 0.2
+  ppo_epochs: 4
+  num_mini_batch: 4
+  value_loss_coef: 0.5
+  entropy_coef: 0.01
+  learning_rate: 3.0e-4
+  max_grad_norm: 0.5
+  barrier_coef: 20.0
+  beta: 0.9
+  beta_mode: dynamic
+  beta_min: 0.88
+  beta_max: 0.98
+  schedule_weights:
+    crowding: 0.25
+    expansion: 0.35
+    low_risk: 0.20
+    progress: 0.20
+  gamma: 0.995
+  gae_lambda: 0.95
+  eps: 1.0e-8
