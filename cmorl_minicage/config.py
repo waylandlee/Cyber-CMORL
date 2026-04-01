@@ -72,6 +72,7 @@ class SelectionConfig:
         }
     )
     utility_tolerance: float = 0.02
+    coverage_mode: str = "static"
     keep_extremes: bool = True
 
 

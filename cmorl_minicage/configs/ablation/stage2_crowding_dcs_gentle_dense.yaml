@@ -1,11 +1,11 @@
 seed: 19
-stage1_buffer: ""
-num_extension_policies: 6
-extension_rounds: 4
+stage1_buffer: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent_stage1_density/e3_dense_ckpt/run_011d7162/solution_buffer.json
+num_extension_policies: 4
+extension_rounds: 3
 constrained_updates: 2
 constraint_tolerance: -0.25
 total_timesteps_per_update: 1024
-output_dir: cmorl_minicage/outputs/formal_c2_adacs_dcs/stage2
+output_dir: cmorl_minicage/outputs/ablation_adacs_dcs_dense/crowding_dcs_gentle
 env:
   num_envs: 8
   red_policy: bline
@@ -21,14 +21,13 @@ eval:
   eval_episodes: 5
   preference_step:
 selection:
-  mode: adaptive
+  mode: crowding
   score_weights:
-    crowding: 0.35
-    expansion: 0.40
-    low_risk: 0.05
+    crowding: 0.30
+    expansion: 0.30
+    low_risk: 0.20
     coverage: 0.20
-  utility_tolerance: 0.005
-  coverage_mode: marginal
+  utility_tolerance: 0.02
   keep_extremes: true
 ipo:
   clip_param: 0.1
@@ -41,13 +40,13 @@ ipo:
   barrier_coef: 50.0
   beta: 1.005
   beta_mode: dynamic
-  beta_min: 1.006
-  beta_max: 1.016
+  beta_min: 1.000
+  beta_max: 1.010
   schedule_weights:
     crowding: 0.25
-    expansion: 0.50
-    low_risk: 0.10
-    progress: 0.15
+    expansion: 0.35
+    low_risk: 0.20
+    progress: 0.20
   gamma: 0.995
   gae_lambda: 0.95
   eps: 1.0e-8

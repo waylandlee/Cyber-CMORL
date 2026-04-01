@@ -18,6 +18,7 @@
 ### P1 次高优先级
 
 - `Planned` 用更多 seed 验证当前 `formal_c2` 主线胜出结论的稳定性。
+- `Done` 增加 [cmorl_minicage/multiseed.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/multiseed.py)，支持按 seed 批跑 `Stage-1 -> Stage-2` 并汇总共享参考点下的稳定性指标。
 - `Planned` 系统比较 Stage-2 的 `beta`、`constraint_tolerance`、`constrained_updates` 和 `total_timesteps_per_update`。
 - `Planned` 为 Stage-1 增加独立 reseed / 独立 env 模式，降低串行随机耦合。
 - `Planned` 为 `visualize.py` 增加可选 policy id 标注与更统一的 figure export 命名。
@@ -156,14 +157,14 @@
 
 #### G-001 先构造 candidate-rich Stage-1
 
-* `Planned` 保持 `independent` 协议不变：
+* `Done` 保持 `independent` 协议不变：
 
   * `stage1_protocol_name = independent`
   * `reseed_mode = per_preference`
   * `independent_env_per_preference = true`
   * `parallel_workers = 1`
 
-* `Planned` 在当前 `E3` 基线之上先做两组最小增厚：
+* `Done` 在当前 `E3` 基线之上完成了两组最小增厚：
 
   * `E3-dense-ckpt`
 
@@ -179,7 +180,15 @@
     * `timesteps_per_policy = 8192`
     * `save_interval_updates = 2`
 
-* `Planned` 这两组的目标不是直接求最好主结果，而是观察 `Stage-1` 的 Pareto front 是否能从 `3` 个点增厚到 `5+` 个点。
+* `结果`
+
+  * `E3-dense-ckpt`
+    * 已把 `Stage-1` 从 `3` 点增厚到 `8` 点
+    * `HV = 6188564.23`
+    * `EU = -104.38`
+    * 当前已被选为 candidate-rich Stage-1 主基线
+  * `E3-dense-pref`
+    * 点数虽增多，但整体质量不如 `dense-ckpt`
 
 * `验收标准`
 
@@ -189,14 +198,18 @@
 
 #### G-002 在厚前沿上做 AdaCS 主消融
 
-* `Planned` 一旦有了 candidate-rich 的 `Stage-1` buffer，就固定只用这一条 buffer 做四组对比：
+* `Done` 已在 `E3-dense-ckpt` 上完成：
 
   * `crowding + fixed beta`
   * `adaptive selection + fixed beta`
   * `crowding + dynamic beta (gentle)`
   * `adaptive selection + dynamic beta (gentle)`
 
-* `Planned` 统一保持：
+* `结果`
+
+  * `crowding + dcs_gentle` 在 dense-front 上先拿到最高 `HV / EU`
+  * `AdaCS + fixed beta` 和 `AdaCS + dcs_gentle` 已经显出“更精、更稳、更安全”的独立收益
+  * 但第一轮 dense-front 消融里，AdaCS 还没有完成对 `crowding + dcs_gentle` 的主指标反超
 
   * `num_extension_policies = 4`
   * `extension_rounds = 3`
@@ -206,25 +219,31 @@
 
 * `Planned` 这里故意把 `extension_rounds` 从 `2` 提到 `3`，是为了让 selection 差异能在 round 1/2 累积出来，而不是只比较 round 0。
 
-* `Planned` 当前默认 DCS 使用已修复可用的温和区间：
+* `Done` 当前默认 DCS 使用已修复可用的温和区间：
 
   * `beta_min ≈ 1.000`
   * `beta_max ≈ 1.010`
 
 #### G-003 如果仍然看不出 AdaCS 差异，再加一档 selection pressure
 
-* `Planned` 如果在厚前沿上 `crowding` 与 `adaptive` 仍几乎完全一致，则追加一组 selection pressure 实验：
+* `Done` 已进一步沿四个方向做持续优化：
 
-  * `num_extension_policies = 3`
-  * `extension_rounds = 3`
-  * 其余保持不变
+  * 更高 `crowding + expansion`
+  * `coverage_gain -> marginal coverage`
+  * 更友好的 DCS 区间
+  * 更高 `num_extension_policies / extension_rounds`
 
-* `Planned` 这样做的目的不是改算法定义，而是人为提高“父策略名额稀缺度”，让 selection score 真正决定谁能进入扩展集。
+* `结果`
 
-* `风险提示`
+  * `marginal_aggressive / balanced / safe` 已明显把 AdaCS 的 `HV / EU` 推近 `crowding + dcs_gentle`
+  * 最终 `chase` 配置完成 `HV / EU` 双反超
+    * `HV = 6612380.50`
+    * `EU = -100.078`
 
-  * 如果 `keep_extremes=true` 且 Pareto front 极点数本身就等于名额数，仍可能压缩 AdaCS 的可见差异
-  * 因此该组主要作为 stress test，而不是正式主配置
+* `当前结论`
+
+  * 当前主瓶颈已经不是“DCS 太严”或“AdaCS 无点可分”
+  * 当前下一步更适合做的是多 seed 验证与 formal 主线整合，而不是继续基础性结构试探
 
 #### G-004 下一轮重点看哪些指标
 

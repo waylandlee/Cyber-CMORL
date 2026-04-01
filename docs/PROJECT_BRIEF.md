@@ -179,7 +179,20 @@
 
 - 原始 `DCS(0.88~0.98)` 在 independent 协议下过严，曾导致 `generated = 0`
 - 把 `dynamic beta` 调整到围绕 `1.005` 的温和区间后，DCS 已恢复到和 `fixed beta` 同水平
-- 当前 `AdaCS` 还没有显出独立收益，主要不是实现问题，而是 `E3 Stage-1` 的 Pareto front 仍然太薄
+- `E3-dense-ckpt` 已把 independent `Stage-1` 从 `3` 点增厚到 `8` 点，并把 `HV / EU` 提升到：
+  - `HV = 6188564.23`
+  - `EU = -104.38`
+- 在 dense-front 上，`AdaCS` 已显出独立收益；当前 `AdaCS-DCS` 的正式主配置已经升级为 `chase`
+- `AdaCS-DCS chase` 在统一参考点下已经实现对 `crowding + dcs_gentle` 的 `HV / EU` 双反超：
+  - `HV = 6612380.50`
+  - `EU = -100.078`
+
+当前升级线最值得记住的两条结果是：
+
+- candidate-rich `Stage-1`
+  - [e3_dense_ckpt/run_011d7162](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent_stage1_density/e3_dense_ckpt/run_011d7162)
+- 当前最强 `AdaCS-DCS`
+  - [chase/run_57a6c14a](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation_adacs_dcs_marginal/chase/run_57a6c14a)
 
 ## 当前保留的关键图
 

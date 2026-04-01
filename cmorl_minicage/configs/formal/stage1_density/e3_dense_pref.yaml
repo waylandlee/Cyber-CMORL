@@ -1,0 +1,43 @@
+seed: 7
+total_timesteps: 8192
+num_policies: 12
+preference_strategy: explicit
+preference_step: 0.25
+preference_dirichlet_alpha: 1.0
+explicit_preferences:
+  - [1.0, 0.0, 0.0]
+  - [0.0, 1.0, 0.0]
+  - [0.0, 0.0, 1.0]
+  - [0.6, 0.2, 0.2]
+  - [0.2, 0.6, 0.2]
+  - [0.2, 0.2, 0.6]
+  - [0.5, 0.4, 0.1]
+  - [0.4, 0.1, 0.5]
+  - [0.1, 0.5, 0.4]
+  - [0.34, 0.33, 0.33]
+  - [0.45, 0.45, 0.10]
+  - [0.10, 0.45, 0.45]
+save_interval_updates: 2
+reseed_mode: per_preference
+independent_env_per_preference: true
+preference_seed_stride: 1000
+env_seed_stride: 1000
+stage1_protocol_name: independent
+parallel_workers: 1
+parallel_backend: process
+merge_order: preference_index
+output_dir: cmorl_minicage/outputs/formal_c2_independent_stage1_density/e3_dense_pref
+env:
+  num_envs: 8
+  red_policy: bline
+  remove_bugs: true
+  max_episode_steps: 100
+  seed: 7
+model:
+  hidden_size: 128
+  obj_dim: 3
+rollout:
+  num_steps: 64
+eval:
+  eval_episodes: 5
+  preference_step:

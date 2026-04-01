@@ -303,6 +303,35 @@
   - 原始区间过严，实证上已经失效。
   - 直接放弃 DCS 会让 AdaCS-DCS 升级线失去一半方法内容，也不利于后续继续改进动态调度。
 
+## D-020 把 `chase` 提升为当前正式 AdaCS-DCS 主配置
+
+- 决策：当前 `AdaCS-DCS` 的 formal 配置采用 `chase` 参数组，而不再停留在早期 `gentle/verygentle` 试探口径。
+- 核心参数：
+  - `num_extension_policies = 6`
+  - `extension_rounds = 4`
+  - `selection.score_weights = {crowding: 0.35, expansion: 0.40, low_risk: 0.05, coverage: 0.20}`
+  - `selection.coverage_mode = marginal`
+  - `selection.utility_tolerance = 0.005`
+  - `ipo.beta_min = 1.006`
+  - `ipo.beta_max = 1.016`
+  - `ipo.schedule_weights = {crowding: 0.25, expansion: 0.50, low_risk: 0.10, progress: 0.15}`
+- 原因：
+  - 这组参数是当前第一组同时实现 `HV / EU` 双反超 `crowding + dcs_gentle` 的 AdaCS-DCS 配置。
+  - 它证明了 AdaCS 的上限高于纯 crowding：当 marginal coverage、expansion-first 选点和更友好的 DCS 协同起来后，AdaCS 不仅更可解释，也可以在主指标上胜出。
+- 当前证据：
+  - `crowding + dcs_gentle`
+    - `HV = 6370030.75`
+    - `EU = -100.337`
+  - `AdaCS-DCS chase`
+    - `HV = 6612380.50`
+    - `EU = -100.078`
+- 备选方案：
+  - 保持 `adacs_dcs_gentle_safe` 作为更克制但并未反超的版本
+  - 保持 `crowding + dcs_gentle` 作为 formal 主配置
+- 未选原因：
+  - `safe` 虽然扰动更低，但没有完成 `HV / EU` 双反超。
+  - `crowding + dcs_gentle` 是强基线，但已被 `chase` 超过，不再适合作为 AdaCS-DCS 的正式代表配置。
+
 ## D-012 README 只提供高层入口，细节下沉到 `docs/`
 
 - 决策：仓库根 [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md) 提供高层入口；更细的项目边界、架构、决策、任务和实验记录放在 `docs/`。

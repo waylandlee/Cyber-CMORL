@@ -22,6 +22,16 @@ def _normalize_nonnegative(values: np.ndarray) -> np.ndarray:
     return (values - vmin) / (vmax - vmin)
 
 
+def _utility_matrix(
+    records: Sequence[dict], preferences: Sequence[Sequence[float]]
+) -> np.ndarray:
+    if not records or not preferences:
+        return np.zeros((len(records), len(preferences)), dtype=np.float32)
+    points = _objective_array(records)
+    weights = np.asarray(preferences, dtype=np.float32)
+    return (points @ weights.T).astype(np.float32)
+
+
 def compute_crowding_score(records: Sequence[dict]) -> np.ndarray:
     distances = crowding_distance(records)
     if distances.size == 0:
@@ -65,13 +75,26 @@ def compute_utility_coverage_gain(
 ) -> np.ndarray:
     if not records or not preferences:
         return np.zeros(len(records), dtype=np.float32)
-    points = _objective_array(records)
-    weights = np.asarray(preferences, dtype=np.float32)
-    utilities = points @ weights.T
+    utilities = _utility_matrix(records, preferences)
     best = np.max(utilities, axis=0, keepdims=True)
     covered = utilities >= (best - float(tolerance))
     coverage_gain = covered.mean(axis=1)
     return coverage_gain.astype(np.float32)
+
+
+def _covered_preferences_mask(
+    utilities: np.ndarray,
+    tolerance: float,
+    selected_indices: Sequence[int],
+) -> np.ndarray:
+    if utilities.size == 0:
+        return np.zeros(0, dtype=bool)
+    best = np.max(utilities, axis=0, keepdims=True)
+    covered = utilities >= (best - float(tolerance))
+    if not selected_indices:
+        return np.zeros(covered.shape[1], dtype=bool)
+    selected_mask = covered[np.asarray(selected_indices, dtype=np.int32)]
+    return np.any(selected_mask, axis=0)
 
 
 def compute_selection_components(
@@ -118,6 +141,7 @@ def select_top_n_adaptive(
     weights: dict[str, float],
     tolerance: float,
     *,
+    coverage_mode: str = "static",
     keep_extremes: bool = True,
 ) -> tuple[list[dict], dict[str, float], dict[str, dict[str, float | list[float]]]]:
     pareto = nondominated_filter(records)
@@ -139,20 +163,64 @@ def select_top_n_adaptive(
                 selected_indices.append(extreme)
 
     selected_ids = {pareto[index]["policy_id"] for index in selected_indices}
-    remaining = [record for record in pareto if record["policy_id"] not in selected_ids]
-    remaining.sort(
-        key=lambda record: (
-            -scores[record["policy_id"]],
-            -float(components[record["policy_id"]]["utility_coverage_gain"]),
-            -float(components[record["policy_id"]]["crowding_score"]),
-            record["policy_id"],
+    if coverage_mode != "marginal":
+        remaining = [record for record in pareto if record["policy_id"] not in selected_ids]
+        remaining.sort(
+            key=lambda record: (
+                -scores[record["policy_id"]],
+                -float(components[record["policy_id"]]["utility_coverage_gain"]),
+                -float(components[record["policy_id"]]["crowding_score"]),
+                record["policy_id"],
+            )
         )
-    )
 
-    for record in remaining:
-        if len(selected_indices) >= top_n:
-            break
-        selected_indices.append(next(i for i, candidate in enumerate(pareto) if candidate["policy_id"] == record["policy_id"]))
+        for record in remaining:
+            if len(selected_indices) >= top_n:
+                break
+            selected_indices.append(
+                next(
+                    i
+                    for i, candidate in enumerate(pareto)
+                    if candidate["policy_id"] == record["policy_id"]
+                )
+            )
+    else:
+        utilities = _utility_matrix(pareto, preferences)
+        while len(selected_indices) < min(top_n, len(pareto)):
+            covered_preferences = _covered_preferences_mask(
+                utilities, tolerance, selected_indices
+            )
+            remaining_indices = [
+                index for index in range(len(pareto)) if index not in selected_indices
+            ]
+            if not remaining_indices:
+                break
+            best_index = None
+            best_key = None
+            for index in remaining_indices:
+                best = np.max(utilities, axis=0, keepdims=True)
+                candidate_covered = utilities[index] >= (
+                    best[0] - float(tolerance)
+                )
+                marginal_gain = float(
+                    np.mean(candidate_covered & (~covered_preferences))
+                )
+                components[pareto[index]["policy_id"]]["utility_coverage_gain"] = marginal_gain
+                scores[pareto[index]["policy_id"]] = compute_selection_score(
+                    components[pareto[index]["policy_id"]], weights
+                )
+                key = (
+                    -scores[pareto[index]["policy_id"]],
+                    -marginal_gain,
+                    -float(components[pareto[index]["policy_id"]]["crowding_score"]),
+                    pareto[index]["policy_id"],
+                )
+                if best_key is None or key < best_key:
+                    best_key = key
+                    best_index = index
+            if best_index is None:
+                break
+            selected_indices.append(best_index)
 
     selected = [dict(pareto[index]) for index in selected_indices[:top_n]]
     selected_scores = {record["policy_id"]: scores[record["policy_id"]] for record in selected}

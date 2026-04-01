@@ -67,7 +67,7 @@
 - `independent + AdaCS-DCS`
   - 这是当前正在推进的升级线
   - `Stage-1` 已切到 `independent` 协议，并把 `E3` explicit preference 设计固化为新基线
-  - `Stage-2` 已支持 `AdaCS-DCS-CMORL` 四种模式，并完成了初步消融与温和 DCS 调参
+  - `Stage-2` 已支持 `AdaCS-DCS-CMORL` 四种模式，并完成了初步消融、温和 DCS 调参与 `chase` 正式主配置升级
 
 当前已发布的正式主结果仍以 `legacy formal_c2` 为准：
 
@@ -94,7 +94,18 @@
   - `crowding_dcs_verygentle`
   - `adacs_dcs_verygentle`
 - 这些温和 DCS 结果在 `HV / EU / Pareto Count` 上已追平 `fixed beta`
-- 当前 `AdaCS` 还没有显出独立增益，主要原因是 `E3 Stage-1` 前沿太薄，`keep_extremes=true` 时父策略集合与 `crowding` 路径一致
+- 在 `E3-dense-ckpt` 的 candidate-rich Stage-1 基线上，AdaCS 已经显出独立增益
+- 当前 `AdaCS-DCS` 的正式主配置已经升级为 `chase`：
+  - `marginal coverage`
+  - `expansion-first` 选点
+  - 更友好的动态 beta 区间
+- 在统一参考点下，`AdaCS-DCS chase` 已实现对 `crowding + dcs_gentle` 的 `HV / EU` 双反超：
+  - `HV = 6612380.50`
+  - `EU = -100.078`
+- 为此，项目已经补入两组新的 `Stage-1 density` 正式配置：
+  - `e3_dense_ckpt`
+  - `e3_dense_pref`
+ 目标是为 AdaCS 提供更厚的可选前沿，并验证其独立收益
 
 ## 论文算法流程 vs 当前代码流程
 
@@ -273,11 +284,13 @@ conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/confi
 
 - Stage-1 independent 基线：
   - [stage1_c2_independent.yaml](./cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
+- Stage-1 density 配置：
+  - [e3_dense_ckpt.yaml](./cmorl_minicage/configs/formal/stage1_density/e3_dense_ckpt.yaml)
+  - [e3_dense_pref.yaml](./cmorl_minicage/configs/formal/stage1_density/e3_dense_pref.yaml)
 - AdaCS-DCS formal 配置：
   - [stage2_c2_adacs_dcs.yaml](./cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
 - AdaCS-DCS ablation 配置：
   - [cmorl_minicage/configs/ablation](./cmorl_minicage/configs/ablation)
-- `cmorl_minicage/configs/ablation/`
 
 当前正式主线默认建议直接使用：
 
@@ -286,6 +299,19 @@ conda run -n cc4 python -m cmorl_minicage.train_stage1 --config cmorl_minicage/c
 conda run -n cc4 python -m cmorl_minicage.train_stage2 --config cmorl_minicage/configs/formal/stage2_c2.yaml --stage1-buffer <stage1_solution_buffer>
 conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/configs/formal/evaluate.yaml --buffer-path <solution_buffer>
 ```
+
+如果要直接跟进当前升级线，建议按下面顺序：
+
+```bash
+conda run -n cc4 python -m cmorl_minicage.train_stage1 --config cmorl_minicage/configs/formal/stage1_density/e3_dense_ckpt.yaml
+conda run -n cc4 python -m cmorl_minicage.train_stage2 --config cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml --stage1-buffer <stage1_solution_buffer>
+conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/configs/formal/evaluate.yaml --buffer-path <solution_buffer>
+```
+
+这里要注意：
+
+- 如果你的目标是复现当前“已发布正式主结果”，请使用 `formal_c2` 的 `stage1_c2.yaml + stage2_c2.yaml`
+- 如果你的目标是继续推进 `independent + AdaCS-DCS` 升级线，请使用 `stage1_c2_independent.yaml` 或 `stage1_density/*`，再接 `stage2_c2_adacs_dcs.yaml`
 
 如果想直接做 baseline，对应入口是：
 

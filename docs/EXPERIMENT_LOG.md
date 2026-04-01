@@ -835,3 +835,74 @@
 - 结论：
   - 当前 DCS 的主要问题已经解决。
   - 当前升级线的下一步瓶颈不再是 beta 调度，而是要先把 `Stage-1` 做成更厚的 candidate-rich front，再比较 `crowding` 与 `adaptive`。
+
+### 2026-04-01 / P8-Stage1-Dense-Front
+
+- 实验 ID：
+  - `run_011d7162` `E3-dense-ckpt`
+  - `E3-dense-pref` secondary comparison
+- 阶段：Independent Protocol / Stage-1 Density Upgrade
+- 目标：
+  - 验证当前 independent 协议下，`Stage-1` 的 `3` 点前沿是否只是 preference 太稀导致。
+  - 为 AdaCS 提供 candidate-rich 的 Stage-1 front。
+- 输出目录：
+  - [e3_dense_ckpt/run_011d7162](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent_stage1_density/e3_dense_ckpt/run_011d7162)
+- 关键结果：
+  - `E3 baseline`
+    - `Pareto Count = 3`
+    - `HV = 4446898.00`
+    - `EU = -128.39`
+  - `E3-dense-ckpt`
+    - `Pareto Count = 8`
+    - `HV = 6188564.23`
+    - `EU = -104.38`
+  - `E3-dense-pref`
+    - `Pareto Count = 6`
+    - `HV = 3978141.75`
+    - `EU = -130.02`
+- 结论：
+  - 当前 independent 协议下，`3` 点并不是自然上限。
+  - 真正有效的增厚方式是提高单条 preference 的训练深度和 checkpoint 密度，而不是单纯继续增加 preference 数量。
+  - `E3-dense-ckpt` 已被提升为当前 candidate-rich Stage-1 主基线。
+
+### 2026-04-01 / P8-AdaCS-DCS-Chase
+
+- 实验 ID：
+  - `run_57a6c14a` `adacs_dcs_chase`
+  - 对照：`run_0fc59441` `crowding_dcs_gentle`
+- 阶段：AdaCS-DCS 持续优化 / EU-HV 双反超验证
+- 目标：
+  - 沿着四个方向持续优化 AdaCS-DCS：
+    - 提高 `crowding + expansion`
+    - 把 `coverage_gain` 改为 `marginal coverage`
+    - 让 DCS 对高价值候选更友好
+    - 提高 `num_extension_policies / extension_rounds`
+  - 验证 AdaCS-DCS 能否在 dense-front 上同时超过 `crowding + dcs_gentle` 的 `HV / EU`。
+- 配置文件：
+  - [stage2_c2_adacs_dcs.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
+- 输出目录：
+  - [chase/run_57a6c14a](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation_adacs_dcs_marginal/chase/run_57a6c14a)
+  - [crowding_dcs_gentle/run_0fc59441](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation_adacs_dcs_dense/crowding_dcs_gentle/run_0fc59441)
+- 公平结果：
+  - `crowding + dcs_gentle`
+    - `HV = 6370030.75`
+    - `EU = -100.337`
+    - `Pareto Count = 9`
+  - `AdaCS-DCS chase`
+    - `HV = 6612380.50`
+    - `EU = -100.078`
+    - `Pareto Count = 9`
+- 语义结果：
+  - `crowding + dcs_gentle`
+    - `critical_impact_count = 0.040`
+    - `high_disruption_action_rate = 0.152`
+  - `AdaCS-DCS chase`
+    - `critical_impact_count = 0.014`
+    - `high_disruption_action_rate = 0.097`
+- 机制解释：
+  - `marginal coverage` 让 AdaCS 不再重复奖励功能重叠的父策略。
+  - 更高的 `crowding + expansion` 权重，让 selection 真正去追击几何上限，而不是只做保守过滤。
+  - 更友好的动态 beta 区间，使这些高价值候选可以稳定通过 gate。
+- 结论：
+  - `AdaCS-DCS chase` 已完成对 `crowding + dcs_gentle` 的 `HV / EU` 双反超。
+  - 当前 formal `AdaCS-DCS` 主配置已切换为 `chase`。

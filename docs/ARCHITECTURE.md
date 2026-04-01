@@ -302,8 +302,9 @@ MiniCAGE C-MORL 复现线的核心目录是 [cmorl_minicage](/home/waylandlee/Cy
 - IPO 是 surrogate 近似实现
 - Stage-2 多了工程化 feasibility gate
 - 运行环境已切换为 MiniCAGE 适配任务，并采用自定义的 `security / business / cost` 奖励口径
-- 当前 `AdaCS` 的独立收益还没显出来，主要是因为 `independent Stage-1 E3` 只形成了 `3` 点 Pareto front，`keep_extremes=true` 时父策略集合过薄
-- 当前 `DCS` 已经从原始 `0.88~0.98` 的过严区间，调整到围绕 `1.005` 的温和区间；在该区间下，`dynamic beta` 已恢复可行扩展并追平 `fixed beta`
+- `E3-dense-ckpt` 已把 independent `Stage-1` 增厚为 candidate-rich front，当前 Pareto 点数达到 `8`
+- `DCS` 已从原始 `0.88~0.98` 的过严区间，推进到 `chase` 所使用的更友好动态区间
+- `AdaCS-DCS chase` 已经在 dense-front 上实现对 `crowding + dcs_gentle` 的 `HV / EU` 双反超
 
 ## 建议的后续扩展点
 
@@ -311,7 +312,7 @@ MiniCAGE C-MORL 复现线的核心目录是 [cmorl_minicage](/home/waylandlee/Cy
 
 1. Stage-1 多 worker 并行初始化
 2. 把 independent / parallel Stage-1 重跑成新的正式主线分支
-3. 先把 `Stage-1` 做成更厚的 candidate-rich front，再验证 AdaCS 是否有独立收益
+3. 以 `chase` 为正式主配置，继续做多 seed、公平评估和图表整理
 4. 更贴近论文的 IPO 数值实现
 5. CPO 分支
 6. 更系统的 Stage-2 buffer / candidate 保存策略

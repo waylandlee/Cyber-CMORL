@@ -123,6 +123,7 @@ def train_stage2(config: Stage2Config) -> Path:
                 diagnostics["selection_preferences"],
                 config.selection.score_weights,
                 config.selection.utility_tolerance,
+                coverage_mode=config.selection.coverage_mode,
                 keep_extremes=config.selection.keep_extremes,
             )
             ranking_source = [

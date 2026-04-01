@@ -1,0 +1,58 @@
+seed: 23
+device: cpu
+output_dir: cmorl_minicage/outputs/ablation_adacs_dcs_marginal/chase_k7
+stage1_buffer: cmorl_minicage/outputs/formal_c2_independent_stage1_density/e3_dense_ckpt/run_011d7162/solution_buffer.json
+num_extension_policies: 7
+extension_rounds: 4
+total_timesteps_per_update: 1024
+constrained_updates: 2
+save_policies: true
+
+env:
+  num_envs: 8
+  red_policy: bline
+  remove_bugs: true
+  max_episode_steps: 100
+  seed: 7
+
+model:
+  hidden_size: 128
+  obj_dim: 3
+
+rollout:
+  num_steps: 64
+  gamma: 0.99
+  gae_lambda: 0.95
+
+eval:
+  eval_episodes: 2
+
+selection:
+  mode: adaptive
+  score_weights:
+    crowding: 0.32
+    expansion: 0.43
+    low_risk: 0.05
+    coverage: 0.20
+  utility_tolerance: 0.005
+  coverage_mode: marginal
+  keep_extremes: true
+
+ipo:
+  beta_mode: dynamic
+  beta: 1.005
+  beta_min: 1.006
+  beta_max: 1.017
+  schedule_weights:
+    crowding: 0.20
+    expansion: 0.55
+    low_risk: 0.10
+    progress: 0.15
+  lr: 0.0003
+  clip_coef: 0.2
+  value_coef: 0.5
+  entropy_coef: 0.01
+  max_grad_norm: 0.5
+  num_epochs: 4
+  num_minibatches: 4
+  target_kl: 0.05
