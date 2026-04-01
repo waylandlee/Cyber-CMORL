@@ -1,0 +1,1268 @@
+{
+  "schema_version": "0.3.0",
+  "metadata": {
+    "schema_version": "0.3.0",
+    "stage": "stage1",
+    "env": {
+      "num_envs": 8,
+      "red_policy": "bline",
+      "remove_bugs": true,
+      "max_episode_steps": 100,
+      "seed": 7
+    },
+    "model": {
+      "hidden_size": 128,
+      "obj_dim": 3
+    },
+    "rollout": {
+      "num_steps": 64
+    },
+    "optimizer": {
+      "clip_param": 0.2,
+      "ppo_epochs": 4,
+      "num_mini_batch": 4,
+      "value_loss_coef": 0.5,
+      "entropy_coef": 0.01,
+      "learning_rate": 0.0003,
+      "max_grad_norm": 0.5,
+      "gamma": 0.995,
+      "gae_lambda": 0.95
+    },
+    "evaluation": {
+      "eval_episodes": 5,
+      "preference_step": null
+    },
+    "seed": 7,
+    "num_policies": 5,
+    "preference_strategy": "explicit",
+    "preference_step": 0.25,
+    "preference_dirichlet_alpha": 1.0,
+    "explicit_preferences": [
+      [
+        0.8,
+        0.1,
+        0.1
+      ],
+      [
+        0.6,
+        0.2,
+        0.2
+      ],
+      [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      [
+        0.2,
+        0.6,
+        0.2
+      ],
+      [
+        0.2,
+        0.2,
+        0.6
+      ]
+    ],
+    "preferences": [
+      [
+        0.8,
+        0.1,
+        0.1
+      ],
+      [
+        0.6,
+        0.2,
+        0.2
+      ],
+      [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      [
+        0.2,
+        0.6,
+        0.2
+      ],
+      [
+        0.2,
+        0.2,
+        0.6
+      ]
+    ],
+    "total_timesteps": 8192,
+    "timesteps_per_policy": 8192,
+    "total_stage_timesteps": 40960,
+    "stage1_summary": [
+      {
+        "preference_index": 0,
+        "preference": [
+          0.8,
+          0.1,
+          0.1
+        ],
+        "num_updates": 16,
+        "save_every": 4,
+        "timesteps_per_policy": 8192,
+        "num_saved_checkpoints": 5,
+        "final_policy_id": "stage1_pref_000_ckpt_015",
+        "final_objective_vector": [
+          -869.3399658203125,
+          -41.334999084472656,
+          -35.819000244140625
+        ],
+        "best_policy_id": "stage1_pref_000_ckpt_015",
+        "best_scalarized_utility": -703.1873725891113
+      },
+      {
+        "preference_index": 1,
+        "preference": [
+          0.6,
+          0.2,
+          0.2
+        ],
+        "num_updates": 16,
+        "save_every": 4,
+        "timesteps_per_policy": 8192,
+        "num_saved_checkpoints": 5,
+        "final_policy_id": "stage1_pref_001_ckpt_015",
+        "final_objective_vector": [
+          -738.2949829101562,
+          -45.661563873291016,
+          -36.1932487487793
+        ],
+        "best_policy_id": "stage1_pref_001_ckpt_012",
+        "best_scalarized_utility": -363.48074340820307
+      },
+      {
+        "preference_index": 2,
+        "preference": [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.3333333333333333
+        ],
+        "num_updates": 16,
+        "save_every": 4,
+        "timesteps_per_policy": 8192,
+        "num_saved_checkpoints": 5,
+        "final_policy_id": "stage1_pref_002_ckpt_015",
+        "final_objective_vector": [
+          -758.5599975585938,
+          -40.62874984741211,
+          -33.14550018310547
+        ],
+        "best_policy_id": "stage1_pref_002_ckpt_015",
+        "best_scalarized_utility": -277.4447491963704
+      },
+      {
+        "preference_index": 3,
+        "preference": [
+          0.2,
+          0.6,
+          0.2
+        ],
+        "num_updates": 16,
+        "save_every": 4,
+        "timesteps_per_policy": 8192,
+        "num_saved_checkpoints": 5,
+        "final_policy_id": "stage1_pref_003_ckpt_015",
+        "final_objective_vector": [
+          -566.9049682617188,
+          -29.107501983642578,
+          -22.59925079345703
+        ],
+        "best_policy_id": "stage1_pref_003_ckpt_012",
+        "best_scalarized_utility": -125.6326972961426
+      },
+      {
+        "preference_index": 4,
+        "preference": [
+          0.2,
+          0.2,
+          0.6
+        ],
+        "num_updates": 16,
+        "save_every": 4,
+        "timesteps_per_policy": 8192,
+        "num_saved_checkpoints": 5,
+        "final_policy_id": "stage1_pref_004_ckpt_015",
+        "final_objective_vector": [
+          -512.1849975585938,
+          -47.76906204223633,
+          -38.40800094604492
+        ],
+        "best_policy_id": "stage1_pref_004_ckpt_015",
+        "best_scalarized_utility": -135.03561248779297
+      }
+    ]
+  },
+  "records": [
+    {
+      "policy_id": "stage1_pref_000_ckpt_000",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_000.pt",
+      "preference": [
+        0.8,
+        0.1,
+        0.1
+      ],
+      "objective_vector": [
+        -938.2025146484375,
+        -41.85187530517578,
+        -33.34700012207031
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -452.78753662109375,
+          -23.89375114440918,
+          -18.72625732421875
+        ],
+        "scalarized_utility": -758.0818992614746,
+        "trainer_stats": {
+          "value_loss": 6294.5267333984375,
+          "action_loss": 89.57861614227295,
+          "entropy": 3.9506837129592896
+        },
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_004",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_001.pt",
+      "preference": [
+        0.8,
+        0.1,
+        0.1
+      ],
+      "objective_vector": [
+        -1615.2950439453125,
+        -45.57719039916992,
+        -35.82324981689453
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 4,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 2560,
+        "rollout_return_estimate": [
+          -744.8372802734375,
+          -29.895309448242188,
+          -24.28876304626465
+        ],
+        "scalarized_utility": -1300.3760791778566,
+        "trainer_stats": {
+          "value_loss": 17860.540771484375,
+          "action_loss": 146.02646684646606,
+          "entropy": 3.83024363219738
+        },
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_008",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_002.pt",
+      "preference": [
+        0.8,
+        0.1,
+        0.1
+      ],
+      "objective_vector": [
+        -1252.8250732421875,
+        -44.77312469482422,
+        -35.06575012207031
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 4608,
+        "rollout_return_estimate": [
+          -510.02496337890625,
+          -30.385934829711914,
+          -23.928756713867188
+        ],
+        "scalarized_utility": -1010.2439460754395,
+        "trainer_stats": {
+          "value_loss": 8262.4384765625,
+          "action_loss": 99.71042919158936,
+          "entropy": 3.7070682644844055
+        },
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_012",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_003.pt",
+      "preference": [
+        0.8,
+        0.1,
+        0.1
+      ],
+      "objective_vector": [
+        -1005.7274780273438,
+        -43.39031219482422,
+        -34.58675003051758
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 12,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 3,
+        "timesteps_seen": 6656,
+        "rollout_return_estimate": [
+          -364.74993896484375,
+          -27.439056396484375,
+          -20.87500762939453
+        ],
+        "scalarized_utility": -812.3796886444093,
+        "trainer_stats": {
+          "value_loss": 6137.905853271484,
+          "action_loss": 66.40515303611755,
+          "entropy": 3.564334496855736
+        },
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_015",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_004.pt",
+      "preference": [
+        0.8,
+        0.1,
+        0.1
+      ],
+      "objective_vector": [
+        -869.3399658203125,
+        -41.334999084472656,
+        -35.819000244140625
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 4,
+        "timesteps_seen": 8192,
+        "rollout_return_estimate": [
+          -253.112548828125,
+          -26.63749122619629,
+          -21.4425106048584
+        ],
+        "scalarized_utility": -703.1873725891113,
+        "trainer_stats": {
+          "value_loss": 1996.2137908935547,
+          "action_loss": 45.14505219459534,
+          "entropy": 3.4098393470048904
+        },
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_000",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_005.pt",
+      "preference": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "objective_vector": [
+        -1205.4150390625,
+        -39.54187774658203,
+        -31.263500213623047
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -458.7249450683594,
+          -23.873435974121094,
+          -19.19875717163086
+        ],
+        "scalarized_utility": -737.410099029541,
+        "trainer_stats": {
+          "value_loss": 9092.116882324219,
+          "action_loss": 67.23906826972961,
+          "entropy": 3.957251787185669
+        },
+        "pareto_size_after_save": 3,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_004",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_006.pt",
+      "preference": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "objective_vector": [
+        -907.677490234375,
+        -41.17062759399414,
+        -34.07749938964844
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 4,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 2560,
+        "rollout_return_estimate": [
+          -608.21240234375,
+          -25.62030792236328,
+          -20.326255798339844
+        ],
+        "scalarized_utility": -559.6561195373534,
+        "trainer_stats": {
+          "value_loss": 13026.131469726562,
+          "action_loss": 89.01853799819946,
+          "entropy": 3.8270909041166306
+        },
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_008",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_007.pt",
+      "preference": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "objective_vector": [
+        -756.5724487304688,
+        -40.399375915527344,
+        -32.92974853515625
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 4608,
+        "rollout_return_estimate": [
+          -631.4998168945312,
+          -25.890621185302734,
+          -20.74125862121582
+        ],
+        "scalarized_utility": -468.60929412841796,
+        "trainer_stats": {
+          "value_loss": 13699.26806640625,
+          "action_loss": 92.52306270599365,
+          "entropy": 3.6850286573171616
+        },
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_012",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_008.pt",
+      "preference": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "objective_vector": [
+        -576.4874877929688,
+        -50.41625213623047,
+        -37.525001525878906
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 12,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 3,
+        "timesteps_seen": 6656,
+        "rollout_return_estimate": [
+          -195.1375732421875,
+          -34.02812194824219,
+          -24.740009307861328
+        ],
+        "scalarized_utility": -363.48074340820307,
+        "trainer_stats": {
+          "value_loss": 648.8797798156738,
+          "action_loss": 26.90840458869934,
+          "entropy": 3.588806137442589
+        },
+        "pareto_size_after_save": 3,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_015",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_009.pt",
+      "preference": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "objective_vector": [
+        -738.2949829101562,
+        -45.661563873291016,
+        -36.1932487487793
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 4,
+        "timesteps_seen": 8192,
+        "rollout_return_estimate": [
+          -318.300048828125,
+          -29.040626525878906,
+          -21.656261444091797
+        ],
+        "scalarized_utility": -459.3479522705078,
+        "trainer_stats": {
+          "value_loss": 4219.654830932617,
+          "action_loss": 44.21582293510437,
+          "entropy": 3.570614367723465
+        },
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_000",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_010.pt",
+      "preference": [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "objective_vector": [
+        -1170.2149658203125,
+        -41.655311584472656,
+        -33.74774932861328
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -375.1750183105469,
+          -27.834373474121094,
+          -22.903759002685547
+        ],
+        "scalarized_utility": -415.2060089111328,
+        "trainer_stats": {
+          "value_loss": 5784.924957275391,
+          "action_loss": 33.05541241168976,
+          "entropy": 3.9592151790857315
+        },
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_004",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_011.pt",
+      "preference": [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "objective_vector": [
+        -1394.4949951171875,
+        -39.02593994140625,
+        -29.927499771118164
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 4,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 2560,
+        "rollout_return_estimate": [
+          -465.1250305175781,
+          -25.462499618530273,
+          -18.55875587463379
+        ],
+        "scalarized_utility": -487.8161449432373,
+        "trainer_stats": {
+          "value_loss": 6875.551940917969,
+          "action_loss": 40.47443509101868,
+          "entropy": 3.8410404473543167
+        },
+        "pareto_size_after_save": 5,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_008",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_012.pt",
+      "preference": [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "objective_vector": [
+        -1562.297607421875,
+        -40.907814025878906,
+        -33.86650085449219
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 4608,
+        "rollout_return_estimate": [
+          -905.524658203125,
+          -24.193748474121094,
+          -19.536256790161133
+        ],
+        "scalarized_utility": -545.6906407674154,
+        "trainer_stats": {
+          "value_loss": 23760.01806640625,
+          "action_loss": 76.5214409828186,
+          "entropy": 3.715879186987877
+        },
+        "pareto_size_after_save": 5,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_012",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_013.pt",
+      "preference": [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "objective_vector": [
+        -1098.875,
+        -40.536251068115234,
+        -33.58675003051758
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 12,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 3,
+        "timesteps_seen": 6656,
+        "rollout_return_estimate": [
+          -687.1123657226562,
+          -26.743749618530273,
+          -22.008758544921875
+        ],
+        "scalarized_utility": -390.99933369954425,
+        "trainer_stats": {
+          "value_loss": 14599.771179199219,
+          "action_loss": 58.553577184677124,
+          "entropy": 3.6811413615942
+        },
+        "pareto_size_after_save": 5,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_015",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_014.pt",
+      "preference": [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "objective_vector": [
+        -758.5599975585938,
+        -40.62874984741211,
+        -33.14550018310547
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 4,
+        "timesteps_seen": 8192,
+        "rollout_return_estimate": [
+          -596.1248779296875,
+          -25.803125381469727,
+          -22.983762741088867
+        ],
+        "scalarized_utility": -277.4447491963704,
+        "trainer_stats": {
+          "value_loss": 13574.806518554688,
+          "action_loss": 49.379732847213745,
+          "entropy": 3.5879782140254974
+        },
+        "pareto_size_after_save": 5,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_003_ckpt_000",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_015.pt",
+      "preference": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "objective_vector": [
+        -1169.6600341796875,
+        -39.07437515258789,
+        -30.28675079345703
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -324.13751220703125,
+          -25.520309448242188,
+          -20.336257934570312
+        ],
+        "scalarized_utility": -263.43398208618163,
+        "trainer_stats": {
+          "value_loss": 4807.608322143555,
+          "action_loss": 18.974450707435608,
+          "entropy": 3.954598069190979
+        },
+        "pareto_size_after_save": 5,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_003_ckpt_004",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_016.pt",
+      "preference": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "objective_vector": [
+        -1146.9775390625,
+        -40.04500198364258,
+        -28.98349952697754
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 4,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 2560,
+        "rollout_return_estimate": [
+          -498.8124694824219,
+          -24.69687271118164,
+          -18.55000877380371
+        ],
+        "scalarized_utility": -259.21920890808104,
+        "trainer_stats": {
+          "value_loss": 9675.242248535156,
+          "action_loss": 27.353443145751953,
+          "entropy": 3.7883428186178207
+        },
+        "pareto_size_after_save": 6,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_003_ckpt_008",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_017.pt",
+      "preference": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "objective_vector": [
+        -724.0599975585938,
+        -33.99031448364258,
+        -23.697500228881836
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 4608,
+        "rollout_return_estimate": [
+          -386.6625061035156,
+          -24.359376907348633,
+          -16.535005569458008
+        ],
+        "scalarized_utility": -169.9456882476807,
+        "trainer_stats": {
+          "value_loss": 6540.496154785156,
+          "action_loss": 21.113524079322815,
+          "entropy": 3.4173064082860947
+        },
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_003_ckpt_012",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_018.pt",
+      "preference": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "objective_vector": [
+        -518.1724853515625,
+        -29.190000534057617,
+        -22.42099952697754
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 12,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 3,
+        "timesteps_seen": 6656,
+        "rollout_return_estimate": [
+          -206.17507934570312,
+          -21.945314407348633,
+          -16.146255493164062
+        ],
+        "scalarized_utility": -125.6326972961426,
+        "trainer_stats": {
+          "value_loss": 764.6345748901367,
+          "action_loss": 11.796497642993927,
+          "entropy": 3.235934227705002
+        },
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_003_ckpt_015",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_019.pt",
+      "preference": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "objective_vector": [
+        -566.9049682617188,
+        -29.107501983642578,
+        -22.59925079345703
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 4,
+        "timesteps_seen": 8192,
+        "rollout_return_estimate": [
+          -191.2750701904297,
+          -20.243751525878906,
+          -14.427504539489746
+        ],
+        "scalarized_utility": -135.36534500122073,
+        "trainer_stats": {
+          "value_loss": 609.9467735290527,
+          "action_loss": 10.534034252166748,
+          "entropy": 3.1563056856393814
+        },
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_000",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_020.pt",
+      "preference": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "objective_vector": [
+        -938.552490234375,
+        -41.49937438964844,
+        -33.14274978637695
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -396.3999938964844,
+          -26.096874237060547,
+          -21.133760452270508
+        ],
+        "scalarized_utility": -215.89602279663086,
+        "trainer_stats": {
+          "value_loss": 6128.825500488281,
+          "action_loss": 22.58180010318756,
+          "entropy": 3.9582260996103287
+        },
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_004",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_021.pt",
+      "preference": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "objective_vector": [
+        -870.85498046875,
+        -43.005313873291016,
+        -34.471500396728516
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 4,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 2560,
+        "rollout_return_estimate": [
+          -826.6622314453125,
+          -28.260934829711914,
+          -22.00750732421875
+        ],
+        "scalarized_utility": -203.45495910644533,
+        "trainer_stats": {
+          "value_loss": 20354.479370117188,
+          "action_loss": 43.34438896179199,
+          "entropy": 3.769334554672241
+        },
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_008",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_022.pt",
+      "preference": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "objective_vector": [
+        -785.1499633789062,
+        -43.602813720703125,
+        -36.881500244140625
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 4608,
+        "rollout_return_estimate": [
+          -195.11256408691406,
+          -27.998435974121094,
+          -23.133758544921875
+        ],
+        "scalarized_utility": -187.87945556640628,
+        "trainer_stats": {
+          "value_loss": 671.4374618530273,
+          "action_loss": 12.107292473316193,
+          "entropy": 3.5884009897708893
+        },
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_012",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_023.pt",
+      "preference": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "objective_vector": [
+        -839.2249755859375,
+        -51.51812744140625,
+        -42.882999420166016
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 12,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 3,
+        "timesteps_seen": 6656,
+        "rollout_return_estimate": [
+          -212.4001007080078,
+          -29.278121948242188,
+          -24.885007858276367
+        ],
+        "scalarized_utility": -203.8784202575684,
+        "trainer_stats": {
+          "value_loss": 839.8496704101562,
+          "action_loss": 13.033798098564148,
+          "entropy": 3.4044920206069946
+        },
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_015",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_024.pt",
+      "preference": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "objective_vector": [
+        -512.1849975585938,
+        -47.76906204223633,
+        -38.40800094604492
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 4,
+        "timesteps_seen": 8192,
+        "rollout_return_estimate": [
+          -373.22503662109375,
+          -30.573436737060547,
+          -25.731258392333984
+        ],
+        "scalarized_utility": -135.03561248779297,
+        "trainer_stats": {
+          "value_loss": 4996.784912109375,
+          "action_loss": 21.659574270248413,
+          "entropy": 3.2307542264461517
+        },
+        "pareto_size_after_save": 3,
+        "is_nondominated_after_save": true
+      }
+    }
+  ],
+  "pareto_front": [
+    {
+      "policy_id": "stage1_pref_003_ckpt_012",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_018.pt",
+      "preference": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "objective_vector": [
+        -518.1724853515625,
+        -29.190000534057617,
+        -22.42099952697754
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 12,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 3,
+        "timesteps_seen": 6656,
+        "rollout_return_estimate": [
+          -206.17507934570312,
+          -21.945314407348633,
+          -16.146255493164062
+        ],
+        "scalarized_utility": -125.6326972961426,
+        "trainer_stats": {
+          "value_loss": 764.6345748901367,
+          "action_loss": 11.796497642993927,
+          "entropy": 3.235934227705002
+        },
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_003_ckpt_015",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_019.pt",
+      "preference": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "objective_vector": [
+        -566.9049682617188,
+        -29.107501983642578,
+        -22.59925079345703
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 4,
+        "timesteps_seen": 8192,
+        "rollout_return_estimate": [
+          -191.2750701904297,
+          -20.243751525878906,
+          -14.427504539489746
+        ],
+        "scalarized_utility": -135.36534500122073,
+        "trainer_stats": {
+          "value_loss": 609.9467735290527,
+          "action_loss": 10.534034252166748,
+          "entropy": 3.1563056856393814
+        },
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_015",
+      "checkpoint_path": "cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/policy_024.pt",
+      "preference": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "objective_vector": [
+        -512.1849975585938,
+        -47.76906204223633,
+        -38.40800094604492
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 4,
+        "timesteps_seen": 8192,
+        "rollout_return_estimate": [
+          -373.22503662109375,
+          -30.573436737060547,
+          -25.731258392333984
+        ],
+        "scalarized_utility": -135.03561248779297,
+        "trainer_stats": {
+          "value_loss": 4996.784912109375,
+          "action_loss": 21.659574270248413,
+          "entropy": 3.2307542264461517
+        },
+        "pareto_size_after_save": 3,
+        "is_nondominated_after_save": true
+      }
+    }
+  ]
+}
