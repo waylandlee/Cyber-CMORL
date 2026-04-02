@@ -12,9 +12,10 @@
 - `CybORG++` 原始环境与开发说明
   - 包括修复后的 CAGE 2 CybORG 环境
   - 包括轻量快速的 `MiniCAGE`
-- `MiniCAGE C-MORL` 论文复现主线
+- `MiniCAGE C-MORL` 论文实验主线
   - 位于 [cmorl_minicage](./cmorl_minicage)
   - 目标是在不改动其他研究主线的前提下，复现论文 *Efficient Discovery of Pareto Front for Multi-Objective Reinforcement Learning (C-MORL)* 的核心训练流程，并将其迁移到 MiniCAGE 场景
+  - 当前已经补齐统一论文实验系统，可直接生成主表 A、主表 B、补充实验、CSV/TEX 表格与图片
 
 ## 当前复现主线在做什么
 
@@ -28,8 +29,22 @@
   - `dynamic beta scheduling`
 - SMP assignment
 - HV / EU / SP evaluation
+- conditioned evaluator
+- constraint evaluator
+- shared-reference compare suite
+- CSV / JSON / TeX table export
 - YAML 配置驱动训练与评估
 - 统一的 buffer / summary / metrics 输出格式
+
+当前还已经补入以下论文 baseline 入口：
+
+- `Weighted-Sum`
+- `Preference-Conditioned PPO`
+- `PCN-lite`
+- `Lagrangian-PPO`
+- `stage1-only`
+- `no-constraint stage2`
+- `single-objective`
 
 当前 Stage-2 已支持四种模式：
 
@@ -58,54 +73,88 @@
   - `stage1_summary.json`
   - `stage2_summary.json`
   - `metrics.json`
+  - `constraint_metrics.json`
+  - `table_a_summary.json`
+  - `table_a_metrics.csv`
+  - `table_b_constraints.csv`
 
-当前实验现状建议分成两条线理解：
+当前正式论文实验链路已经固定为：
 
-- `legacy formal_c2`
-  - 这是当前已经发布、图表与 baseline suite 最完整的一条正式结果线
-  - `Stage-2` 在统一评估口径下优于 `Stage-1` 和 5 个 baseline
-- `independent + AdaCS-DCS`
-  - 这是当前正在推进的升级线
-  - `Stage-1` 已切到 `independent` 协议，并把 `E3` explicit preference 设计固化为新基线
-  - `Stage-2` 已支持 `AdaCS-DCS-CMORL` 四种模式，并完成了初步消融、温和 DCS 调参与 `chase` 正式主配置升级
+- 主表 A：Pareto / utility 比较
+  - `Ours (stage2)`
+  - `Weighted-Sum`
+  - `Preference-Conditioned PPO`
+  - `PCN-lite`
+- 主表 B：约束处理比较
+  - `Ours (stage2)`
+  - `Lagrangian-PPO`
+  - `Weighted-Sum`
+  - `stage1-only`
+  - `no-constraint stage2`
+  - `single-objective`
+- 补充实验
+  - `stage1-only`
+  - `no-constraint stage2`
+  - `single-objective`
+  - `multiseed summary`
 
-当前已发布的正式主结果仍以 `legacy formal_c2` 为准：
+当前统一 paper protocol 的固定口径是：
 
-- `Stage-1`
-  - `HV = 362094.86`
-  - `EU = -170.55`
-  - `Pareto Count = 4`
-- `Stage-2`
-  - `HV = 601513.12`
-  - `EU = -114.70`
-  - `Pareto Count = 6`
-- 6 方法 suite 公平比较中，`Stage-2` 仍为最优：
-  - `HV = 1699877.00`
-  - `EU = -114.69`
-  - `Pareto Count = 6`
+- 环境：
+  - `num_envs=8`
+  - `red_policy=bline`
+  - `remove_bugs=true`
+  - `max_episode_steps=100`
+- 目标维度：
+  - `obj_dim=3`
+- 主表 A 评估：
+  - `preference_step=0.1`
+  - `reference_strategy=data_min_range`
+  - `reference_margin=0.25`
+- 统一总训练预算：
+  - `98304 env steps`
+- 主表 A 使用共享 reference point：
+  - `[-884.1681, -82.3076, -99.1242]`
+- 主表 B 使用共享 thresholds：
+  - `d_business=-29.2917`
+  - `d_cost=-20.9862`
 
-当前升级线的最新状态是：
+当前已经跑完一轮 formal 5-seed 长跑，seed 为：
 
-- `independent Stage-1` 在 `E3` 基线上目前稳定形成 `3` 点初始 Pareto front
-- 原始 `AdaCS + DCS(0.88~0.98)` 在 independent 协议下过严，曾导致 `generated = 0`
-- 把 DCS 调整到围绕 `beta≈1.005` 的温和区间后，`dynamic beta` 已恢复可行扩展：
-  - `crowding_dcs_gentle`
-  - `adacs_dcs_gentle`
-  - `crowding_dcs_verygentle`
-  - `adacs_dcs_verygentle`
-- 这些温和 DCS 结果在 `HV / EU / Pareto Count` 上已追平 `fixed beta`
-- 在 `E3-dense-ckpt` 的 candidate-rich Stage-1 基线上，AdaCS 已经显出独立增益
-- 当前 `AdaCS-DCS` 的正式主配置已经升级为 `chase`：
-  - `marginal coverage`
-  - `expansion-first` 选点
-  - 更友好的动态 beta 区间
-- 在统一参考点下，`AdaCS-DCS chase` 已实现对 `crowding + dcs_gentle` 的 `HV / EU` 双反超：
-  - `HV = 6612380.50`
-  - `EU = -100.078`
-- 为此，项目已经补入两组新的 `Stage-1 density` 正式配置：
-  - `e3_dense_ckpt`
-  - `e3_dense_pref`
- 目标是为 AdaCS 提供更厚的可选前沿，并验证其独立收益
+- `7`
+- `11`
+- `19`
+- `23`
+- `29`
+
+当前这轮 formal 结果最值得直接查看的是：
+
+- 主表 A 汇总：
+  - [table_a_summary.json](./cmorl_minicage/outputs/paper_table_a/table_a_summary.json)
+- 主表 B 汇总：
+  - [table_b_constraints.csv](./cmorl_minicage/outputs/paper_table_a/tables/table_b_constraints.csv)
+- 补充实验汇总：
+  - [multiseed_summary.json](./cmorl_minicage/outputs/paper_appendix/multiseed_summary.json)
+
+主表 A 当前导出的方法均值为：
+
+| Method | HV | EU | SP |
+| --- | --- | --- | --- |
+| Ours | `3290687.06 ± 91067.55` | `-117.33 ± 2.96` | `5593.55 ± 7050.51` |
+| Weighted-Sum | `4232624.89 ± 50823.96` | `-102.20 ± 4.48` | `699.32 ± 720.16` |
+| Pref-Cond PPO | `3033873.25 ± 442592.20` | `-113.25 ± 3.65` | `0.81 ± 0.63` |
+| PCN-lite | `4003017.17 ± 217249.56` | `-131.41 ± 29.95` | `346.10 ± 682.68` |
+
+主表 B 当前导出的代表性结果为：
+
+| Method | Security | Feasible Rate | Mean Violation |
+| --- | --- | --- | --- |
+| Ours | `-418.47` | `0.965` | `0.071` |
+| Lagrangian-PPO | `-300.81` | `0.255` | `23.056` |
+| Weighted-Sum | `-310.52` | `0.890` | `0.270` |
+| stage1-only | `-433.62` | `0.940` | `0.138` |
+| no-constraint stage2 | `-360.74` | `0.900` | `0.553` |
+| single-objective | `-310.90` | `0.990` | `0.004` |
 
 ## 论文算法流程 vs 当前代码流程
 
@@ -268,7 +317,9 @@
 
 ## 快速开始
 
-建议在仓库根目录、使用 `cc4` conda 环境运行：
+建议在仓库根目录、使用 `cc4` conda 环境运行。
+
+基础 smoke 链路：
 
 ```bash
 conda run -n cc4 python -m cmorl_minicage.train_stage1 --config cmorl_minicage/configs/smoke/stage1.yaml
@@ -276,47 +327,43 @@ conda run -n cc4 python -m cmorl_minicage.train_stage2 --config cmorl_minicage/c
 conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/configs/smoke/evaluate.yaml --buffer-path <solution_buffer>
 ```
 
-如果要跑更正式的实验，可以切换到：
+如果要跑当前统一论文配置，优先看：
 
-- `cmorl_minicage/configs/formal/`
+- [cmorl_minicage/configs/paper](./cmorl_minicage/configs/paper)
 
-如果要直接复现实验升级线，当前最值得看的配置是：
+其中最常用的入口是：
 
-- Stage-1 independent 基线：
-  - [stage1_c2_independent.yaml](./cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
-- Stage-1 density 配置：
-  - [e3_dense_ckpt.yaml](./cmorl_minicage/configs/formal/stage1_density/e3_dense_ckpt.yaml)
-  - [e3_dense_pref.yaml](./cmorl_minicage/configs/formal/stage1_density/e3_dense_pref.yaml)
-- AdaCS-DCS formal 配置：
-  - [stage2_c2_adacs_dcs.yaml](./cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
-- AdaCS-DCS ablation 配置：
-  - [cmorl_minicage/configs/ablation](./cmorl_minicage/configs/ablation)
+- `stage1_main.yaml`
+- `stage2_main.yaml`
+- `stage2_no_constraint.yaml`
+- `weighted_sum_main.yaml`
+- `pref_cond_ppo.yaml`
+- `lagrangian_ppo.yaml`
+- `pcn.yaml`
 
-当前正式主线默认建议直接使用：
+运行 Ours 的 paper 配置：
 
 ```bash
-conda run -n cc4 python -m cmorl_minicage.train_stage1 --config cmorl_minicage/configs/formal/stage1_c2.yaml
-conda run -n cc4 python -m cmorl_minicage.train_stage2 --config cmorl_minicage/configs/formal/stage2_c2.yaml --stage1-buffer <stage1_solution_buffer>
-conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/configs/formal/evaluate.yaml --buffer-path <solution_buffer>
+conda run -n cc4 python -m cmorl_minicage.train_stage1 --config cmorl_minicage/configs/paper/stage1_main.yaml
+conda run -n cc4 python -m cmorl_minicage.train_stage2 --config cmorl_minicage/configs/paper/stage2_main.yaml --stage1-buffer <stage1_solution_buffer>
+conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/configs/paper/evaluate_main_table_a.yaml --buffer-path <solution_buffer>
 ```
 
-如果要直接跟进当前升级线，建议按下面顺序：
+运行 conditioned / constrained baseline：
 
 ```bash
-conda run -n cc4 python -m cmorl_minicage.train_stage1 --config cmorl_minicage/configs/formal/stage1_density/e3_dense_ckpt.yaml
-conda run -n cc4 python -m cmorl_minicage.train_stage2 --config cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml --stage1-buffer <stage1_solution_buffer>
-conda run -n cc4 python -m cmorl_minicage.evaluate --config cmorl_minicage/configs/formal/evaluate.yaml --buffer-path <solution_buffer>
+conda run -n cc4 python -m cmorl_minicage.baselines weighted-sum --stage1-config cmorl_minicage/configs/paper/weighted_sum_main.yaml --preferences-file cmorl_minicage/configs/paper/preferences_main_table_a.yaml --output-dir cmorl_minicage/outputs/paper_table_a/weighted_sum
+conda run -n cc4 python -m cmorl_minicage.train_pref_conditioned_ppo --config cmorl_minicage/configs/paper/pref_cond_ppo.yaml
+conda run -n cc4 python -m cmorl_minicage.evaluate_conditioned --config cmorl_minicage/configs/paper/evaluate_main_table_a.yaml --input-path <conditioned_run_metadata_or_points>
+conda run -n cc4 python -m cmorl_minicage.train_lagrangian_ppo --config cmorl_minicage/configs/paper/lagrangian_ppo.yaml
+conda run -n cc4 python -m cmorl_minicage.train_pcn --config cmorl_minicage/configs/paper/pcn.yaml
 ```
 
-这里要注意：
-
-- 如果你的目标是复现当前“已发布正式主结果”，请使用 `formal_c2` 的 `stage1_c2.yaml + stage2_c2.yaml`
-- 如果你的目标是继续推进 `independent + AdaCS-DCS` 升级线，请使用 `stage1_c2_independent.yaml` 或 `stage1_density/*`，再接 `stage2_c2_adacs_dcs.yaml`
-
-如果想直接做 baseline，对应入口是：
+运行统一对比与导表：
 
 ```bash
-conda run -n cc4 python -m cmorl_minicage.baselines weighted-sum --stage1-config cmorl_minicage/configs/formal/stage1_c2.yaml --evaluate-config cmorl_minicage/configs/formal/evaluate.yaml --output-dir cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum
+conda run -n cc4 python -m cmorl_minicage.compare_suite --config cmorl_minicage/outputs/paper_table_a/compare_suite_config.yaml
+conda run -n cc4 python -m cmorl_minicage.export_tables --config cmorl_minicage/outputs/paper_table_a/export_tables_config.yaml
 ```
 
 ## 输出与实验记录
@@ -324,6 +371,31 @@ conda run -n cc4 python -m cmorl_minicage.baselines weighted-sum --stage1-config
 当前复现线所有实验输出默认写入：
 
 - `cmorl_minicage/outputs/`
+
+本轮论文实验系统的核心输出目录是：
+
+- `cmorl_minicage/outputs/paper_table_a/`
+- `cmorl_minicage/outputs/paper_table_b/`
+- `cmorl_minicage/outputs/paper_appendix/`
+
+其中包含：
+
+- 主表 A：
+  - `shared_reference.json`
+  - `table_a_summary.json`
+  - `tables/table_a_metrics.csv`
+  - `tables/table_a_metrics.tex`
+  - `main_table_a_metrics.png`
+  - `main_table_a_pairwise.png`
+- 主表 B：
+  - `shared_thresholds.json`
+  - `aggregated/*.json`
+  - `tables/table_b_constraints.csv`
+  - `tables/table_b_constraints.tex`
+  - `main_table_b_bar.png`
+- 补充实验：
+  - `multiseed_summary.json`
+  - `aggregated/*.json`
 
 实验过程中的结构化事实来自 run 目录下的 JSON 文件；实验现象、结论和后续动作统一记录在：
 

@@ -108,6 +108,7 @@ class Stage2Config:
     num_extension_policies: int = 6
     extension_rounds: int = 2
     constrained_updates: int = 2
+    extension_mode: str = "constrained"
     constraint_tolerance: float = 1e-6
     total_timesteps_per_update: int = 512
     output_dir: str = "cmorl_minicage/outputs/stage2"
@@ -131,12 +132,123 @@ class EvaluateConfig:
     hv_mc_samples: int = 50000
 
 
+@dataclass
+class ConditionedEvaluateConfig:
+    input_path: str = ""
+    input_kind: str = "run_metadata"
+    output_path: str = ""
+    preference_step: float | None = None
+    reference_strategy: str = "data_min_margin"
+    reference_margin: float = 1.0
+    reference_point: list[float] = field(default_factory=list)
+    hv_max_exact_points: int = 18
+    hv_mc_samples: int = 50000
+    eval_episodes: int = 3
+
+
+@dataclass
+class ConstraintEvaluateConfig:
+    method_name: str = ""
+    input_kind: str = "buffer"
+    input_path: str = ""
+    selection_source: str = "pareto"
+    thresholds_path: str = ""
+    output_path: str = ""
+    eval_episodes: int = 5
+
+
+@dataclass
+class PreferenceConditionedPPOConfig:
+    seed: int = 7
+    total_timesteps: int = 98304
+    output_dir: str = "cmorl_minicage/outputs/paper_table_a/pref_conditioned_ppo"
+    preference_strategy: str = "dirichlet"
+    preference_step: float = 0.1
+    preference_dirichlet_alpha: float = 1.0
+    explicit_preferences: list[list[float]] = field(default_factory=list)
+    clip_param: float = 0.2
+    ppo_epochs: int = 4
+    num_mini_batch: int = 4
+    value_loss_coef: float = 0.5
+    entropy_coef: float = 0.01
+    learning_rate: float = 3e-4
+    max_grad_norm: float = 0.5
+    gamma: float = 0.995
+    gae_lambda: float = 0.95
+    env: EnvConfig = field(default_factory=EnvConfig)
+    model: ModelConfig = field(default_factory=ModelConfig)
+    rollout: RolloutConfig = field(default_factory=RolloutConfig)
+    eval: EvalConfig = field(default_factory=EvalConfig)
+
+
+@dataclass
+class LagrangianPPOConfig:
+    seed: int = 23
+    total_timesteps: int = 98304
+    output_dir: str = "cmorl_minicage/outputs/paper_table_b/lagrangian_ppo"
+    stage1_buffer: str = ""
+    thresholds_path: str = ""
+    dual_lr: float = 0.05
+    clip_param: float = 0.2
+    ppo_epochs: int = 4
+    num_mini_batch: int = 4
+    value_loss_coef: float = 0.5
+    entropy_coef: float = 0.01
+    learning_rate: float = 3e-4
+    max_grad_norm: float = 0.5
+    gamma: float = 0.995
+    gae_lambda: float = 0.95
+    env: EnvConfig = field(default_factory=lambda: EnvConfig(seed=23))
+    model: ModelConfig = field(default_factory=ModelConfig)
+    rollout: RolloutConfig = field(default_factory=RolloutConfig)
+    eval: EvalConfig = field(default_factory=EvalConfig)
+
+
+@dataclass
+class PCNConfig:
+    seed: int = 29
+    total_timesteps: int = 98304
+    output_dir: str = "cmorl_minicage/outputs/paper_appendix/pcn"
+    archive_sources: list[str] = field(default_factory=list)
+    archive_episodes_per_source: int = 2
+    batch_size: int = 256
+    learning_rate: float = 3e-4
+    num_epochs: int = 10
+    hidden_size: int = 128
+    eval_preferences_path: str = ""
+    env: EnvConfig = field(default_factory=lambda: EnvConfig(seed=29))
+    model: ModelConfig = field(default_factory=ModelConfig)
+    eval: EvalConfig = field(default_factory=EvalConfig)
+
+
+@dataclass
+class CompareSuiteConfig:
+    output_dir: str = "cmorl_minicage/outputs/paper_table_a"
+    entries: list[dict[str, Any]] = field(default_factory=list)
+    preference_step: float | None = 0.1
+    reference_strategy: str = "data_min_range"
+    reference_margin: float = 0.25
+    reference_point: list[float] = field(default_factory=list)
+    hv_max_exact_points: int = 18
+    hv_mc_samples: int = 100000
+
+
+@dataclass
+class ExportTablesConfig:
+    compare_summary_path: str = ""
+    constraint_metrics_paths: list[str] = field(default_factory=list)
+    appendix_metrics_paths: list[str] = field(default_factory=list)
+    output_dir: str = "cmorl_minicage/outputs/paper_tables"
+
+
 T = TypeVar("T")
 
 CONFIG_DIR = Path(__file__).resolve().parent / "configs"
 DEFAULT_STAGE1_CONFIG = CONFIG_DIR / "stage1.yaml"
 DEFAULT_STAGE2_CONFIG = CONFIG_DIR / "stage2.yaml"
 DEFAULT_EVALUATE_CONFIG = CONFIG_DIR / "evaluate.yaml"
+DEFAULT_CONDITIONED_EVALUATE_CONFIG = CONFIG_DIR / "paper" / "evaluate_main_table_a.yaml"
+DEFAULT_CONSTRAINT_EVALUATE_CONFIG = CONFIG_DIR / "paper" / "evaluate_main_table_b.yaml"
 
 
 def _merge_dataclass(instance: T, overrides: dict[str, Any]) -> T:
@@ -184,6 +296,61 @@ def load_stage2_config(path: str | Path | None = None) -> Stage2Config:
 
 def load_evaluate_config(path: str | Path | None = None) -> EvaluateConfig:
     config = EvaluateConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_conditioned_evaluate_config(
+    path: str | Path | None = None,
+) -> ConditionedEvaluateConfig:
+    config = ConditionedEvaluateConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_constraint_evaluate_config(
+    path: str | Path | None = None,
+) -> ConstraintEvaluateConfig:
+    config = ConstraintEvaluateConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_preference_conditioned_ppo_config(
+    path: str | Path | None = None,
+) -> PreferenceConditionedPPOConfig:
+    config = PreferenceConditionedPPOConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_lagrangian_ppo_config(path: str | Path | None = None) -> LagrangianPPOConfig:
+    config = LagrangianPPOConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_pcn_config(path: str | Path | None = None) -> PCNConfig:
+    config = PCNConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_compare_suite_config(path: str | Path | None = None) -> CompareSuiteConfig:
+    config = CompareSuiteConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_export_tables_config(path: str | Path | None = None) -> ExportTablesConfig:
+    config = ExportTablesConfig()
     if path is None:
         return config
     return _merge_dataclass(config, _load_yaml(path))

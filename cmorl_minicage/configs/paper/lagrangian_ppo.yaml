@@ -1,0 +1,29 @@
+seed: 23
+total_timesteps: 98304
+stage1_buffer: ""
+thresholds_path: ""
+dual_lr: 0.05
+output_dir: cmorl_minicage/outputs/paper_table_b/lagrangian_ppo
+clip_param: 0.2
+ppo_epochs: 4
+num_mini_batch: 4
+value_loss_coef: 0.5
+entropy_coef: 0.01
+learning_rate: 3.0e-4
+max_grad_norm: 0.5
+gamma: 0.995
+gae_lambda: 0.95
+env:
+  num_envs: 8
+  red_policy: bline
+  remove_bugs: true
+  max_episode_steps: 100
+  seed: 23
+model:
+  hidden_size: 128
+  obj_dim: 3
+rollout:
+  num_steps: 64
+eval:
+  eval_episodes: 5
+  preference_step: 0.1

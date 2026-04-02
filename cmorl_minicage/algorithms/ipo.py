@@ -38,6 +38,7 @@ class IPOTrainer:
         objective_idx: int,
         reference_objectives,
         beta_override: float | None = None,
+        use_barrier: bool = True,
     ) -> dict[str, float]:
         reference = torch.as_tensor(
             reference_objectives, device=storage.device, dtype=torch.float32
@@ -76,21 +77,21 @@ class IPOTrainer:
 
                 barrier_terms = []
                 margin_values = []
-                for idx in range(batch.advantages.shape[1]):
-                    if idx == objective_idx:
-                        continue
-                    constraint_adv = batch.advantages[:, idx]
-                    clipped_constraint_gain = torch.min(
-                        ratio * batch.advantages[:, idx],
-                        clipped_ratio * batch.advantages[:, idx],
-                    )
-                    surrogate_return = reference[idx] + clipped_constraint_gain.mean()
-                    margin = surrogate_return - beta_value * reference[idx]
-                    margin_values.append(margin.detach())
-                    barrier_terms.append(
-                        torch.log(torch.clamp(margin, min=self.config.eps))
-                        / self.config.barrier_coef
-                    )
+                if use_barrier:
+                    for idx in range(batch.advantages.shape[1]):
+                        if idx == objective_idx:
+                            continue
+                        clipped_constraint_gain = torch.min(
+                            ratio * batch.advantages[:, idx],
+                            clipped_ratio * batch.advantages[:, idx],
+                        )
+                        surrogate_return = reference[idx] + clipped_constraint_gain.mean()
+                        margin = surrogate_return - beta_value * reference[idx]
+                        margin_values.append(margin.detach())
+                        barrier_terms.append(
+                            torch.log(torch.clamp(margin, min=self.config.eps))
+                            / self.config.barrier_coef
+                        )
                 barrier_bonus = (
                     torch.stack(barrier_terms).sum()
                     if barrier_terms

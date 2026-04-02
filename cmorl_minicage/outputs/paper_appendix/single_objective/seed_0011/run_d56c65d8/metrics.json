@@ -1,0 +1,3965 @@
+{
+  "schema_version": "0.3.0",
+  "metadata": {
+    "schema_version": "0.3.0",
+    "stage": "stage1",
+    "env": {
+      "num_envs": 8,
+      "red_policy": "bline",
+      "remove_bugs": true,
+      "max_episode_steps": 100,
+      "seed": 11
+    },
+    "model": {
+      "hidden_size": 128,
+      "obj_dim": 3
+    },
+    "rollout": {
+      "num_steps": 64
+    },
+    "optimizer": {
+      "clip_param": 0.2,
+      "ppo_epochs": 4,
+      "num_mini_batch": 4,
+      "value_loss_coef": 0.5,
+      "entropy_coef": 0.01,
+      "learning_rate": 0.0003,
+      "max_grad_norm": 0.5,
+      "gamma": 0.995,
+      "gae_lambda": 0.95
+    },
+    "evaluation": {
+      "eval_episodes": 5,
+      "preference_step": null
+    },
+    "seed": 11,
+    "num_policies": 3,
+    "preference_strategy": "explicit",
+    "preference_step": 0.5,
+    "preference_dirichlet_alpha": 1.0,
+    "explicit_preferences": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "preferences": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "total_timesteps": 98304,
+    "timesteps_per_policy": 98304,
+    "total_stage_timesteps": 294912,
+    "stage1_summary": [
+      {
+        "preference_index": 0,
+        "preference": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "num_updates": 192,
+        "save_every": 4,
+        "timesteps_per_policy": 98304,
+        "num_saved_checkpoints": 49,
+        "final_policy_id": "stage1_pref_000_ckpt_191",
+        "final_objective_vector": [
+          -115.38500213623047,
+          -78.40438079833984,
+          -97.60250091552734
+        ],
+        "best_policy_id": "stage1_pref_000_ckpt_191",
+        "best_scalarized_utility": -115.38500213623047,
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial"
+      },
+      {
+        "preference_index": 1,
+        "preference": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "num_updates": 192,
+        "save_every": 4,
+        "timesteps_per_policy": 98304,
+        "num_saved_checkpoints": 49,
+        "final_policy_id": "stage1_pref_001_ckpt_191",
+        "final_objective_vector": [
+          -303.8000183105469,
+          -5.0425004959106445,
+          -2.0234997272491455
+        ],
+        "best_policy_id": "stage1_pref_001_ckpt_191",
+        "best_scalarized_utility": -5.0425004959106445,
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial"
+      },
+      {
+        "preference_index": 2,
+        "preference": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "num_updates": 192,
+        "save_every": 4,
+        "timesteps_per_policy": 98304,
+        "num_saved_checkpoints": 49,
+        "final_policy_id": "stage1_pref_002_ckpt_191",
+        "final_objective_vector": [
+          -303.88751220703125,
+          -5.93125057220459,
+          -2.1052498817443848
+        ],
+        "best_policy_id": "stage1_pref_002_ckpt_184",
+        "best_scalarized_utility": -2.05299973487854,
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial"
+      }
+    ],
+    "stage1_protocol_name": "legacy",
+    "reseed_mode": "shared",
+    "independent_env_per_preference": false,
+    "preference_seed_stride": 1000,
+    "env_seed_stride": 1000,
+    "parallel_workers": 1,
+    "parallel_backend": "process",
+    "merge_order": "preference_index"
+  },
+  "metrics": {
+    "num_records": 147,
+    "num_pareto_records": 21,
+    "hypervolume": 930654.47383,
+    "hypervolume_method": "monte_carlo",
+    "expected_utility": -69.83779795603319,
+    "sparsity": 425.8509155273438,
+    "reference_point": [
+      -350.9037780761719,
+      -96.7448501586914,
+      -121.49725341796875
+    ],
+    "reference_strategy": "data_min_range",
+    "reference_margin": 0.25,
+    "preference_step": 0.1,
+    "obj_dim": 3,
+    "semantic_eval_batches": 5
+  },
+  "pareto_front": [
+    {
+      "policy_id": "stage1_pref_000_ckpt_048",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_048.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -303.01751708984375,
+        -54.32625198364258,
+        -38.460750579833984
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 48,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 12,
+        "timesteps_seen": 25088,
+        "rollout_return_estimate": [
+          -191.85008239746094,
+          -38.82969284057617,
+          -28.916263580322266
+        ],
+        "scalarized_utility": -303.01751708984375,
+        "trainer_stats": {
+          "value_loss": 578.8098564147949,
+          "action_loss": 38.60825991630554,
+          "entropy": 2.9071907997131348
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 6,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_124",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_124.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -293.32501220703125,
+        -46.34250259399414,
+        -43.82500076293945
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 124,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 31,
+        "timesteps_seen": 64000,
+        "rollout_return_estimate": [
+          -188.67507934570312,
+          -30.32498550415039,
+          -29.54876136779785
+        ],
+        "scalarized_utility": -293.32501220703125,
+        "trainer_stats": {
+          "value_loss": 457.24816513061523,
+          "action_loss": 35.19821858406067,
+          "entropy": 2.5949046909809113
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 7,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_128",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_128.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -264.6150207519531,
+        -50.13875198364258,
+        -51.35649871826172
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 128,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 32,
+        "timesteps_seen": 66048,
+        "rollout_return_estimate": [
+          -172.21253967285156,
+          -32.2968635559082,
+          -33.755008697509766
+        ],
+        "scalarized_utility": -264.6150207519531,
+        "trainer_stats": {
+          "value_loss": 365.9863910675049,
+          "action_loss": 31.33764088153839,
+          "entropy": 2.517441302537918
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 8,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_132",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_132.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -258.8349914550781,
+        -52.711875915527344,
+        -58.2807502746582
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 132,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 33,
+        "timesteps_seen": 68096,
+        "rollout_return_estimate": [
+          -148.1125030517578,
+          -29.865610122680664,
+          -31.85251235961914
+        ],
+        "scalarized_utility": -258.8349914550781,
+        "trainer_stats": {
+          "value_loss": 255.5495662689209,
+          "action_loss": 25.58931815624237,
+          "entropy": 2.0114995762705803
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 9,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_136",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_136.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -202.2949981689453,
+        -57.28937911987305,
+        -61.85300064086914
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 136,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 34,
+        "timesteps_seen": 70144,
+        "rollout_return_estimate": [
+          -148.54998779296875,
+          -32.22186279296875,
+          -32.82876205444336
+        ],
+        "scalarized_utility": -202.2949981689453,
+        "trainer_stats": {
+          "value_loss": 252.57315921783447,
+          "action_loss": 25.74659514427185,
+          "entropy": 1.9153872057795525
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 10,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_140",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_140.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -208.0500030517578,
+        -55.367191314697266,
+        -61.04100036621094
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 140,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 35,
+        "timesteps_seen": 72192,
+        "rollout_return_estimate": [
+          -112.86248016357422,
+          -40.615604400634766,
+          -46.162506103515625
+        ],
+        "scalarized_utility": -208.0500030517578,
+        "trainer_stats": {
+          "value_loss": 127.74383640289307,
+          "action_loss": 17.94813632965088,
+          "entropy": 1.6199456006288528
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 11,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_156",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_156.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -155.2375030517578,
+        -64.49531555175781,
+        -77.09500122070312
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 156,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 39,
+        "timesteps_seen": 80384,
+        "rollout_return_estimate": [
+          -87.84999084472656,
+          -46.80622863769531,
+          -56.857505798339844
+        ],
+        "scalarized_utility": -155.2375030517578,
+        "trainer_stats": {
+          "value_loss": 65.00532460212708,
+          "action_loss": 12.095842599868774,
+          "entropy": 0.8990801684558392
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 13,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_160",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_160.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -179.2274932861328,
+        -58.90437698364258,
+        -66.8655014038086
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 160,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 40,
+        "timesteps_seen": 82432,
+        "rollout_return_estimate": [
+          -95.79998779296875,
+          -42.070289611816406,
+          -50.087501525878906
+        ],
+        "scalarized_utility": -179.2274932861328,
+        "trainer_stats": {
+          "value_loss": 72.34741735458374,
+          "action_loss": 13.436655700206757,
+          "entropy": 1.237996183335781
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 13,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_164",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_164.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -179.6875,
+        -56.83781433105469,
+        -65.21199798583984
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 164,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 41,
+        "timesteps_seen": 84480,
+        "rollout_return_estimate": [
+          -117.2874755859375,
+          -35.224979400634766,
+          -40.470008850097656
+        ],
+        "scalarized_utility": -179.6875,
+        "trainer_stats": {
+          "value_loss": 123.4209041595459,
+          "action_loss": 18.29047155380249,
+          "entropy": 1.267175741493702
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 14,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_172",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_172.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -143.5175018310547,
+        -67.63313293457031,
+        -81.47574615478516
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 172,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 43,
+        "timesteps_seen": 88576,
+        "rollout_return_estimate": [
+          -103.74998474121094,
+          -40.34685134887695,
+          -47.50251007080078
+        ],
+        "scalarized_utility": -143.5175018310547,
+        "trainer_stats": {
+          "value_loss": 84.51185989379883,
+          "action_loss": 14.414303839206696,
+          "entropy": 0.9378701336681843
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 15,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_176",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_176.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -129.10499572753906,
+        -73.52375793457031,
+        -89.98049926757812
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 176,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 44,
+        "timesteps_seen": 90624,
+        "rollout_return_estimate": [
+          -81.66249084472656,
+          -46.36247634887695,
+          -56.45500183105469
+        ],
+        "scalarized_utility": -129.10499572753906,
+        "trainer_stats": {
+          "value_loss": 43.92602300643921,
+          "action_loss": 9.766910672187805,
+          "entropy": 0.6357333622872829
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_180",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_180.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -120.39749908447266,
+        -76.02438354492188,
+        -93.63899993896484
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 180,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 45,
+        "timesteps_seen": 92672,
+        "rollout_return_estimate": [
+          -77.1875,
+          -48.99372100830078,
+          -60.36000442504883
+        ],
+        "scalarized_utility": -120.39749908447266,
+        "trainer_stats": {
+          "value_loss": 35.589889883995056,
+          "action_loss": 8.66859120130539,
+          "entropy": 0.4375418424606323
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_184",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_184.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -117.95000457763672,
+        -77.12313079833984,
+        -95.6614990234375
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 184,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 46,
+        "timesteps_seen": 94720,
+        "rollout_return_estimate": [
+          -76.61249542236328,
+          -48.89997100830078,
+          -60.3275032043457
+        ],
+        "scalarized_utility": -117.95000457763672,
+        "trainer_stats": {
+          "value_loss": 32.055261969566345,
+          "action_loss": 8.41878193616867,
+          "entropy": 0.3276829179376364
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_188",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_188.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -117.93000030517578,
+        -77.74313354492188,
+        -96.50800323486328
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 188,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 47,
+        "timesteps_seen": 96768,
+        "rollout_return_estimate": [
+          -75.375,
+          -49.834346771240234,
+          -61.897499084472656
+        ],
+        "scalarized_utility": -117.93000030517578,
+        "trainer_stats": {
+          "value_loss": 29.651925206184387,
+          "action_loss": 7.963472336530685,
+          "entropy": 0.23449178226292133
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 19,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_160",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_160.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -303.760009765625,
+        -5.0946879386901855,
+        -2.060499668121338
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 160,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 40,
+        "timesteps_seen": 82432,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.449998378753662,
+          -1.5349993705749512
+        ],
+        "scalarized_utility": -5.0946879386901855,
+        "trainer_stats": {
+          "value_loss": 435.931489944458,
+          "action_loss": 0.04715410782955587,
+          "entropy": 0.7819665037095547
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_176",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_176.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -303.6925048828125,
+        -5.165937900543213,
+        -2.1227498054504395
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 176,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 44,
+        "timesteps_seen": 90624,
+        "rollout_return_estimate": [
+          -192.6875762939453,
+          -3.4281232357025146,
+          -1.3799993991851807
+        ],
+        "scalarized_utility": -5.165937900543213,
+        "trainer_stats": {
+          "value_loss": 424.6031494140625,
+          "action_loss": 0.035332960658706725,
+          "entropy": 0.7816603370010853
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 19,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_072",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_002_ckpt_072.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -303.6650085449219,
+        -5.594062805175781,
+        -2.360999822616577
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 72,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 18,
+        "timesteps_seen": 37376,
+        "rollout_return_estimate": [
+          -192.2500762939453,
+          -3.528123140335083,
+          -1.4662492275238037
+        ],
+        "scalarized_utility": -2.360999822616577,
+        "trainer_stats": {
+          "value_loss": 534.5957660675049,
+          "action_loss": -0.05911419866606593,
+          "entropy": 1.2690628543496132
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 19,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_080",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_002_ckpt_080.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -303.5775146484375,
+        -5.66687536239624,
+        -2.412749767303467
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 80,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 20,
+        "timesteps_seen": 41472,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.5781238079071045,
+          -1.4074993133544922
+        ],
+        "scalarized_utility": -2.412749767303467,
+        "trainer_stats": {
+          "value_loss": 524.0593242645264,
+          "action_loss": -0.051275762962177396,
+          "entropy": 1.546665996313095
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_096",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_002_ckpt_096.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -303.5350036621094,
+        -5.650938034057617,
+        -2.5047497749328613
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 96,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 24,
+        "timesteps_seen": 49664,
+        "rollout_return_estimate": [
+          -192.63758850097656,
+          -3.515623092651367,
+          -1.4437493085861206
+        ],
+        "scalarized_utility": -2.5047497749328613,
+        "trainer_stats": {
+          "value_loss": 507.9673767089844,
+          "action_loss": -0.015106628416106105,
+          "entropy": 1.705338567495346
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 21,
+        "is_nondominated_after_save": true
+      }
+    }
+  ],
+  "assignments": [
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -2.0234997272491455
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.10000000149011612,
+        0.8999999761581421
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -2.325399875640869
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.20000000298023224,
+        0.800000011920929
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -2.6272997856140137
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.30000001192092896,
+        0.699999988079071
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -2.9292001724243164
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.4000000059604645,
+        0.6000000238418579
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -3.231100082397461
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.5,
+        0.5
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -3.5329999923706055
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.6000000238418579,
+        0.4000000059604645
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -3.834900379180908
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.699999988079071,
+        0.30000001192092896
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -4.136800289154053
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.800000011920929,
+        0.20000000298023224
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -4.438700199127197
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.8999999761581421,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -4.7406005859375
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -5.0425004959106445
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.0,
+        0.8999999761581421
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -32.20115280151367
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.10000000149011612,
+        0.800000011920929
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -32.5030517578125
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.20000000298023224,
+        0.699999988079071
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -32.804954528808594
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.30000001192092896,
+        0.6000000238418579
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -33.10685348510742
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.4000000059604645,
+        0.5
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -33.40875244140625
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.5,
+        0.4000000059604645
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -33.71065139770508
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.6000000238418579,
+        0.30000001192092896
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -34.012550354003906
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.699999988079071,
+        0.20000000298023224
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -34.314453125
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.800000011920929,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -34.61635208129883
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.10000000149011612,
+        0.8999999761581421,
+        0.0
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -34.91825485229492
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.20000000298023224,
+        0.0,
+        0.800000011920929
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -62.378807067871094
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.20000000298023224,
+        0.10000000149011612,
+        0.699999988079071
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -62.68070602416992
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.20000000298023224,
+        0.20000000298023224,
+        0.6000000238418579
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -62.98260498046875
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.20000000298023224,
+        0.30000001192092896,
+        0.5
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -63.28450393676758
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.20000000298023224,
+        0.4000000059604645,
+        0.4000000059604645
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -63.58640670776367
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.20000000298023224,
+        0.5,
+        0.30000001192092896
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -63.8883056640625
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.20000000298023224,
+        0.6000000238418579,
+        0.20000000298023224
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -64.1902084350586
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.20000000298023224,
+        0.699999988079071,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -64.49210357666016
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.20000000298023224,
+        0.800000011920929,
+        0.0
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -64.79400634765625
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.30000001192092896,
+        0.0,
+        0.699999988079071
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -92.55645751953125
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.30000001192092896,
+        0.10000000149011612,
+        0.6000000238418579
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -92.85835266113281
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.30000001192092896,
+        0.20000000298023224,
+        0.5
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -93.1602554321289
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.30000001192092896,
+        0.30000001192092896,
+        0.4000000059604645
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -93.462158203125
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.30000001192092896,
+        0.4000000059604645,
+        0.30000001192092896
+      ],
+      "objective_vector": [
+        -303.8000183105469,
+        -5.0425004959106445,
+        -2.0234997272491455
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -192.20008850097656,
+          -3.2843732833862305,
+          -1.3024994134902954
+        ],
+        "scalarized_utility": -5.0425004959106445,
+        "trainer_stats": {
+          "value_loss": 403.6116352081299,
+          "action_loss": 0.0031427223002538085,
+          "entropy": 0.7743700630962849
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 18,
+        "is_nondominated_after_save": true
+      },
+      "utility": -93.76405334472656
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_180",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_180.pt",
+      "preference": [
+        0.30000001192092896,
+        0.5,
+        0.20000000298023224
+      ],
+      "objective_vector": [
+        -120.39749908447266,
+        -76.02438354492188,
+        -93.63899993896484
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 180,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 45,
+        "timesteps_seen": 92672,
+        "rollout_return_estimate": [
+          -77.1875,
+          -48.99372100830078,
+          -60.36000442504883
+        ],
+        "scalarized_utility": -120.39749908447266,
+        "trainer_stats": {
+          "value_loss": 35.589889883995056,
+          "action_loss": 8.66859120130539,
+          "entropy": 0.4375418424606323
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      },
+      "utility": -92.85923767089844
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_180",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_180.pt",
+      "preference": [
+        0.30000001192092896,
+        0.6000000238418579,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -120.39749908447266,
+        -76.02438354492188,
+        -93.63899993896484
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 180,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 45,
+        "timesteps_seen": 92672,
+        "rollout_return_estimate": [
+          -77.1875,
+          -48.99372100830078,
+          -60.36000442504883
+        ],
+        "scalarized_utility": -120.39749908447266,
+        "trainer_stats": {
+          "value_loss": 35.589889883995056,
+          "action_loss": 8.66859120130539,
+          "entropy": 0.4375418424606323
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      },
+      "utility": -91.09778594970703
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_180",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_180.pt",
+      "preference": [
+        0.30000001192092896,
+        0.699999988079071,
+        0.0
+      ],
+      "objective_vector": [
+        -120.39749908447266,
+        -76.02438354492188,
+        -93.63899993896484
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 180,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 45,
+        "timesteps_seen": 92672,
+        "rollout_return_estimate": [
+          -77.1875,
+          -48.99372100830078,
+          -60.36000442504883
+        ],
+        "scalarized_utility": -120.39749908447266,
+        "trainer_stats": {
+          "value_loss": 35.589889883995056,
+          "action_loss": 8.66859120130539,
+          "entropy": 0.4375418424606323
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      },
+      "utility": -89.33631896972656
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_180",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_180.pt",
+      "preference": [
+        0.4000000059604645,
+        0.0,
+        0.6000000238418579
+      ],
+      "objective_vector": [
+        -120.39749908447266,
+        -76.02438354492188,
+        -93.63899993896484
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 180,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 45,
+        "timesteps_seen": 92672,
+        "rollout_return_estimate": [
+          -77.1875,
+          -48.99372100830078,
+          -60.36000442504883
+        ],
+        "scalarized_utility": -120.39749908447266,
+        "trainer_stats": {
+          "value_loss": 35.589889883995056,
+          "action_loss": 8.66859120130539,
+          "entropy": 0.4375418424606323
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      },
+      "utility": -104.3424072265625
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_180",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_180.pt",
+      "preference": [
+        0.4000000059604645,
+        0.10000000149011612,
+        0.5
+      ],
+      "objective_vector": [
+        -120.39749908447266,
+        -76.02438354492188,
+        -93.63899993896484
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 180,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 45,
+        "timesteps_seen": 92672,
+        "rollout_return_estimate": [
+          -77.1875,
+          -48.99372100830078,
+          -60.36000442504883
+        ],
+        "scalarized_utility": -120.39749908447266,
+        "trainer_stats": {
+          "value_loss": 35.589889883995056,
+          "action_loss": 8.66859120130539,
+          "entropy": 0.4375418424606323
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      },
+      "utility": -102.58094024658203
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_180",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_180.pt",
+      "preference": [
+        0.4000000059604645,
+        0.20000000298023224,
+        0.4000000059604645
+      ],
+      "objective_vector": [
+        -120.39749908447266,
+        -76.02438354492188,
+        -93.63899993896484
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 180,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 45,
+        "timesteps_seen": 92672,
+        "rollout_return_estimate": [
+          -77.1875,
+          -48.99372100830078,
+          -60.36000442504883
+        ],
+        "scalarized_utility": -120.39749908447266,
+        "trainer_stats": {
+          "value_loss": 35.589889883995056,
+          "action_loss": 8.66859120130539,
+          "entropy": 0.4375418424606323
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      },
+      "utility": -100.81947326660156
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.4000000059604645,
+        0.30000001192092896,
+        0.30000001192092896
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -98.95606994628906
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.4000000059604645,
+        0.4000000059604645,
+        0.20000000298023224
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -97.0362548828125
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.4000000059604645,
+        0.5,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -95.11643981933594
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.4000000059604645,
+        0.6000000238418579,
+        0.0
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -93.1966323852539
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.5,
+        0.0,
+        0.5
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -106.4937515258789
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.5,
+        0.10000000149011612,
+        0.4000000059604645
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -104.57393646240234
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.5,
+        0.20000000298023224,
+        0.30000001192092896
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -102.65412902832031
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.5,
+        0.30000001192092896,
+        0.20000000298023224
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -100.73431396484375
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.5,
+        0.4000000059604645,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -98.81449890136719
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.5,
+        0.5,
+        0.0
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -96.89469146728516
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.6000000238418579,
+        0.0,
+        0.4000000059604645
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -108.27200317382812
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.6000000238418579,
+        0.10000000149011612,
+        0.30000001192092896
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -106.3521957397461
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.6000000238418579,
+        0.20000000298023224,
+        0.20000000298023224
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -104.43238067626953
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.6000000238418579,
+        0.30000001192092896,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -102.5125732421875
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.6000000238418579,
+        0.4000000059604645,
+        0.0
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -100.59275817871094
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.699999988079071,
+        0.0,
+        0.30000001192092896
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -110.05025482177734
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.699999988079071,
+        0.10000000149011612,
+        0.20000000298023224
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -108.13043975830078
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.699999988079071,
+        0.20000000298023224,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -106.21063232421875
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.699999988079071,
+        0.30000001192092896,
+        0.0
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -104.29081726074219
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.800000011920929,
+        0.0,
+        0.20000000298023224
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -111.82850646972656
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.800000011920929,
+        0.10000000149011612,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -109.90869140625
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.800000011920929,
+        0.20000000298023224,
+        0.0
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -107.98888397216797
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.8999999761581421,
+        0.0,
+        0.10000000149011612
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -113.60675048828125
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        0.8999999761581421,
+        0.10000000149011612,
+        0.0
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -111.68693542480469
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/paper_appendix/single_objective/seed_0011/run_d56c65d8/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -115.38500213623047,
+        -78.40438079833984,
+        -97.60250091552734
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 48,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -73.6875,
+          -49.36247253417969,
+          -61.250003814697266
+        ],
+        "scalarized_utility": -115.38500213623047,
+        "trainer_stats": {
+          "value_loss": 25.45566165447235,
+          "action_loss": 7.4940584897994995,
+          "entropy": 0.19184835255146027
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "legacy",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 20,
+        "is_nondominated_after_save": true
+      },
+      "utility": -115.38500213623047
+    }
+  ],
+  "assignment_counts": {
+    "stage1_pref_001_ckpt_191": 35,
+    "stage1_pref_000_ckpt_180": 6,
+    "stage1_pref_000_ckpt_191": 25
+  },
+  "assignment_summary": {
+    "num_preferences": 66,
+    "unique_assigned_policies": 3,
+    "coverage_ratio": 0.14285714285714285,
+    "max_assignment_count": 35,
+    "mean_assignment_count": 22.0,
+    "mean_assigned_utility": -69.83779795603319,
+    "per_policy_mean_utility": {
+      "stage1_pref_001_ckpt_191": -40.35825595174517,
+      "stage1_pref_000_ckpt_180": -96.83936055501302,
+      "stage1_pref_000_ckpt_191": -104.62878173828125
+    }
+  },
+  "semantic_metrics": {
+    "final_compromised_hosts": 0.5325757575757576,
+    "final_critical_compromised_hosts": 0.0,
+    "critical_impact_count": 0.0,
+    "recovered_hosts": 33.861363636363635,
+    "analyse_count": 53.73977272727272,
+    "remove_count": 0.6454545454545455,
+    "restore_count": 45.49962121212121,
+    "high_disruption_action_rate": 0.4614507575757576
+  },
+  "semantic_policy_metrics": {
+    "stage1_pref_000_ckpt_180": {
+      "final_compromised_hosts": 0.025,
+      "final_critical_compromised_hosts": 0.0,
+      "critical_impact_count": 0.0,
+      "recovered_hosts": 69.975,
+      "analyse_count": 3.325,
+      "remove_count": 3.725,
+      "restore_count": 92.85,
+      "high_disruption_action_rate": 0.96575,
+      "semantic_eval_episodes": 40
+    },
+    "stage1_pref_000_ckpt_191": {
+      "final_compromised_hosts": 0.0,
+      "final_critical_compromised_hosts": 0.0,
+      "critical_impact_count": 0.0,
+      "recovered_hosts": 72.6,
+      "analyse_count": 1.425,
+      "remove_count": 0.775,
+      "restore_count": 97.8,
+      "high_disruption_action_rate": 0.98575,
+      "semantic_eval_episodes": 40
+    },
+    "stage1_pref_001_ckpt_191": {
+      "final_compromised_hosts": 1.0,
+      "final_critical_compromised_hosts": 0.0,
+      "critical_impact_count": 0.0,
+      "recovered_hosts": 0.0,
+      "analyse_count": 99.75,
+      "remove_count": 0.025,
+      "restore_count": 0.025,
+      "high_disruption_action_rate": 0.0005,
+      "semantic_eval_episodes": 40
+    }
+  }
+}

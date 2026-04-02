@@ -248,6 +248,7 @@ def train_stage2(config: Stage2Config) -> Path:
                             objective_idx,
                             current_reference,
                             beta_override=beta_value,
+                            use_barrier=(config.extension_mode == "constrained"),
                         )
                     candidate_objectives = evaluate_policy(
                         env,
@@ -255,17 +256,20 @@ def train_stage2(config: Stage2Config) -> Path:
                         device,
                         episodes=config.eval.eval_episodes,
                     )
-                    candidate_margins = candidate_objectives - (
-                        beta_value * current_reference
-                    )
-                    constraint_margins = np.delete(candidate_margins, objective_idx)
-                    last_constraint_margins = constraint_margins.astype(np.float32)
-                    is_feasible = bool(
-                        np.all(constraint_margins > config.constraint_tolerance)
-                    )
-                    if not is_feasible:
-                        terminated_due_to_constraints = True
-                        break
+                    if config.extension_mode == "constrained":
+                        candidate_margins = candidate_objectives - (
+                            beta_value * current_reference
+                        )
+                        constraint_margins = np.delete(candidate_margins, objective_idx)
+                        last_constraint_margins = constraint_margins.astype(np.float32)
+                        is_feasible = bool(
+                            np.all(constraint_margins > config.constraint_tolerance)
+                        )
+                        if not is_feasible:
+                            terminated_due_to_constraints = True
+                            break
+                    else:
+                        last_constraint_margins = None
 
                     successful_updates += 1
                     current_reference = candidate_objectives
@@ -325,6 +329,7 @@ def train_stage2(config: Stage2Config) -> Path:
                         ),
                         "dynamic_beta": beta_value,
                         "beta_mode": config.ipo.beta_mode,
+                        "extension_mode": config.extension_mode,
                         "beta_components": beta_components,
                         "successful_constrained_updates": successful_updates,
                         "terminated_due_to_constraints": terminated_due_to_constraints,
@@ -409,6 +414,7 @@ def train_stage2(config: Stage2Config) -> Path:
                 "selection_weights": dict(config.selection.score_weights),
                 "selection_utility_tolerance": config.selection.utility_tolerance,
                 "selection_keep_extremes": config.selection.keep_extremes,
+                "extension_mode": config.extension_mode,
                 "beta_mode": config.ipo.beta_mode,
                 "beta_min": config.ipo.beta_min,
                 "beta_max": config.ipo.beta_max,

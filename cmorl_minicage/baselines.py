@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Callable, Sequence
 
 import numpy as np
+import yaml
 
 from cmorl_minicage.buffer import buffer_metadata, policy_record, save_policy_buffer
 from cmorl_minicage.config import (
@@ -28,6 +29,18 @@ DEFAULT_WEIGHTED_SUM_PREFERENCES = [
     [0.2, 0.6, 0.2],
     [0.2, 0.2, 0.6],
 ]
+
+
+def _load_preferences_file(path: str | Path) -> list[list[float]]:
+    with Path(path).open("r", encoding="utf-8") as handle:
+        payload = yaml.safe_load(handle) or {}
+    if isinstance(payload, dict):
+        preferences = payload.get("preferences", [])
+    else:
+        preferences = payload
+    if not isinstance(preferences, list) or not preferences:
+        raise ValueError(f"Invalid preferences file: {path}")
+    return [list(map(float, preference)) for preference in preferences]
 
 
 def _evaluate_policy_fn(
@@ -311,8 +324,13 @@ def run_weighted_sum_baseline(
     preferences: Sequence[Sequence[float]] | None = None,
 ) -> tuple[Path, Path]:
     preference_list = preferences or DEFAULT_WEIGHTED_SUM_PREFERENCES
+    per_policy_timesteps = max(
+        int(stage1_config.total_timesteps // max(len(preference_list), 1)),
+        stage1_config.rollout.num_steps * stage1_config.env.num_envs,
+    )
+    adjusted_config = replace(stage1_config, total_timesteps=per_policy_timesteps)
     return _run_learning_baseline(
-        stage1_config,
+        adjusted_config,
         evaluate_config,
         explicit_preferences=preference_list,
         output_dir=output_dir,
@@ -347,6 +365,7 @@ def main() -> None:
     weighted_parser.add_argument("--stage1-config", default=str(DEFAULT_STAGE1_CONFIG))
     weighted_parser.add_argument("--evaluate-config", default=str(DEFAULT_EVALUATE_CONFIG))
     weighted_parser.add_argument("--output-dir", required=True)
+    weighted_parser.add_argument("--preferences-file", default=None)
 
     args = parser.parse_args()
     if args.command == "stage1-only":
@@ -373,8 +392,16 @@ def main() -> None:
             stage1_config, evaluate_config, args.output_dir
         )
     else:
+        preference_list = (
+            _load_preferences_file(args.preferences_file)
+            if getattr(args, "preferences_file", None)
+            else None
+        )
         buffer_path, metrics_path = run_weighted_sum_baseline(
-            stage1_config, evaluate_config, args.output_dir
+            stage1_config,
+            evaluate_config,
+            args.output_dir,
+            preferences=preference_list,
         )
     print(buffer_path)
     print(metrics_path)
