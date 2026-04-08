@@ -1,0 +1,109 @@
+output_dir: cmorl_cyborg/outputs/paper_table_b
+table_output_dir: cmorl_cyborg/outputs/paper_table_a/tables
+shared_thresholds_path: cmorl_cyborg/outputs/paper_table_b/shared_thresholds.json
+eval_episodes: 5
+
+# Week-2 frozen Scenario2 protocol for Day 4-5.
+# The experiment layer remains Scenario2; these globs assume the 3-seed runs
+# are organized under stable seed directories and each seed contains one run_*.
+threshold_buffer_sources:
+  - path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0007/run_*/solution_buffer.json
+  - path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_*/solution_buffer.json
+  - path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0019/run_*/solution_buffer.json
+
+entries:
+  - method_name: ours_stage2
+    seed: 7
+    input_kind: buffer
+    input_path: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0007/run_ddb937f9/solution_buffer.json
+    selection_source: pareto
+  - method_name: ours_stage2
+    seed: 11
+    input_kind: buffer
+    input_path: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0011/run_3006e442/solution_buffer.json
+    selection_source: pareto
+  - method_name: ours_stage2
+    seed: 19
+    input_kind: buffer
+    input_path: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0019/run_05e9f8d6/solution_buffer.json
+    selection_source: pareto
+
+  - method_name: stage1_only
+    seed: 7
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0007/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: stage1_only
+    seed: 11
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: stage1_only
+    seed: 19
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0019/run_*/solution_buffer.json
+    selection_source: pareto
+
+  - method_name: weighted_sum
+    seed: 7
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0007/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: weighted_sum
+    seed: 11
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0011/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: weighted_sum
+    seed: 19
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0019/run_*/solution_buffer.json
+    selection_source: pareto
+
+  - method_name: no_constraint_stage2
+    seed: 7
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_appendix/no_constraint_stage2/seed_0007/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: no_constraint_stage2
+    seed: 11
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_appendix/no_constraint_stage2/seed_0011/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: no_constraint_stage2
+    seed: 19
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_appendix/no_constraint_stage2/seed_0019/run_*/solution_buffer.json
+    selection_source: pareto
+
+  - method_name: single_objective
+    seed: 7
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_table_b/single_objective/seed_0007/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: single_objective
+    seed: 11
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_table_b/single_objective/seed_0011/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: single_objective
+    seed: 19
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_table_b/single_objective/seed_0019/run_*/solution_buffer.json
+    selection_source: pareto
+
+  - method_name: lagrangian_ppo
+    seed: 7
+    input_kind: single_policy
+    input_path_glob: cmorl_cyborg/outputs/paper_table_b/lagrangian_ppo/seed_0007/run_*/run_metadata.json
+    selection_source: pareto
+  - method_name: lagrangian_ppo
+    seed: 11
+    input_kind: single_policy
+    input_path_glob: cmorl_cyborg/outputs/paper_table_b/lagrangian_ppo/seed_0011/run_*/run_metadata.json
+    selection_source: pareto
+  - method_name: lagrangian_ppo
+    seed: 19
+    input_kind: single_policy
+    input_path_glob: cmorl_cyborg/outputs/paper_table_b/lagrangian_ppo/seed_0019/run_*/run_metadata.json
+    selection_source: pareto

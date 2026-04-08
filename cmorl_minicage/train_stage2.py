@@ -68,6 +68,209 @@ def _selected_components_for_crowding(
     return selected_scores, selected_components, selected_ranks
 
 
+def _normalize_metric(values: np.ndarray) -> np.ndarray:
+    values = np.asarray(values, dtype=np.float32)
+    if values.size == 0:
+        return np.zeros(0, dtype=np.float32)
+    vmin = float(np.min(values))
+    vmax = float(np.max(values))
+    if np.isclose(vmax, vmin):
+        return np.zeros_like(values, dtype=np.float32)
+    return (values - vmin) / (vmax - vmin)
+
+
+def _semantic_selection_metrics(
+    env_config,
+    model_config,
+    checkpoint_path: str,
+    *,
+    eval_episodes: int,
+) -> dict[str, float]:
+    env = MiniCageMORLEnv(
+        num_envs=env_config.num_envs,
+        red_policy=env_config.red_policy,
+        remove_bugs=env_config.remove_bugs,
+        max_steps=env_config.max_episode_steps,
+        seed=env_config.seed,
+    )
+    actor_critic = ActorCritic(
+        obs_dim=env.obs_dim,
+        action_dim=env.action_dim,
+        obj_dim=env.obj_dim,
+        hidden_sizes=(model_config.hidden_size, model_config.hidden_size),
+    ).to(torch.device("cpu"))
+    actor_critic.load_state_dict(
+        torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    )
+    actor_critic.eval()
+
+    totals = {
+        "final_critical_compromised_hosts": [],
+        "critical_impact_count": [],
+        "high_disruption_action_count": [],
+        "total_action_count": [],
+    }
+    base_seed = int(env_config.seed)
+    with torch.no_grad():
+        for episode_idx in range(max(int(eval_episodes), 1)):
+            env.seed = base_seed + episode_idx
+            obs, _ = env.reset()
+            done = np.zeros(env.num_envs, dtype=bool)
+            episode_semantics = {
+                "critical_impact_count": np.zeros(env.num_envs, dtype=np.float64),
+                "high_disruption_action_count": np.zeros(env.num_envs, dtype=np.float64),
+                "total_action_count": np.zeros(env.num_envs, dtype=np.float64),
+            }
+            final_critical = np.zeros(env.num_envs, dtype=np.float64)
+
+            while not np.all(done):
+                obs_tensor = torch.as_tensor(obs, dtype=torch.float32)
+                actions = (
+                    actor_critic.act(obs_tensor)
+                    .actions.cpu()
+                    .numpy()
+                    .reshape(env.num_envs, 1)
+                )
+                obs, _, done, _, info = env.step(actions)
+                semantic_info = info["semantic_info"]
+                final_critical = np.asarray(
+                    semantic_info["final_critical_compromised_hosts"],
+                    dtype=np.float64,
+                )
+                for key in episode_semantics:
+                    episode_semantics[key] += np.asarray(
+                        semantic_info[key], dtype=np.float64
+                    )
+
+            totals["final_critical_compromised_hosts"].extend(final_critical.tolist())
+            for key in episode_semantics:
+                totals[key].extend(episode_semantics[key].tolist())
+
+    total_action_sum = max(float(np.sum(totals["total_action_count"])), 1.0)
+    return {
+        "final_critical_compromised_hosts": float(
+            np.mean(totals["final_critical_compromised_hosts"])
+        ),
+        "critical_impact_count": float(np.mean(totals["critical_impact_count"])),
+        "high_disruption_action_rate": float(
+            np.sum(totals["high_disruption_action_count"]) / total_action_sum
+        ),
+    }
+
+
+def _semantic_component_overrides(
+    records: list[dict],
+    config: Stage2Config,
+) -> dict[str, dict[str, float | dict[str, float]]]:
+    if config.selection.semantic_eval_episodes <= 0 or not records:
+        return {}
+
+    metric_names = tuple(config.selection.semantic_metric_weights.keys())
+    by_policy: dict[str, dict[str, float]] = {}
+    for record in records:
+        by_policy[record["policy_id"]] = _semantic_selection_metrics(
+            config.env,
+            config.model,
+            record["checkpoint_path"],
+            eval_episodes=config.selection.semantic_eval_episodes,
+        )
+
+    normalized_metrics: dict[str, np.ndarray] = {}
+    for metric_name in metric_names:
+        values = np.asarray(
+            [by_policy[record["policy_id"]][metric_name] for record in records],
+            dtype=np.float32,
+        )
+        normalized_metrics[metric_name] = _normalize_metric(values)
+
+    overrides: dict[str, dict[str, float | dict[str, float]]] = {}
+    total_weight = max(
+        float(
+            sum(
+                float(weight)
+                for weight in config.selection.semantic_metric_weights.values()
+            )
+        ),
+        1e-8,
+    )
+    for index, record in enumerate(records):
+        weighted_risk = 0.0
+        for metric_name, weight in config.selection.semantic_metric_weights.items():
+            weighted_risk += float(weight) * float(normalized_metrics[metric_name][index])
+        semantic_risk = weighted_risk / total_weight
+        overrides[record["policy_id"]] = {
+            "semantic_risk": float(semantic_risk),
+            "semantic_low_risk_score": float(1.0 - semantic_risk),
+            "semantic_metrics": dict(by_policy[record["policy_id"]]),
+        }
+    return overrides
+
+
+def _semantic_penalty(
+    semantic_info: dict[str, np.ndarray | list[float]],
+    weights: dict[str, float],
+    coef: float,
+) -> np.ndarray:
+    if coef <= 0.0:
+        first = next(iter(semantic_info.values()))
+        return np.zeros(len(first), dtype=np.float32)
+    penalty = None
+    for metric_name, weight in weights.items():
+        values = np.asarray(semantic_info.get(metric_name, 0.0), dtype=np.float32)
+        term = float(weight) * values
+        penalty = term if penalty is None else penalty + term
+    if penalty is None:
+        return np.zeros(0, dtype=np.float32)
+    return np.asarray(coef * penalty, dtype=np.float32)
+
+
+def _collect_rollout_stage2(
+    env: MiniCageMORLEnv,
+    actor_critic: ActorCritic,
+    storage: VectorRolloutStorage,
+    device: torch.device,
+    *,
+    semantic_penalty_coef: float,
+    semantic_penalty_weights: dict[str, float],
+) -> np.ndarray:
+    obs, _ = env.reset()
+    obs_tensor = torch.as_tensor(obs, dtype=torch.float32, device=device)
+    storage.reset()
+    storage.obs[0].copy_(obs_tensor)
+    episode_return = np.zeros((env.num_envs, env.obj_dim), dtype=np.float32)
+
+    for _ in range(storage.num_steps):
+        with torch.no_grad():
+            policy_output = actor_critic.act(obs_tensor)
+        actions = policy_output.actions.cpu().numpy().reshape(env.num_envs, 1)
+        next_obs, reward_vec, done, _, info = env.step(actions)
+        reward_vec = np.asarray(reward_vec, dtype=np.float32)
+        penalty = _semantic_penalty(
+            info.get("semantic_info", {}),
+            semantic_penalty_weights,
+            semantic_penalty_coef,
+        )
+        if penalty.size:
+            reward_vec = reward_vec - penalty[:, None]
+        next_obs_tensor = torch.as_tensor(next_obs, dtype=torch.float32, device=device)
+        reward_tensor = torch.as_tensor(reward_vec, dtype=torch.float32, device=device)
+        masks = torch.as_tensor(1.0 - done.astype(np.float32), dtype=torch.float32, device=device)
+        storage.insert(
+            obs=next_obs_tensor,
+            actions=policy_output.actions,
+            log_probs=policy_output.log_probs,
+            values=policy_output.values,
+            rewards=reward_tensor,
+            masks=masks,
+        )
+        obs_tensor = next_obs_tensor
+        episode_return += reward_vec
+
+    with torch.no_grad():
+        next_value = actor_critic.get_value(obs_tensor)
+    return episode_return.mean(axis=0), next_value
+
+
 def train_stage2(config: Stage2Config) -> Path:
     if not config.stage1_buffer:
         raise ValueError("stage1_buffer must be provided")
@@ -117,6 +320,9 @@ def train_stage2(config: Stage2Config) -> Path:
         current_pareto = nondominated_filter(records)
         current_crowding = crowding_distance(current_pareto)
         if config.selection.mode == "adaptive":
+            semantic_component_overrides = _semantic_component_overrides(
+                current_pareto, config
+            )
             extension_records, selected_scores, selected_components = select_top_n_adaptive(
                 records,
                 config.num_extension_policies,
@@ -125,6 +331,7 @@ def train_stage2(config: Stage2Config) -> Path:
                 config.selection.utility_tolerance,
                 coverage_mode=config.selection.coverage_mode,
                 keep_extremes=config.selection.keep_extremes,
+                component_overrides=semantic_component_overrides,
             )
             ranking_source = [
                 (float(selected_scores[record["policy_id"]]), record["policy_id"])
@@ -209,6 +416,7 @@ def train_stage2(config: Stage2Config) -> Path:
                 best_feasible_objectives = None
                 successful_updates = 0
                 terminated_due_to_constraints = False
+                consecutive_constraint_failures = 0
                 last_constraint_margins = None
                 last_trainer_stats: dict[str, float] = {}
                 if config.ipo.beta_mode == "dynamic":
@@ -239,7 +447,14 @@ def train_stage2(config: Stage2Config) -> Path:
 
                 for _ in range(config.constrained_updates):
                     for _ in range(num_updates):
-                        _, next_value = collect_rollout(env, actor_critic, storage, device)
+                        _, next_value = _collect_rollout_stage2(
+                            env,
+                            actor_critic,
+                            storage,
+                            device,
+                            semantic_penalty_coef=float(config.semantic_penalty_coef),
+                            semantic_penalty_weights=dict(config.semantic_penalty_weights),
+                        )
                         storage.compute_returns(
                             next_value, ipo_config.gamma, ipo_config.gae_lambda
                         )
@@ -266,8 +481,15 @@ def train_stage2(config: Stage2Config) -> Path:
                             np.all(constraint_margins > config.constraint_tolerance)
                         )
                         if not is_feasible:
-                            terminated_due_to_constraints = True
-                            break
+                            consecutive_constraint_failures += 1
+                            if (
+                                consecutive_constraint_failures
+                                >= max(int(config.max_consecutive_constraint_failures), 1)
+                            ):
+                                terminated_due_to_constraints = True
+                                break
+                            continue
+                        consecutive_constraint_failures = 0
                     else:
                         last_constraint_margins = None
 
@@ -288,6 +510,12 @@ def train_stage2(config: Stage2Config) -> Path:
                             "selection_rank": selection_rank,
                             "dynamic_beta": beta_value,
                             "beta_components": beta_components,
+                            "max_consecutive_constraint_failures": int(
+                                config.max_consecutive_constraint_failures
+                            ),
+                            "consecutive_constraint_failures": int(
+                                consecutive_constraint_failures
+                            ),
                             "last_constraint_margins": (
                                 None
                                 if last_constraint_margins is None
@@ -334,6 +562,12 @@ def train_stage2(config: Stage2Config) -> Path:
                         "successful_constrained_updates": successful_updates,
                         "terminated_due_to_constraints": terminated_due_to_constraints,
                         "constraint_tolerance": config.constraint_tolerance,
+                        "max_consecutive_constraint_failures": int(
+                            config.max_consecutive_constraint_failures
+                        ),
+                        "consecutive_constraint_failures": int(
+                            consecutive_constraint_failures
+                        ),
                         "last_constraint_margins": (
                             last_constraint_margins.tolist()
                             if last_constraint_margins is not None
@@ -408,6 +642,7 @@ def train_stage2(config: Stage2Config) -> Path:
                 "num_extension_policies": config.num_extension_policies,
                 "extension_rounds": config.extension_rounds,
                 "constrained_updates": config.constrained_updates,
+                "max_consecutive_constraint_failures": config.max_consecutive_constraint_failures,
                 "constraint_tolerance": config.constraint_tolerance,
                 "total_timesteps_per_update": config.total_timesteps_per_update,
                 "selection_mode": config.selection.mode,

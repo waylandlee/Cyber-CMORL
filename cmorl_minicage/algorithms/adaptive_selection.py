@@ -131,6 +131,8 @@ def compute_selection_score(
         + weights.get("expansion", 0.0) * float(component["expansion_potential"])
         + weights.get("low_risk", 0.0) * float(component["low_risk_score"])
         + weights.get("coverage", 0.0) * float(component["utility_coverage_gain"])
+        + weights.get("semantic_low_risk", 0.0)
+        * float(component.get("semantic_low_risk_score", 0.0))
     )
 
 
@@ -143,12 +145,18 @@ def select_top_n_adaptive(
     *,
     coverage_mode: str = "static",
     keep_extremes: bool = True,
+    component_overrides: dict[str, dict[str, float | list[float] | dict[str, float]]] | None = None,
 ) -> tuple[list[dict], dict[str, float], dict[str, dict[str, float | list[float]]]]:
     pareto = nondominated_filter(records)
     if top_n <= 0 or not pareto:
         return [], {}, {}
 
     components = compute_selection_components(pareto, preferences, tolerance)
+    component_overrides = component_overrides or {}
+    for policy_id, override in component_overrides.items():
+        if policy_id not in components:
+            continue
+        components[policy_id].update(dict(override))
     scores = {
         record["policy_id"]: compute_selection_score(components[record["policy_id"]], weights)
         for record in pareto

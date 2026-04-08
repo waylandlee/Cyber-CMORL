@@ -1,0 +1,45 @@
+{
+  "schema_version": "0.1.0",
+  "method_name": "lagrangian_ppo",
+  "model_type": "actor_critic",
+  "policy_id": "lagrangian_ppo_final",
+  "checkpoint_path": "cmorl_cyborg/outputs/dev_tuning/week2_baselines/lagrangian_ppo/run_2b8e92d7/policy_final.pt",
+  "final_objective_vector": [
+    -252.0812530517578,
+    -52.54531478881836,
+    -9.227499961853027
+  ],
+  "env": {
+    "num_envs": 4,
+    "red_policy": "bline",
+    "remove_bugs": true,
+    "max_episode_steps": 40,
+    "seed": 7
+  },
+  "model": {
+    "hidden_size": 128,
+    "obj_dim": 3
+  },
+  "rollout": {
+    "num_steps": 32
+  },
+  "evaluation": {
+    "eval_episodes": 2,
+    "preference_step": 0.25
+  },
+  "training": {
+    "seed": 7,
+    "total_timesteps": 4096,
+    "num_updates": 32,
+    "dual_lr": 0.05,
+    "thresholds_path": "cmorl_cyborg/outputs/dev_tuning/week2_baselines/lagrangian_ppo/run_2b8e92d7/shared_thresholds.json",
+    "thresholds": {
+      "d_business": -51.10710906982422,
+      "d_cost": -8.742187738418579
+    },
+    "final_lambdas": {
+      "business": 0.0,
+      "cost": 0.0
+    }
+  }
+}

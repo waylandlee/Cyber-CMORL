@@ -16,6 +16,36 @@
   - 位于 [cmorl_minicage](./cmorl_minicage)
   - 目标是在不改动其他研究主线的前提下，复现论文 *Efficient Discovery of Pareto Front for Multi-Objective Reinforcement Learning (C-MORL)* 的核心训练流程，并将其迁移到 MiniCAGE 场景
   - 当前已经补齐统一论文实验系统，可直接生成主表 A、主表 B、补充实验、CSV/TEX 表格与图片
+- `CybORG formal migration` 正式环境主线
+  - 位于 [cmorl_cyborg](./cmorl_cyborg)
+  - 目标是把 `security / business / cost` 三目标、主表 A/B 导表协议和约束评估协议迁移到正式 `CybORG`
+  - 当前文档口径以 `cmorl_cyborg` 的 `3-seed (7/11/19)` 结果为准
+
+## 2026-04-08 当前状态
+
+如果你现在是第一次进仓库，建议优先把项目理解为：
+
+- `cmorl_minicage`：历史复现与升级探索线
+- `cmorl_cyborg`：当前论文正式环境结果线
+
+截至 `2026-04-08`，`cmorl_cyborg` 已完成：
+
+- 正式 `Scenario2` 协议下的 `3-seed` 主表 A / 主表 B 聚合
+- 共享 `reference point` 与共享 `thresholds` 的固定
+- `fair_compare_eval` 下 tight / loose 两组公平比较
+- 新增 `coverage_combo_fair` 与 `coverage_more_parents_fair` 的聚合与出图
+
+当前最重要的几个结果文件是：
+
+- 主表 B 原始 3-seed 聚合：
+  - [ours_stage2.json](./cmorl_cyborg/outputs/paper_table_b/aggregated/ours_stage2.json)
+  - [main_table_b_bar.png](./cmorl_cyborg/outputs/paper_table_b/main_table_b_bar.png)
+- 公平比较：
+  - [fair_compare_table_b_tight_with_coverage.png](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_tight_with_coverage.png)
+  - [fair_compare_table_b_loose_with_coverage.png](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_loose_with_coverage.png)
+- 新增 coverage 聚合：
+  - [coverage_combo_fair_loose.json](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
+  - [coverage_more_parents_fair_loose.json](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_loose.json)
 
 ## 当前复现主线在做什么
 
@@ -119,42 +149,38 @@
   - `d_business=-29.2917`
   - `d_cost=-20.9862`
 
-当前已经跑完一轮 formal 5-seed 长跑，seed 为：
+当前 `cmorl_cyborg` 文档默认使用的正式 seed 集为：
 
-- `7`
-- `11`
-- `19`
-- `23`
-- `29`
+- `3-seed`: `7 / 11 / 19`
+- `5-seed formal`: 仍保留为下一阶段候选，不在本轮文档里假装已经完成
 
-当前这轮 formal 结果最值得直接查看的是：
+当前这轮正式环境结果最值得直接查看的是：
 
-- 主表 A 汇总：
-  - [table_a_summary.json](./cmorl_minicage/outputs/paper_table_a/table_a_summary.json)
 - 主表 B 汇总：
-  - [table_b_constraints.csv](./cmorl_minicage/outputs/paper_table_a/tables/table_b_constraints.csv)
-- 补充实验汇总：
-  - [multiseed_summary.json](./cmorl_minicage/outputs/paper_appendix/multiseed_summary.json)
-
-主表 A 当前导出的方法均值为：
-
-| Method | HV | EU | SP |
-| --- | --- | --- | --- |
-| Ours | `3290687.06 ± 91067.55` | `-117.33 ± 2.96` | `5593.55 ± 7050.51` |
-| Weighted-Sum | `4232624.89 ± 50823.96` | `-102.20 ± 4.48` | `699.32 ± 720.16` |
-| Pref-Cond PPO | `3033873.25 ± 442592.20` | `-113.25 ± 3.65` | `0.81 ± 0.63` |
-| PCN-lite | `4003017.17 ± 217249.56` | `-131.41 ± 29.95` | `346.10 ± 682.68` |
+  - [ours_stage2.json](./cmorl_cyborg/outputs/paper_table_b/aggregated/ours_stage2.json)
+  - [no_constraint_stage2.json](./cmorl_cyborg/outputs/paper_table_b/aggregated/no_constraint_stage2.json)
+  - [main_table_b_bar.png](./cmorl_cyborg/outputs/paper_table_b/main_table_b_bar.png)
+- 公平比较汇总：
+  - [ours_stage2_fair_loose.json](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/ours_stage2_fair_loose.json)
+  - [no_constraint_stage2_fair_loose.json](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/no_constraint_stage2_fair_loose.json)
+  - [coverage_combo_fair_loose.json](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
+  - [coverage_more_parents_fair_loose.json](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_loose.json)
 
 主表 B 当前导出的代表性结果为：
 
 | Method | Security | Feasible Rate | Mean Violation |
 | --- | --- | --- | --- |
-| Ours | `-418.47` | `0.965` | `0.071` |
-| Lagrangian-PPO | `-300.81` | `0.255` | `23.056` |
-| Weighted-Sum | `-310.52` | `0.890` | `0.270` |
-| stage1-only | `-433.62` | `0.940` | `0.138` |
-| no-constraint stage2 | `-360.74` | `0.900` | `0.553` |
-| single-objective | `-310.90` | `0.990` | `0.004` |
+| Ours (`paper_table_b`) | `-518.70 ± 17.16` | `0.800 ± 0.089` | `0.380 ± 0.300` |
+| coverage combo fair (`loose`) | `-491.02 ± 13.59` | `0.633 ± 0.116` | `0.287 ± 0.119` |
+| coverage more parents fair (`loose`) | `-509.10 ± 21.99` | `0.600 ± 0.094` | `0.380 ± 0.037` |
+| no-constraint stage2 fair (`loose`) | `-490.91 ± 34.04` | `0.892 ± 0.042` | `0.084 ± 0.054` |
+
+当前对这些结果的保守解读是：
+
+- `coverage_combo_fair` 相比原始 `ours_stage2`，在 `security / business` 和 `mean_violation` 上更好。
+- 但它的 `feasible_rate` 从 `0.800` 降到 `0.633`，因此不能当成对原始 `ours_stage2` 的严格改进。
+- 在 `Loose` 公平比较下，`coverage_combo_fair` 与 `coverage_more_parents_fair` 选中了同一组策略，说明二者差别更像评估波动而不是机制性分化。
+- 在 `Loose` 设定下，`no_constraint_stage2_fair` 仍然是最稳的可行性基线。
 
 ## 论文算法流程 vs 当前代码流程
 
@@ -312,6 +338,7 @@
 
 - [docs/PROJECT_BRIEF.md](./docs/PROJECT_BRIEF.md)
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+- [docs/MINICAGE_TO_CYBORG_MIGRATION.md](./docs/MINICAGE_TO_CYBORG_MIGRATION.md)
 - [docs/TASKS.md](./docs/TASKS.md)
 - [docs/EXPERIMENT_LOG.md](./docs/EXPERIMENT_LOG.md)
 

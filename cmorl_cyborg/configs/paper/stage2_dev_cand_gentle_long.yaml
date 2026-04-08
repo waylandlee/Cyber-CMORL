@@ -1,0 +1,37 @@
+seed: 17
+stage1_buffer: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/dev_tuning/dev_seed/stage1/run_f632469b/solution_buffer.json
+num_extension_policies: 4
+extension_rounds: 2
+constrained_updates: 6
+extension_mode: constrained
+constraint_tolerance: -2.5
+total_timesteps_per_update: 2304
+output_dir: cmorl_cyborg/outputs/dev_tuning/tuning/cand_gentle_long
+env:
+  num_envs: 4
+  red_policy: bline
+  max_episode_steps: 40
+  seed: 17
+  scenario_name: Scenario2
+  gym_wrapper_name: ChallengeWrapper
+  blue_agent_name: Blue
+  red_agent_name: Red
+  obs_mode: vector
+  state_mode: true
+model:
+  hidden_size: 128
+  obj_dim: 3
+rollout:
+  num_steps: 32
+eval:
+  eval_episodes: 2
+  preference_step: 0.25
+selection:
+  mode: adaptive
+  coverage_mode: static
+  keep_extremes: true
+ipo:
+  beta_mode: dynamic
+  beta_min: 1.004
+  beta_max: 1.012
+  barrier_coef: 20.0

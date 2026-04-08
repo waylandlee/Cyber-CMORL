@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import os
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -91,6 +93,47 @@ def _load_run_metadata(path: str | Path) -> dict[str, Any]:
     if "checkpoint_path" not in payload:
         raise ValueError(f"Invalid conditioned run metadata: {path}")
     return payload
+
+
+def _load_model_and_env_from_metadata(
+    run_metadata_path: str | Path,
+    metadata: dict[str, Any],
+    *,
+    device: torch.device,
+) -> tuple[str, Any, MiniCageMORLEnv, Path, np.ndarray | None]:
+    env = _build_env(metadata)
+    hidden_size = int(metadata.get("model", {}).get("hidden_size", 128))
+    checkpoint_path = _resolve_path(run_metadata_path, metadata["checkpoint_path"])
+    model_kind = metadata.get("model_type", "preference_conditioned_ppo")
+
+    if model_kind == "preference_conditioned_ppo":
+        model = PreferenceConditionedActorCritic(
+            obs_dim=env.obs_dim,
+            preference_dim=env.obj_dim,
+            action_dim=env.action_dim,
+            hidden_sizes=(hidden_size, hidden_size),
+        ).to(device)
+        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
+        model.load_state_dict(checkpoint)
+        model.eval()
+        return model_kind, model, env, checkpoint_path, None
+
+    if model_kind == "pcn":
+        command_library_path = _resolve_path(run_metadata_path, metadata["command_library_path"])
+        command_payload = load_json(command_library_path)
+        command_returns = np.asarray(command_payload.get("command_returns", []), dtype=np.float32)
+        model = PCNPolicy(
+            obs_dim=env.obs_dim,
+            command_dim=env.obj_dim,
+            action_dim=env.action_dim,
+            hidden_sizes=(hidden_size, hidden_size),
+        ).to(device)
+        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
+        model.load_state_dict(checkpoint)
+        model.eval()
+        return model_kind, model, env, checkpoint_path, command_returns
+
+    raise ValueError(f"Unsupported conditioned model_type: {model_kind}")
 
 
 def _build_env(metadata: dict[str, Any]) -> MiniCageMORLEnv:
@@ -290,6 +333,67 @@ def _evaluate_pcn_point(
     return returns.astype(np.float32), _semantic_summary(totals), desired_return.tolist()
 
 
+def _evaluate_conditioned_preference_task(task: dict[str, Any]) -> dict[str, Any]:
+    run_metadata_path = task["run_metadata_path"]
+    metadata = task["metadata"]
+    preference = task["preference"]
+    pref_idx = int(task["pref_idx"])
+    preference_step = float(task["preference_step"])
+    eval_episodes = int(task["eval_episodes"])
+
+    device = torch.device("cpu")
+    model_kind, model, env, checkpoint_path, command_returns = _load_model_and_env_from_metadata(
+        run_metadata_path,
+        metadata,
+        device=device,
+    )
+
+    if model_kind == "preference_conditioned_ppo":
+        objective_vector, semantic_metrics = _evaluate_pref_conditioned_point(
+            model,
+            env,
+            preference,
+            eval_batches=eval_episodes,
+            seed_offset=pref_idx * 1000,
+            device=device,
+        )
+        return {
+            "policy_id": f"evaluated_pref_{pref_idx:03d}",
+            "checkpoint_path": str(checkpoint_path),
+            "preference": list(map(float, preference)),
+            "objective_vector": objective_vector.tolist(),
+            "utility": float(np.dot(np.asarray(preference, dtype=np.float32), objective_vector)),
+            "stage": "conditioned_eval",
+            "source": model_kind,
+            "semantic_metrics": semantic_metrics,
+            "pref_idx": pref_idx,
+            "preference_step": preference_step,
+        }
+
+    objective_vector, semantic_metrics, desired_return = _evaluate_pcn_point(
+        model,
+        env,
+        preference,
+        command_returns=command_returns if command_returns is not None else np.empty((0,)),
+        eval_batches=eval_episodes,
+        seed_offset=pref_idx * 1000,
+        device=device,
+    )
+    return {
+        "policy_id": f"evaluated_pref_{pref_idx:03d}",
+        "checkpoint_path": str(checkpoint_path),
+        "preference": list(map(float, preference)),
+        "objective_vector": objective_vector.tolist(),
+        "utility": float(np.dot(np.asarray(preference, dtype=np.float32), objective_vector)),
+        "stage": "conditioned_eval",
+        "source": model_kind,
+        "desired_return": desired_return,
+        "semantic_metrics": semantic_metrics,
+        "pref_idx": pref_idx,
+        "preference_step": preference_step,
+    }
+
+
 def evaluate_conditioned_points_payload(
     payload: dict[str, Any],
     *,
@@ -396,87 +500,130 @@ def evaluate_conditioned_model(
     hv_max_exact_points: int,
     hv_mc_samples: int,
     eval_episodes: int,
+    preference_eval_workers: int | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     metadata = _load_run_metadata(run_metadata_path)
     env = _build_env(metadata)
-    device = torch.device("cpu")
     preferences = _preferences_from_step(preference_step, env.obj_dim)
-    hidden_size = int(metadata.get("model", {}).get("hidden_size", 128))
-    checkpoint_path = _resolve_path(run_metadata_path, metadata["checkpoint_path"])
     model_kind = metadata.get("model_type", "preference_conditioned_ppo")
+    seed = int(metadata.get("env", {}).get("seed", 0))
+    preference_eval_workers = int(
+        preference_eval_workers
+        if preference_eval_workers is not None
+        else os.environ.get("CMORL_CONDITIONED_PREF_WORKERS", "1")
+    )
+    preference_eval_workers = max(preference_eval_workers, 1)
+
+    print(
+        f"[conditioned-eval] START model={model_kind} seed={seed} "
+        f"preferences={len(preferences)} eval_episodes={eval_episodes} "
+        f"workers={preference_eval_workers}",
+        flush=True,
+    )
 
     evaluated_points: list[dict[str, Any]] = []
-    if model_kind == "preference_conditioned_ppo":
-        model = PreferenceConditionedActorCritic(
-            obs_dim=env.obs_dim,
-            preference_dim=env.obj_dim,
-            action_dim=env.action_dim,
-            hidden_sizes=(hidden_size, hidden_size),
-        ).to(device)
-        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
-        model.load_state_dict(checkpoint)
-        model.eval()
-
-        for pref_idx, preference in enumerate(preferences):
-            objective_vector, semantic_metrics = _evaluate_pref_conditioned_point(
-                model,
-                env,
-                preference,
-                eval_batches=eval_episodes,
-                seed_offset=pref_idx * 1000,
-                device=device,
-            )
-            evaluated_points.append(
-                {
-                    "policy_id": f"evaluated_pref_{pref_idx:03d}",
-                    "checkpoint_path": str(checkpoint_path),
-                    "preference": list(map(float, preference)),
-                    "objective_vector": objective_vector.tolist(),
-                    "utility": float(np.dot(np.asarray(preference, dtype=np.float32), objective_vector)),
-                    "stage": "conditioned_eval",
-                    "source": model_kind,
-                    "semantic_metrics": semantic_metrics,
-                }
-            )
-    elif model_kind == "pcn":
-        command_library_path = _resolve_path(run_metadata_path, metadata["command_library_path"])
-        command_payload = load_json(command_library_path)
-        command_returns = np.asarray(command_payload.get("command_returns", []), dtype=np.float32)
-        model = PCNPolicy(
-            obs_dim=env.obs_dim,
-            command_dim=env.obj_dim,
-            action_dim=env.action_dim,
-            hidden_sizes=(hidden_size, hidden_size),
-        ).to(device)
-        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
-        model.load_state_dict(checkpoint)
-        model.eval()
-
-        for pref_idx, preference in enumerate(preferences):
-            objective_vector, semantic_metrics, desired_return = _evaluate_pcn_point(
-                model,
-                env,
-                preference,
-                command_returns=command_returns,
-                eval_batches=eval_episodes,
-                seed_offset=pref_idx * 1000,
-                device=device,
-            )
-            evaluated_points.append(
-                {
-                    "policy_id": f"evaluated_pref_{pref_idx:03d}",
-                    "checkpoint_path": str(checkpoint_path),
-                    "preference": list(map(float, preference)),
-                    "objective_vector": objective_vector.tolist(),
-                    "utility": float(np.dot(np.asarray(preference, dtype=np.float32), objective_vector)),
-                    "stage": "conditioned_eval",
-                    "source": model_kind,
-                    "desired_return": desired_return,
-                    "semantic_metrics": semantic_metrics,
-                }
-            )
+    if preference_eval_workers == 1 or len(preferences) <= 1:
+        device = torch.device("cpu")
+        resolved_kind, model, env, checkpoint_path, command_returns = _load_model_and_env_from_metadata(
+            run_metadata_path,
+            metadata,
+            device=device,
+        )
+        if resolved_kind == "preference_conditioned_ppo":
+            for pref_idx, preference in enumerate(preferences):
+                objective_vector, semantic_metrics = _evaluate_pref_conditioned_point(
+                    model,
+                    env,
+                    preference,
+                    eval_batches=eval_episodes,
+                    seed_offset=pref_idx * 1000,
+                    device=device,
+                )
+                evaluated_points.append(
+                    {
+                        "policy_id": f"evaluated_pref_{pref_idx:03d}",
+                        "checkpoint_path": str(checkpoint_path),
+                        "preference": list(map(float, preference)),
+                        "objective_vector": objective_vector.tolist(),
+                        "utility": float(
+                            np.dot(np.asarray(preference, dtype=np.float32), objective_vector)
+                        ),
+                        "stage": "conditioned_eval",
+                        "source": resolved_kind,
+                        "semantic_metrics": semantic_metrics,
+                    }
+                )
+                print(
+                    f"[conditioned-eval] RUN model={resolved_kind} seed={seed} "
+                    f"{pref_idx + 1}/{len(preferences)}",
+                    flush=True,
+                )
+        elif resolved_kind == "pcn":
+            for pref_idx, preference in enumerate(preferences):
+                objective_vector, semantic_metrics, desired_return = _evaluate_pcn_point(
+                    model,
+                    env,
+                    preference,
+                    command_returns=command_returns if command_returns is not None else np.empty((0,)),
+                    eval_batches=eval_episodes,
+                    seed_offset=pref_idx * 1000,
+                    device=device,
+                )
+                evaluated_points.append(
+                    {
+                        "policy_id": f"evaluated_pref_{pref_idx:03d}",
+                        "checkpoint_path": str(checkpoint_path),
+                        "preference": list(map(float, preference)),
+                        "objective_vector": objective_vector.tolist(),
+                        "utility": float(
+                            np.dot(np.asarray(preference, dtype=np.float32), objective_vector)
+                        ),
+                        "stage": "conditioned_eval",
+                        "source": resolved_kind,
+                        "desired_return": desired_return,
+                        "semantic_metrics": semantic_metrics,
+                    }
+                )
+                print(
+                    f"[conditioned-eval] RUN model={resolved_kind} seed={seed} "
+                    f"{pref_idx + 1}/{len(preferences)}",
+                    flush=True,
+                )
+        else:
+            raise ValueError(f"Unsupported conditioned model_type: {resolved_kind}")
     else:
-        raise ValueError(f"Unsupported conditioned model_type: {model_kind}")
+        max_workers = min(preference_eval_workers, len(preferences))
+        tasks = [
+            {
+                "run_metadata_path": str(run_metadata_path),
+                "metadata": metadata,
+                "preference": preference,
+                "pref_idx": pref_idx,
+                "preference_step": preference_step if preference_step is not None else 0.1,
+                "eval_episodes": eval_episodes,
+            }
+            for pref_idx, preference in enumerate(preferences)
+        ]
+        completed = 0
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = [
+                executor.submit(_evaluate_conditioned_preference_task, task)
+                for task in tasks
+            ]
+            for future in as_completed(futures):
+                result = future.result()
+                completed += 1
+                pref_idx = int(result.pop("pref_idx"))
+                result.pop("preference_step", None)
+                evaluated_points.append((pref_idx, result))
+                print(
+                    f"[conditioned-eval] RUN model={model_kind} seed={seed} "
+                    f"{completed}/{len(preferences)}",
+                    flush=True,
+                )
+        evaluated_points = [
+            entry for _, entry in sorted(evaluated_points, key=lambda item: item[0])
+        ]
 
     points_payload = {
         "schema_version": metadata.get("schema_version", "0.1.0"),
@@ -491,6 +638,12 @@ def evaluate_conditioned_model(
         reference_point=reference_point,
         hv_max_exact_points=hv_max_exact_points,
         hv_mc_samples=hv_mc_samples,
+    )
+    print(
+        f"[conditioned-eval] DONE model={model_kind} seed={seed} "
+        f"pareto={len(metrics_payload.get('pareto_front', []))} "
+        f"records={len(evaluated_points)}",
+        flush=True,
     )
     return points_payload, metrics_payload
 

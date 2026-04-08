@@ -69,11 +69,20 @@ class SelectionConfig:
             "expansion": 0.30,
             "low_risk": 0.20,
             "coverage": 0.20,
+            "semantic_low_risk": 0.0,
         }
     )
     utility_tolerance: float = 0.02
     coverage_mode: str = "static"
     keep_extremes: bool = True
+    semantic_eval_episodes: int = 0
+    semantic_metric_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "high_disruption_action_rate": 0.50,
+            "final_critical_compromised_hosts": 0.30,
+            "critical_impact_count": 0.20,
+        }
+    )
 
 
 @dataclass
@@ -108,9 +117,18 @@ class Stage2Config:
     num_extension_policies: int = 6
     extension_rounds: int = 2
     constrained_updates: int = 2
+    max_consecutive_constraint_failures: int = 1
     extension_mode: str = "constrained"
     constraint_tolerance: float = 1e-6
     total_timesteps_per_update: int = 512
+    semantic_penalty_coef: float = 0.0
+    semantic_penalty_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "high_disruption_action_count": 0.50,
+            "final_critical_compromised_hosts": 0.30,
+            "critical_impact_count": 0.20,
+        }
+    )
     output_dir: str = "cmorl_minicage/outputs/stage2"
     env: EnvConfig = field(default_factory=lambda: EnvConfig(seed=19))
     model: ModelConfig = field(default_factory=ModelConfig)
@@ -152,6 +170,17 @@ class ConstraintEvaluateConfig:
     input_kind: str = "buffer"
     input_path: str = ""
     selection_source: str = "pareto"
+    selection_policy: str = "objective"
+    security_margin: float = 120.0
+    feasible_rate_tolerance: float = 0.10
+    mean_violation_tolerance: float = 0.50
+    semantic_metric_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "high_disruption_action_rate": 0.50,
+            "final_critical_compromised_hosts": 0.30,
+            "critical_impact_count": 0.20,
+        }
+    )
     thresholds_path: str = ""
     output_path: str = ""
     eval_episodes: int = 5

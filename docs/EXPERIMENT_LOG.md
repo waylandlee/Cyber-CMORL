@@ -906,3 +906,133 @@
 - 结论：
   - `AdaCS-DCS chase` 已完成对 `crowding + dcs_gentle` 的 `HV / EU` 双反超。
   - 当前 formal `AdaCS-DCS` 主配置已切换为 `chase`。
+
+### 2026-04-03 / CybORG-Week2-Closeout
+
+- 阶段：
+  - `cmorl_cyborg` 第二周正式 `Scenario2` 收尾
+- 目标：
+  - 把第二周协议从“草稿 checklist”推进到真正可复用的正式导表链
+  - 固定主表 A / 主表 B / 总导表入口
+  - 给出进入 `5-seed formal` 前的最终命令模板与准入判断口径
+- 关键改动：
+  - 新增 [cmorl_cyborg/main_table_a.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/main_table_a.py)
+  - 新增 [cmorl_cyborg/main_table_b.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/main_table_b.py)
+  - [cmorl_cyborg/evaluate_constraints.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/evaluate_constraints.py) 补齐 `build-thresholds` 与 `aggregate`
+  - [compare_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/compare_suite_main.yaml) 改为第二周正式 `3-seed` 协议入口
+  - 新增 [table_b_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/table_b_suite_main.yaml)
+  - 新增 [CYBORG_WEEK2_CLOSEOUT.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_WEEK2_CLOSEOUT.md)
+- 当前状态：
+  - 第二周的代码链、配置链、导表链已经固定在 `Scenario2` 协议上
+  - `shared reference` 与 `shared thresholds` 的正式生成入口已经固定
+  - 但 `cmorl_cyborg/outputs/paper_*` 下的正式 `3-seed` 长跑产物尚未补齐
+- 结论：
+  - 第二周从工程角度已经达到“可低风险继续”的状态
+  - 但从实验结果角度，仍应先补齐正式 `3-seed` 产物，再决定是否进入第三周 `5-seed formal`
+
+### 2026-04-08 / CybORG-TableB-vs-CoverageCombo
+
+- 阶段：
+  - `cmorl_cyborg` 主表 B 与 coverage 公平比较结果复盘
+- 目标：
+  - 判断 `coverage_combo_fair` 的 `3-seed` 效果是否优于原始 `paper_table_b` 中的 `ours_stage2`
+- 输入文件：
+  - [ours_stage2.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_b/aggregated/ours_stage2.json)
+  - [coverage_combo_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
+  - [main_table_b_bar.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_b/main_table_b_bar.png)
+- 关键指标：
+  - 原始 `ours_stage2`
+    - `security_return = -518.70 ± 17.16`
+    - `business_return = -125.91 ± 6.51`
+    - `cost_return = -24.12 ± 0.55`
+    - `feasible_rate = 0.800 ± 0.089`
+    - `mean_violation = 0.380 ± 0.300`
+  - `coverage_combo_fair (loose)`
+    - `security_return = -491.02 ± 13.59`
+    - `business_return = -124.35 ± 6.71`
+    - `cost_return = -24.66 ± 0.20`
+    - `feasible_rate = 0.633 ± 0.116`
+    - `mean_violation = 0.287 ± 0.119`
+- 现象：
+  - `coverage_combo_fair` 在 `security`、`business`、`mean_violation` 上比原始 `ours_stage2` 更好。
+  - 但它的 `feasible_rate` 从 `0.800` 降到了 `0.633`，`cost_return` 也更差。
+  - 其余语义指标上属于有得有失，不构成一边倒优势。
+- 结论：
+  - `coverage_combo_fair` 不能被表述成对原始 `ours_stage2` 的严格改进。
+  - 更准确的说法是：它是一个偏重回报与平均违约的替代方案，但牺牲了可行率。
+
+### 2026-04-08 / CybORG-FairCompare-Loose-Coverage
+
+- 阶段：
+  - `cmorl_cyborg` loose fair compare 结果分析
+- 目标：
+  - 判断新增 `coverage_combo_fair` 与 `coverage_more_parents_fair` 是否在 `Loose` 情况下形成稳定优势
+- 输入文件：
+  - [coverage_combo_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
+  - [coverage_more_parents_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_loose.json)
+  - [ours_stage2_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/ours_stage2_fair_loose.json)
+  - [no_constraint_stage2_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/no_constraint_stage2_fair_loose.json)
+  - [fair_compare_table_b_loose_with_coverage.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_loose_with_coverage.png)
+- 关键指标：
+  - `coverage_combo_fair`
+    - `feasible_rate = 0.633 ± 0.116`
+    - `mean_violation = 0.287 ± 0.119`
+    - `security_return = -491.02 ± 13.59`
+  - `coverage_more_parents_fair`
+    - `feasible_rate = 0.600 ± 0.094`
+    - `mean_violation = 0.380 ± 0.037`
+    - `security_return = -509.10 ± 21.99`
+  - `ours_stage2_fair`
+    - `feasible_rate = 0.683 ± 0.059`
+    - `mean_violation = 0.891 ± 0.914`
+    - `security_return = -525.26 ± 24.37`
+  - `no_constraint_stage2_fair`
+    - `feasible_rate = 0.892 ± 0.042`
+    - `mean_violation = 0.084 ± 0.054`
+    - `security_return = -490.91 ± 34.04`
+- 现象：
+  - `coverage_combo_fair` 与 `coverage_more_parents_fair` 在聚合里选中了同一组 policy id：
+    - `stage2_ext_005_obj_0`
+    - `stage2_ext_001_obj_2`
+    - `stage2_ext_015_obj_0`
+  - `coverage_combo_fair` 相对 `more_parents` 更均衡：
+    - 更高的 `feasible_rate`
+    - 更低的 `mean_violation`
+    - 更好的 `security_return`
+  - 但两者都没有超过 `no_constraint_stage2_fair` 的可行性与平均违约表现。
+- 结论：
+  - `Loose` 下 coverage 机制的增益是有限的，当前还不足以支撑强 claim。
+  - 如果必须在两个 coverage 版本里选一个，当前应优先保留 `coverage_combo_fair`。
+  - 如果目标是“更稳的可行率”，`no_constraint_stage2_fair` 仍然是更强基线。
+
+### 2026-04-08 / CybORG-FairCompare-Tight-Coverage
+
+- 阶段：
+  - `cmorl_cyborg` tight fair compare 结果分析
+- 目标：
+  - 判断 coverage 变体在更严格阈值下是否显示出更强的约束处理优势
+- 输入文件：
+  - [coverage_combo_fair_tight.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_tight.json)
+  - [coverage_more_parents_fair_tight.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_tight.json)
+  - [ours_stage2_fair_tight.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/ours_stage2_fair_tight.json)
+  - [no_constraint_stage2_fair_tight.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/no_constraint_stage2_fair_tight.json)
+  - [fair_compare_table_b_tight_with_coverage.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_tight_with_coverage.png)
+- 关键指标：
+  - `coverage_combo_fair`
+    - `feasible_rate = 0.300 ± 0.134`
+    - `mean_violation = 8.015 ± 1.914`
+  - `coverage_more_parents_fair`
+    - `feasible_rate = 0.183 ± 0.112`
+    - `mean_violation = 6.378 ± 1.663`
+  - `ours_stage2_fair`
+    - `feasible_rate = 0.142 ± 0.150`
+    - `mean_violation = 5.776 ± 0.528`
+  - `no_constraint_stage2_fair`
+    - `feasible_rate = 0.367 ± 0.155`
+    - `mean_violation = 6.954 ± 1.985`
+- 现象：
+  - `Tight` 下四个方法都表现出明显更低的 `feasible_rate` 和更高的 `mean_violation`。
+  - 不同方法之间存在局部指标交换，但没有形成稳定、全面的 coverage 优势。
+- 结论：
+  - `Tight` 结果当前更适合被写成“压力测试”，不适合作为正式主卖点。
+  - 文档与论文叙事中应避免把 `tight` 下 coverage 结果写成已经被强力支持的结论。

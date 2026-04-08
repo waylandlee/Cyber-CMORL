@@ -1,0 +1,5359 @@
+{
+  "schema_version": "0.3.0",
+  "metadata": {
+    "schema_version": "0.3.0",
+    "stage": "stage2",
+    "env": {
+      "num_envs": 8,
+      "red_policy": "bline",
+      "remove_bugs": true,
+      "max_episode_steps": 100,
+      "seed": 11,
+      "scenario_name": "Scenario2",
+      "scenario_profile": "",
+      "gym_wrapper_name": "ChallengeWrapper",
+      "blue_agent_name": "Blue",
+      "red_agent_name": "Red",
+      "obs_mode": "vector",
+      "state_mode": true
+    },
+    "model": {
+      "hidden_size": 128,
+      "obj_dim": 3
+    },
+    "rollout": {
+      "num_steps": 64
+    },
+    "optimizer": {
+      "clip_param": 0.2,
+      "ppo_epochs": 4,
+      "num_mini_batch": 4,
+      "value_loss_coef": 0.5,
+      "entropy_coef": 0.01,
+      "learning_rate": 0.0003,
+      "max_grad_norm": 0.5,
+      "barrier_coef": 20.0,
+      "beta": 0.9,
+      "gamma": 0.995,
+      "gae_lambda": 0.95,
+      "eps": 1e-08
+    },
+    "evaluation": {
+      "eval_episodes": 3,
+      "preference_step": 0.1
+    },
+    "seed": 11,
+    "stage1_buffer": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/solution_buffer.json",
+    "num_extension_policies": 6,
+    "extension_rounds": 2,
+    "constrained_updates": 5,
+    "max_consecutive_constraint_failures": 1,
+    "constraint_tolerance": -2.0,
+    "total_timesteps_per_update": 1536,
+    "selection_mode": "adaptive",
+    "selection_weights": {
+      "crowding": 0.3,
+      "expansion": 0.3,
+      "low_risk": 0.2,
+      "coverage": 0.2,
+      "semantic_low_risk": 0.0
+    },
+    "selection_utility_tolerance": 0.02,
+    "selection_keep_extremes": true,
+    "extension_mode": "unconstrained",
+    "beta_mode": "dynamic",
+    "beta_min": 1.002,
+    "beta_max": 1.008,
+    "beta_schedule_weights": {
+      "crowding": 0.25,
+      "expansion": 0.35,
+      "low_risk": 0.2,
+      "progress": 0.2
+    },
+    "round_summaries": [
+      {
+        "round_index": 0,
+        "num_records_before_round": 18,
+        "pareto_size_before_round": 9,
+        "selection_mode": "adaptive",
+        "beta_schedule_mode": "dynamic",
+        "selected_policy_ids": [
+          "stage1_pref_000_ckpt_096",
+          "stage1_pref_003_ckpt_191",
+          "stage1_pref_002_ckpt_191",
+          "stage1_pref_004_ckpt_096",
+          "stage1_pref_004_ckpt_191",
+          "stage1_pref_001_ckpt_096"
+        ],
+        "selected_policy_crowding": {
+          "stage1_pref_000_ckpt_096": Infinity,
+          "stage1_pref_001_ckpt_096": 1.049448013305664,
+          "stage1_pref_002_ckpt_191": Infinity,
+          "stage1_pref_003_ckpt_191": Infinity,
+          "stage1_pref_004_ckpt_096": 1.9677510261535645,
+          "stage1_pref_004_ckpt_191": Infinity
+        },
+        "selected_policy_scores": {
+          "stage1_pref_000_ckpt_096": 0.765328413248062,
+          "stage1_pref_003_ckpt_191": 0.612664771080017,
+          "stage1_pref_002_ckpt_191": 0.6151515156030655,
+          "stage1_pref_004_ckpt_096": 0.687923538684845,
+          "stage1_pref_004_ckpt_191": 0.6858942031860351,
+          "stage1_pref_001_ckpt_096": 0.5016376316547394
+        },
+        "selected_policy_components": {
+          "stage1_pref_000_ckpt_096": {
+            "crowding_score": 1.0,
+            "expansion_potential": 0.9401426911354065,
+            "target_expansion_by_objective": [
+              0.0,
+              0.023516906425356865,
+              0.9401426911354065
+            ],
+            "constraint_risk": 0.8866022825241089,
+            "low_risk_score": 0.11339771747589111,
+            "utility_coverage_gain": 0.8030303120613098
+          },
+          "stage1_pref_003_ckpt_191": {
+            "crowding_score": 1.0,
+            "expansion_potential": 1.0,
+            "target_expansion_by_objective": [
+              0.011382917873561382,
+              0.0,
+              1.0
+            ],
+            "constraint_risk": 0.9972822070121765,
+            "low_risk_score": 0.0027177929878234863,
+            "utility_coverage_gain": 0.06060606241226196
+          },
+          "stage1_pref_002_ckpt_191": {
+            "crowding_score": 1.0,
+            "expansion_potential": 1.0,
+            "target_expansion_by_objective": [
+              1.0,
+              0.9918943643569946,
+              0.0
+            ],
+            "constraint_risk": 1.0,
+            "low_risk_score": 0.0,
+            "utility_coverage_gain": 0.07575757801532745
+          },
+          "stage1_pref_004_ckpt_096": {
+            "crowding_score": 1.0,
+            "expansion_potential": 0.6264117956161499,
+            "target_expansion_by_objective": [
+              0.16477639973163605,
+              0.6264117956161499,
+              0.3542717695236206
+            ],
+            "constraint_risk": 0.0,
+            "low_risk_score": 1.0,
+            "utility_coverage_gain": 0.0
+          },
+          "stage1_pref_004_ckpt_191": {
+            "crowding_score": 1.0,
+            "expansion_potential": 1.0,
+            "target_expansion_by_objective": [
+              0.14460478723049164,
+              1.0,
+              0.5637857913970947
+            ],
+            "constraint_risk": 0.5705289840698242,
+            "low_risk_score": 0.4294710159301758,
+            "utility_coverage_gain": 0.0
+          },
+          "stage1_pref_001_ckpt_096": {
+            "crowding_score": 0.46506476402282715,
+            "expansion_potential": 0.8299606442451477,
+            "target_expansion_by_objective": [
+              0.8299606442451477,
+              0.11816942691802979,
+              0.7562474012374878
+            ],
+            "constraint_risk": 0.46465298533439636,
+            "low_risk_score": 0.5353470146656036,
+            "utility_coverage_gain": 0.03030303120613098
+          }
+        },
+        "extension_results": [
+          {
+            "parent_policy_id": "stage1_pref_000_ckpt_096",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_000_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.765328413248062,
+            "selection_rank": 1,
+            "dynamic_beta": 1.0063639227390289,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.0,
+              "low_risk": 0.11339771747589111,
+              "progress": 0.0,
+              "strictness": 0.2726795434951782
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 25.52288818359375,
+            "ipo_stats": {
+              "value_loss": 1376.0895156860352,
+              "action_loss": 57.11365628242493,
+              "objective_surrogate": -539.8823928833008,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.7887220680713654,
+              "beta_used": 1.0063639227390289
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_000_ckpt_096",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_001_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.765328413248062,
+            "selection_rank": 1,
+            "dynamic_beta": 1.0063145372355358,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.023516906425356865,
+              "low_risk": 0.11339771747589111,
+              "progress": 0.0,
+              "strictness": 0.2809104607440531
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 5.46697998046875,
+            "ipo_stats": {
+              "value_loss": 3523.9417877197266,
+              "action_loss": 13.459107220172882,
+              "objective_surrogate": -143.17088413238525,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.686575308442116,
+              "beta_used": 1.0063145372355358
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_000_ckpt_096",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_002_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.765328413248062,
+            "selection_rank": 1,
+            "dynamic_beta": 1.0043896230876446,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.9401426911354065,
+              "low_risk": 0.11339771747589111,
+              "progress": 0.0,
+              "strictness": 0.6017294853925704
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 11.537084579467773,
+            "ipo_stats": {
+              "value_loss": 5082.058074951172,
+              "action_loss": -0.4398147091269493,
+              "objective_surrogate": -18.324353098869324,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.169194594025612,
+              "beta_used": 1.0043896230876446
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_003_ckpt_191",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_003_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.612664771080017,
+            "selection_rank": 5,
+            "dynamic_beta": 1.0064728345208802,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.011382917873561382,
+              "low_risk": 0.0027177929878234863,
+              "progress": 0.0,
+              "strictness": 0.2545275798533112
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 19.572906494140625,
+            "ipo_stats": {
+              "value_loss": 2057.3223190307617,
+              "action_loss": 65.08810067176819,
+              "objective_surrogate": -542.1651802062988,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.9018442183732986,
+              "beta_used": 1.0064728345208802
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_003_ckpt_191",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_004_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.612664771080017,
+            "selection_rank": 5,
+            "dynamic_beta": 1.0064967386484147,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.0,
+              "low_risk": 0.0027177929878234863,
+              "progress": 0.0,
+              "strictness": 0.2505435585975647
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 10.657081604003906,
+            "ipo_stats": {
+              "value_loss": 2201.407066345215,
+              "action_loss": 8.890659749507904,
+              "objective_surrogate": -129.41118335723877,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.864157736301422,
+              "beta_used": 1.0064967386484147
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_003_ckpt_191",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_005_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.612664771080017,
+            "selection_rank": 5,
+            "dynamic_beta": 1.0043967386484147,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 1.0,
+              "low_risk": 0.0027177929878234863,
+              "progress": 0.0,
+              "strictness": 0.6005435585975647
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 12.290000915527344,
+            "ipo_stats": {
+              "value_loss": 7138.248474121094,
+              "action_loss": -0.6381455473601818,
+              "objective_surrogate": -18.97560679912567,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 2.349995344877243,
+              "beta_used": 1.0043967386484147
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_002_ckpt_191",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_006_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6151515156030655,
+            "selection_rank": 4,
+            "dynamic_beta": 1.0044,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 1.0,
+              "low_risk": 0.0,
+              "progress": 0.0,
+              "strictness": 0.6
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 909.1146240234375,
+            "ipo_stats": {
+              "value_loss": 5549.628143310547,
+              "action_loss": 99.60845994949341,
+              "objective_surrogate": -766.675106048584,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.785671815276146,
+              "beta_used": 1.0044
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_002_ckpt_191",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_007_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6151515156030655,
+            "selection_rank": 4,
+            "dynamic_beta": 1.0044170218348503,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.9918943643569946,
+              "low_risk": 0.0,
+              "progress": 0.0,
+              "strictness": 0.5971630275249481
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 34.3111572265625,
+            "ipo_stats": {
+              "value_loss": 9511.911071777344,
+              "action_loss": 11.19098150730133,
+              "objective_surrogate": -155.04036235809326,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.7195586264133453,
+              "beta_used": 1.0044170218348503
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_002_ckpt_191",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_008_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6151515156030655,
+            "selection_rank": 4,
+            "dynamic_beta": 1.0065,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.0,
+              "low_risk": 0.0,
+              "progress": 0.0,
+              "strictness": 0.25
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": -0.3075000047683716,
+            "ipo_stats": {
+              "value_loss": 15139.135314941406,
+              "action_loss": -0.0022910442639840767,
+              "objective_surrogate": -0.32479230500757694,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 0.16063520591706038,
+              "beta_used": 1.0065
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_004_ckpt_096",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_009_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.687923538684845,
+            "selection_rank": 2,
+            "dynamic_beta": 1.0049539695605636,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.16477639973163605,
+              "low_risk": 1.0,
+              "progress": 0.0,
+              "strictness": 0.5076717399060726
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 80.26873779296875,
+            "ipo_stats": {
+              "value_loss": 2284.2154693603516,
+              "action_loss": 74.19893789291382,
+              "objective_surrogate": -656.9884796142578,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.780530944466591,
+              "beta_used": 1.0049539695605636
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_004_ckpt_096",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_010_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.687923538684845,
+            "selection_rank": 2,
+            "dynamic_beta": 1.003984535229206,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.6264117956161499,
+              "low_risk": 1.0,
+              "progress": 0.0,
+              "strictness": 0.6692441284656525
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": -9.642593383789062,
+            "ipo_stats": {
+              "value_loss": 2930.5155029296875,
+              "action_loss": 17.54648494720459,
+              "objective_surrogate": -176.78836822509766,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.677726060152054,
+              "beta_used": 1.003984535229206
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_004_ckpt_096",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_011_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.687923538684845,
+            "selection_rank": 2,
+            "dynamic_beta": 1.0045560292840003,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.3542717695236206,
+              "low_risk": 1.0,
+              "progress": 0.0,
+              "strictness": 0.5739951193332673
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 8.368749618530273,
+            "ipo_stats": {
+              "value_loss": 15775.219848632812,
+              "action_loss": -0.8201376385986805,
+              "objective_surrogate": -2.3190289586782455,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 0.46096206828951836,
+              "beta_used": 1.0045560292840003
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_004_ckpt_191",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_012_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6858942031860351,
+            "selection_rank": 3,
+            "dynamic_beta": 1.0056809647276999,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.14460478723049164,
+              "low_risk": 0.4294710159301758,
+              "progress": 0.0,
+              "strictness": 0.3865058787167073
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": -4.07293701171875,
+            "ipo_stats": {
+              "value_loss": 2337.213134765625,
+              "action_loss": 75.5720043182373,
+              "objective_surrogate": -700.5720024108887,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.7098987102508545,
+              "beta_used": 1.0056809647276999
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_004_ckpt_191",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_013_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6858942031860351,
+            "selection_rank": 3,
+            "dynamic_beta": 1.0038846347808839,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 1.0,
+              "low_risk": 0.4294710159301758,
+              "progress": 0.0,
+              "strictness": 0.6858942031860351
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 27.711776733398438,
+            "ipo_stats": {
+              "value_loss": 3245.9342651367188,
+              "action_loss": 10.942790389060974,
+              "objective_surrogate": -154.33352279663086,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.7876487374305725,
+              "beta_used": 1.0038846347808839
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_004_ckpt_191",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_014_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6858942031860351,
+            "selection_rank": 3,
+            "dynamic_beta": 1.00480068461895,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.5637857913970947,
+              "low_risk": 0.4294710159301758,
+              "progress": 0.0,
+              "strictness": 0.5332192301750183
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 13.333333969116211,
+            "ipo_stats": {
+              "value_loss": 13454.820861816406,
+              "action_loss": -0.7990408316254616,
+              "objective_surrogate": -4.077208966016769,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 0.9695655182003975,
+              "beta_used": 1.00480068461895
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_001_ckpt_096",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_015_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.5016376316547394,
+            "selection_rank": 6,
+            "dynamic_beta": 1.0049170690834521,
+            "beta_components": {
+              "crowding": 0.46506476402282715,
+              "target_expansion": 0.8299606442451477,
+              "low_risk": 0.5353470146656036,
+              "progress": 0.0,
+              "strictness": 0.5138218194246291
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 671.7687377929688,
+            "ipo_stats": {
+              "value_loss": 6996.744842529297,
+              "action_loss": 121.11425447463989,
+              "objective_surrogate": -1290.589241027832,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 4.053811222314835,
+              "beta_used": 1.0049170690834521
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_001_ckpt_096",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_016_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.5016376316547394,
+            "selection_rank": 6,
+            "dynamic_beta": 1.006411830639839,
+            "beta_components": {
+              "crowding": 0.46506476402282715,
+              "target_expansion": 0.11816942691802979,
+              "low_risk": 0.5353470146656036,
+              "progress": 0.0,
+              "strictness": 0.26469489336013796
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 3.5745849609375,
+            "ipo_stats": {
+              "value_loss": 12145.137084960938,
+              "action_loss": 13.650169968605042,
+              "objective_surrogate": -144.84881019592285,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.824517458677292,
+              "beta_used": 1.006411830639839
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_001_ckpt_096",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_017_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.5016376316547394,
+            "selection_rank": 6,
+            "dynamic_beta": 1.0050718668937684,
+            "beta_components": {
+              "crowding": 0.46506476402282715,
+              "target_expansion": 0.7562474012374878,
+              "low_risk": 0.5353470146656036,
+              "progress": 0.0,
+              "strictness": 0.4880221843719482
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 11.618751525878906,
+            "ipo_stats": {
+              "value_loss": 15496.043395996094,
+              "action_loss": -0.7811293601989746,
+              "objective_surrogate": -12.750120520591736,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 2.169337421655655,
+              "beta_used": 1.0050718668937684
+            }
+          }
+        ],
+        "num_records_after_round": 36,
+        "pareto_size_after_round": 16
+      },
+      {
+        "round_index": 1,
+        "num_records_before_round": 36,
+        "pareto_size_before_round": 16,
+        "selection_mode": "adaptive",
+        "beta_schedule_mode": "dynamic",
+        "selected_policy_ids": [
+          "stage2_ext_000_obj_0",
+          "stage2_ext_004_obj_1",
+          "stage1_pref_002_ckpt_191",
+          "stage2_ext_014_obj_2",
+          "stage2_ext_011_obj_2",
+          "stage1_pref_004_ckpt_096"
+        ],
+        "selected_policy_crowding": {
+          "stage1_pref_002_ckpt_191": Infinity,
+          "stage1_pref_004_ckpt_096": 0.7361315488815308,
+          "stage2_ext_000_obj_0": Infinity,
+          "stage2_ext_004_obj_1": Infinity,
+          "stage2_ext_011_obj_2": Infinity,
+          "stage2_ext_014_obj_2": 0.8210453987121582
+        },
+        "selected_policy_scores": {
+          "stage2_ext_000_obj_0": 0.7799818515777588,
+          "stage2_ext_004_obj_1": 0.631349417567253,
+          "stage1_pref_002_ckpt_191": 0.6121212124824523,
+          "stage2_ext_014_obj_2": 0.6602744698524475,
+          "stage2_ext_011_obj_2": 0.6316117882728577,
+          "stage1_pref_004_ckpt_096": 0.6076590955257416
+        },
+        "selected_policy_components": {
+          "stage2_ext_000_obj_0": {
+            "crowding_score": 1.0,
+            "expansion_potential": 1.0,
+            "target_expansion_by_objective": [
+              0.0,
+              0.19276878237724304,
+              1.0
+            ],
+            "constraint_risk": 0.9031210541725159,
+            "low_risk_score": 0.09687894582748413,
+            "utility_coverage_gain": 0.8030303120613098
+          },
+          "stage2_ext_004_obj_1": {
+            "crowding_score": 1.0,
+            "expansion_potential": 0.9344262480735779,
+            "target_expansion_by_objective": [
+              0.07042733579874039,
+              0.0,
+              0.9344262480735779
+            ],
+            "constraint_risk": 0.8812559247016907,
+            "low_risk_score": 0.11874407529830933,
+            "utility_coverage_gain": 0.13636364042758942
+          },
+          "stage1_pref_002_ckpt_191": {
+            "crowding_score": 1.0,
+            "expansion_potential": 1.0,
+            "target_expansion_by_objective": [
+              1.0,
+              0.9940061569213867,
+              0.0
+            ],
+            "constraint_risk": 1.0,
+            "low_risk_score": 0.0,
+            "utility_coverage_gain": 0.06060606241226196
+          },
+          "stage2_ext_014_obj_2": {
+            "crowding_score": 1.0,
+            "expansion_potential": 0.9798005819320679,
+            "target_expansion_by_objective": [
+              0.770591139793396,
+              0.9798005819320679,
+              0.1684446781873703
+            ],
+            "constraint_risk": 0.6683285236358643,
+            "low_risk_score": 0.33167147636413574,
+            "utility_coverage_gain": 0.0
+          },
+          "stage2_ext_011_obj_2": {
+            "crowding_score": 1.0,
+            "expansion_potential": 1.0,
+            "target_expansion_by_objective": [
+              0.9494195580482483,
+              1.0,
+              0.10623282194137573
+            ],
+            "constraint_risk": 0.8419410586357117,
+            "low_risk_score": 0.15805894136428833,
+            "utility_coverage_gain": 0.0
+          },
+          "stage1_pref_004_ckpt_096": {
+            "crowding_score": 0.8669668436050415,
+            "expansion_potential": 0.7095537185668945,
+            "target_expansion_by_objective": [
+              0.18538951873779297,
+              0.7095537185668945,
+              0.44050928950309753
+            ],
+            "constraint_risk": 0.32648536562919617,
+            "low_risk_score": 0.6735146343708038,
+            "utility_coverage_gain": 0.0
+          }
+        },
+        "extension_results": [
+          {
+            "parent_policy_id": "stage2_ext_000_obj_0",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_018_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.7799818515777588,
+            "selection_rank": 1,
+            "dynamic_beta": 1.005183745265007,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.0,
+              "low_risk": 0.09687894582748413,
+              "progress": 1.0,
+              "strictness": 0.4693757891654968
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": -60.4478759765625,
+            "ipo_stats": {
+              "value_loss": 2123.8883209228516,
+              "action_loss": 70.01261806488037,
+              "objective_surrogate": -577.6897087097168,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.852287992835045,
+              "beta_used": 1.005183745265007
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_000_obj_0",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_019_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.7799818515777588,
+            "selection_rank": 1,
+            "dynamic_beta": 1.0047789308220147,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.19276878237724304,
+              "low_risk": 0.09687894582748413,
+              "progress": 1.0,
+              "strictness": 0.5368448629975319
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 10.251251220703125,
+            "ipo_stats": {
+              "value_loss": 3669.148239135742,
+              "action_loss": 9.032305717468262,
+              "objective_surrogate": -119.6680326461792,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.949391260743141,
+              "beta_used": 1.0047789308220147
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_000_obj_0",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_020_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.7799818515777588,
+            "selection_rank": 1,
+            "dynamic_beta": 1.003083745265007,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 1.0,
+              "low_risk": 0.09687894582748413,
+              "progress": 1.0,
+              "strictness": 0.8193757891654969
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 13.374167442321777,
+            "ipo_stats": {
+              "value_loss": 10640.838684082031,
+              "action_loss": -1.3280220031738281,
+              "objective_surrogate": -11.89156049489975,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 1.9655085355043411,
+              "beta_used": 1.003083745265007
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_004_obj_1",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_021_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.631349417567253,
+            "selection_rank": 4,
+            "dynamic_beta": 1.0050096097044647,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.07042733579874039,
+              "low_risk": 0.11874407529830933,
+              "progress": 1.0,
+              "strictness": 0.49839838258922103
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 27.01458740234375,
+            "ipo_stats": {
+              "value_loss": 1576.4189453125,
+              "action_loss": 57.573272705078125,
+              "objective_surrogate": -526.4024314880371,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.999553844332695,
+              "beta_used": 1.0050096097044647
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_004_obj_1",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_022_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.631349417567253,
+            "selection_rank": 4,
+            "dynamic_beta": 1.0051575071096421,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.0,
+              "low_risk": 0.11874407529830933,
+              "progress": 1.0,
+              "strictness": 0.4737488150596619
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 1.7095794677734375,
+            "ipo_stats": {
+              "value_loss": 2681.9283142089844,
+              "action_loss": 3.9218655079603195,
+              "objective_surrogate": -121.5356125831604,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.9872515350580215,
+              "beta_used": 1.0051575071096421
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_004_obj_1",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_023_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.631349417567253,
+            "selection_rank": 4,
+            "dynamic_beta": 1.0031952119886876,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.9344262480735779,
+              "low_risk": 0.11874407529830933,
+              "progress": 1.0,
+              "strictness": 0.8007980018854142
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 11.383750915527344,
+            "ipo_stats": {
+              "value_loss": 10594.20263671875,
+              "action_loss": -1.337178535759449,
+              "objective_surrogate": -13.548655271530151,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 2.0119176283478737,
+              "beta_used": 1.0031952119886876
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_002_ckpt_191",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_024_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6121212124824523,
+            "selection_rank": 5,
+            "dynamic_beta": 1.0032,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 1.0,
+              "low_risk": 0.0,
+              "progress": 1.0,
+              "strictness": 0.8
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 941.675048828125,
+            "ipo_stats": {
+              "value_loss": 1924.4821243286133,
+              "action_loss": 63.826472997665405,
+              "objective_surrogate": -669.0076866149902,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 4.009402021765709,
+              "beta_used": 1.0032
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_002_ckpt_191",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_025_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6121212124824523,
+            "selection_rank": 5,
+            "dynamic_beta": 1.0032125870704651,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.9940061569213867,
+              "low_risk": 0.0,
+              "progress": 1.0,
+              "strictness": 0.7979021549224854
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 23.60302734375,
+            "ipo_stats": {
+              "value_loss": 10022.538513183594,
+              "action_loss": 10.917427062988281,
+              "objective_surrogate": -154.91888999938965,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.6981644481420517,
+              "beta_used": 1.0032125870704651
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_002_ckpt_191",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_026_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6121212124824523,
+            "selection_rank": 5,
+            "dynamic_beta": 1.0053,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.0,
+              "low_risk": 0.0,
+              "progress": 1.0,
+              "strictness": 0.45
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": -0.24833333492279053,
+            "ipo_stats": {
+              "value_loss": 15139.0205078125,
+              "action_loss": 0.005856200426933356,
+              "objective_surrogate": -0.23752287030220032,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 0.11089779948815703,
+              "beta_used": 1.0053
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_014_obj_2",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_027_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6602744698524475,
+            "selection_rank": 2,
+            "dynamic_beta": 1.0032837528347969,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.770591139793396,
+              "low_risk": 0.33167147636413574,
+              "progress": 1.0,
+              "strictness": 0.7860411942005157
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 690.6790771484375,
+            "ipo_stats": {
+              "value_loss": 3399.6739654541016,
+              "action_loss": 78.71871328353882,
+              "objective_surrogate": -639.5937118530273,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.7971429973840714,
+              "beta_used": 1.0032837528347969
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_014_obj_2",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_028_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6602744698524475,
+            "selection_rank": 2,
+            "dynamic_beta": 1.0028444130063057,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.9798005819320679,
+              "low_risk": 0.33167147636413574,
+              "progress": 1.0,
+              "strictness": 0.859264498949051
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 14.509063720703125,
+            "ipo_stats": {
+              "value_loss": 8864.818786621094,
+              "action_loss": 12.114033460617065,
+              "objective_surrogate": -162.9438238143921,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.967146411538124,
+              "beta_used": 1.0028444130063057
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_014_obj_2",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_029_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6602744698524475,
+            "selection_rank": 2,
+            "dynamic_beta": 1.0045482604041696,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.1684446781873703,
+              "low_risk": 0.33167147636413574,
+              "progress": 1.0,
+              "strictness": 0.5752899326384068
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 1.9345831871032715,
+            "ipo_stats": {
+              "value_loss": 15038.943908691406,
+              "action_loss": -0.5387813709676266,
+              "objective_surrogate": -1.9562185257673264,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 0.2319426154717803,
+              "beta_used": 1.0045482604041696
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_011_obj_2",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_030_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6316117882728577,
+            "selection_rank": 3,
+            "dynamic_beta": 1.0031165481984616,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.9494195580482483,
+              "low_risk": 0.15805894136428833,
+              "progress": 1.0,
+              "strictness": 0.8139086335897445
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 799.8417358398438,
+            "ipo_stats": {
+              "value_loss": 4473.723846435547,
+              "action_loss": 95.0715184211731,
+              "objective_surrogate": -973.738151550293,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.3231309056282043,
+              "beta_used": 1.0031165481984616
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_011_obj_2",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_031_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6316117882728577,
+            "selection_rank": 3,
+            "dynamic_beta": 1.003010329270363,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 1.0,
+              "low_risk": 0.15805894136428833,
+              "progress": 1.0,
+              "strictness": 0.8316117882728578
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 13.3309326171875,
+            "ipo_stats": {
+              "value_loss": 11725.535339355469,
+              "action_loss": 14.827966392040253,
+              "objective_surrogate": -168.5480718612671,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.8517811000347137,
+              "beta_used": 1.003010329270363
+            }
+          },
+          {
+            "parent_policy_id": "stage2_ext_011_obj_2",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_032_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6316117882728577,
+            "selection_rank": 3,
+            "dynamic_beta": 1.004887240344286,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.10623282194137573,
+              "low_risk": 0.15805894136428833,
+              "progress": 1.0,
+              "strictness": 0.5187932759523392
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 0.6195833683013916,
+            "ipo_stats": {
+              "value_loss": 15671.390563964844,
+              "action_loss": -0.3991038464009762,
+              "objective_surrogate": -1.6783960163593292,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 0.05297531164251268,
+              "beta_used": 1.004887240344286
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_004_ckpt_096",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_033_obj_0",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6076590955257416,
+            "selection_rank": 6,
+            "dynamic_beta": 1.004302014183998,
+            "beta_components": {
+              "crowding": 0.8669668436050415,
+              "target_expansion": 0.18538951873779297,
+              "low_risk": 0.6735146343708038,
+              "progress": 1.0,
+              "strictness": 0.6163309693336487
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 44.870849609375,
+            "ipo_stats": {
+              "value_loss": 1952.8619232177734,
+              "action_loss": 68.04591798782349,
+              "objective_surrogate": -655.370922088623,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.8002699613571167,
+              "beta_used": 1.004302014183998
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_004_ckpt_096",
+            "target_objective": 1,
+            "generated_policy_id": "stage2_ext_034_obj_1",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6076590955257416,
+            "selection_rank": 6,
+            "dynamic_beta": 1.003201269364357,
+            "beta_components": {
+              "crowding": 0.8669668436050415,
+              "target_expansion": 0.7095537185668945,
+              "low_risk": 0.6735146343708038,
+              "progress": 1.0,
+              "strictness": 0.7997884392738341
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 8.44781494140625,
+            "ipo_stats": {
+              "value_loss": 11758.671203613281,
+              "action_loss": 17.59408164024353,
+              "objective_surrogate": -172.69741344451904,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 3.6672955751419067,
+              "beta_used": 1.003201269364357
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_004_ckpt_096",
+            "target_objective": 2,
+            "generated_policy_id": "stage2_ext_035_obj_2",
+            "successful_constrained_updates": 5,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6076590955257416,
+            "selection_rank": 6,
+            "dynamic_beta": 1.003766262665391,
+            "beta_components": {
+              "crowding": 0.8669668436050415,
+              "target_expansion": 0.44050928950309753,
+              "low_risk": 0.6735146343708038,
+              "progress": 1.0,
+              "strictness": 0.7056228891015053
+            },
+            "last_constraint_margins": null,
+            "objective_improvement": 7.952083587646484,
+            "ipo_stats": {
+              "value_loss": 13318.124755859375,
+              "action_loss": -0.6936346627771854,
+              "objective_surrogate": -3.6088650971651077,
+              "barrier_bonus": 0.0,
+              "min_constraint_margin": 0.0,
+              "feasible_ratio": 1.0,
+              "entropy": 0.6364881619811058,
+              "beta_used": 1.003766262665391
+            }
+          }
+        ],
+        "num_records_after_round": 54,
+        "pareto_size_after_round": 17
+      }
+    ],
+    "parent_buffer_metadata": {
+      "schema_version": "0.3.0",
+      "stage": "stage1",
+      "env": {
+        "num_envs": 8,
+        "red_policy": "bline",
+        "remove_bugs": true,
+        "max_episode_steps": 100,
+        "seed": 11,
+        "scenario_name": "Scenario2",
+        "scenario_profile": "",
+        "gym_wrapper_name": "ChallengeWrapper",
+        "blue_agent_name": "Blue",
+        "red_agent_name": "Red",
+        "obs_mode": "vector",
+        "state_mode": true
+      },
+      "model": {
+        "hidden_size": 128,
+        "obj_dim": 3
+      },
+      "rollout": {
+        "num_steps": 64
+      },
+      "optimizer": {
+        "clip_param": 0.2,
+        "ppo_epochs": 4,
+        "num_mini_batch": 4,
+        "value_loss_coef": 0.5,
+        "entropy_coef": 0.01,
+        "learning_rate": 0.0003,
+        "max_grad_norm": 0.5,
+        "gamma": 0.995,
+        "gae_lambda": 0.95
+      },
+      "evaluation": {
+        "eval_episodes": 3,
+        "preference_step": 0.1
+      },
+      "seed": 11,
+      "num_policies": 6,
+      "preference_strategy": "dirichlet_extremes",
+      "preference_step": 0.1,
+      "preference_dirichlet_alpha": 1.0,
+      "explicit_preferences": [],
+      "preferences": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.12145774066448212,
+          0.28477224707603455,
+          0.5937700271606445
+        ],
+        [
+          0.011584676802158356,
+          0.029490819200873375,
+          0.9589245319366455
+        ],
+        [
+          0.12935374677181244,
+          0.34182003140449524,
+          0.5288262367248535
+        ]
+      ],
+      "total_timesteps": 98304,
+      "timesteps_per_policy": 98304,
+      "total_stage_timesteps": 589824,
+      "stage1_summary": [
+        {
+          "preference_index": 0,
+          "preference": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "num_updates": 192,
+          "save_every": 96,
+          "timesteps_per_policy": 98304,
+          "num_saved_checkpoints": 3,
+          "final_policy_id": "stage1_pref_000_ckpt_191",
+          "final_objective_vector": [
+            -516.3312377929688,
+            -135.8569793701172,
+            -23.545001983642578
+          ],
+          "best_policy_id": "stage1_pref_000_ckpt_096",
+          "best_scalarized_utility": -487.410400390625,
+          "preference_seed": 11,
+          "env_seed": 11,
+          "protocol_name": "cyborg_week2_three_seed",
+          "execution_mode": "parallel"
+        },
+        {
+          "preference_index": 1,
+          "preference": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "num_updates": 192,
+          "save_every": 96,
+          "timesteps_per_policy": 98304,
+          "num_saved_checkpoints": 3,
+          "final_policy_id": "stage1_pref_001_ckpt_191",
+          "final_objective_vector": [
+            -1368.949951171875,
+            -137.8852081298828,
+            -19.171667098999023
+          ],
+          "best_policy_id": "stage1_pref_001_ckpt_096",
+          "best_scalarized_utility": -131.21697998046875,
+          "preference_seed": 1011,
+          "env_seed": 1011,
+          "protocol_name": "cyborg_week2_three_seed",
+          "execution_mode": "parallel"
+        },
+        {
+          "preference_index": 2,
+          "preference": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "num_updates": 192,
+          "save_every": 96,
+          "timesteps_per_policy": 98304,
+          "num_saved_checkpoints": 3,
+          "final_policy_id": "stage1_pref_002_ckpt_191",
+          "final_objective_vector": [
+            -1496.050048828125,
+            -163.8577117919922,
+            -0.02500000037252903
+          ],
+          "best_policy_id": "stage1_pref_002_ckpt_191",
+          "best_scalarized_utility": -0.02500000037252903,
+          "preference_seed": 2011,
+          "env_seed": 2011,
+          "protocol_name": "cyborg_week2_three_seed",
+          "execution_mode": "parallel"
+        },
+        {
+          "preference_index": 3,
+          "preference": [
+            0.12145774066448212,
+            0.28477224707603455,
+            0.5937700271606445
+          ],
+          "num_updates": 192,
+          "save_every": 96,
+          "timesteps_per_policy": 98304,
+          "num_saved_checkpoints": 3,
+          "final_policy_id": "stage1_pref_003_ckpt_191",
+          "final_objective_vector": [
+            -498.89166259765625,
+            -126.8023910522461,
+            -31.154584884643555
+          ],
+          "best_policy_id": "stage1_pref_003_ckpt_191",
+          "best_scalarized_utility": -115.20271472315403,
+          "preference_seed": 3011,
+          "env_seed": 3011,
+          "protocol_name": "cyborg_week2_three_seed",
+          "execution_mode": "parallel"
+        },
+        {
+          "preference_index": 4,
+          "preference": [
+            0.011584676802158356,
+            0.029490819200873375,
+            0.9589245319366455
+          ],
+          "num_updates": 192,
+          "save_every": 96,
+          "timesteps_per_policy": 98304,
+          "num_saved_checkpoints": 3,
+          "final_policy_id": "stage1_pref_004_ckpt_191",
+          "final_objective_vector": [
+            -633.2645263671875,
+            -164.1605224609375,
+            -17.575416564941406
+          ],
+          "best_policy_id": "stage1_pref_004_ckpt_096",
+          "best_scalarized_utility": -22.60081578116379,
+          "preference_seed": 4011,
+          "env_seed": 4011,
+          "protocol_name": "cyborg_week2_three_seed",
+          "execution_mode": "parallel"
+        },
+        {
+          "preference_index": 5,
+          "preference": [
+            0.12935374677181244,
+            0.34182003140449524,
+            0.5288262367248535
+          ],
+          "num_updates": 192,
+          "save_every": 96,
+          "timesteps_per_policy": 98304,
+          "num_saved_checkpoints": 3,
+          "final_policy_id": "stage1_pref_005_ckpt_191",
+          "final_objective_vector": [
+            -638.4937744140625,
+            -136.81813049316406,
+            -19.145000457763672
+          ],
+          "best_policy_id": "stage1_pref_005_ckpt_096",
+          "best_scalarized_utility": -126.41556378271571,
+          "preference_seed": 5011,
+          "env_seed": 5011,
+          "protocol_name": "cyborg_week2_three_seed",
+          "execution_mode": "parallel"
+        }
+      ],
+      "stage1_protocol_name": "cyborg_week2_three_seed",
+      "reseed_mode": "per_preference",
+      "independent_env_per_preference": true,
+      "preference_seed_stride": 1000,
+      "env_seed_stride": 1000,
+      "parallel_workers": 6,
+      "parallel_backend": "process",
+      "merge_order": "preference_index"
+    }
+  },
+  "records": [
+    {
+      "policy_id": "stage1_pref_000_ckpt_000",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_000_ckpt_000.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -1022.4187622070312,
+        -148.56405639648438,
+        -20.892501831054688
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -698.1874389648438,
+          -90.59906005859375,
+          -13.153743743896484
+        ],
+        "scalarized_utility": -1022.4187622070312,
+        "trainer_stats": {
+          "value_loss": 11543.661499023438,
+          "action_loss": 162.24484157562256,
+          "entropy": 4.9736389219760895
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_096",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_000_ckpt_096.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -487.410400390625,
+        -127.68093872070312,
+        -29.29125213623047
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 96,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 49664,
+        "rollout_return_estimate": [
+          -331.2125244140625,
+          -84.98812103271484,
+          -18.061243057250977
+        ],
+        "scalarized_utility": -487.410400390625,
+        "trainer_stats": {
+          "value_loss": 1906.1981201171875,
+          "action_loss": 69.06028699874878,
+          "entropy": 2.918502628803253
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_000_ckpt_191.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -516.3312377929688,
+        -135.8569793701172,
+        -23.545001983642578
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -340.7812805175781,
+          -90.2509536743164,
+          -14.886241912841797
+        ],
+        "scalarized_utility": -516.3312377929688,
+        "trainer_stats": {
+          "value_loss": 1805.6917037963867,
+          "action_loss": 67.35282397270203,
+          "entropy": 2.431833118200302
+        },
+        "preference_seed": 11,
+        "env_seed": 11,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 3,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_000",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_001_ckpt_000.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -1181.2396240234375,
+        -144.05770874023438,
+        -21.26500129699707
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -645.631103515625,
+          -88.9206314086914,
+          -13.259993553161621
+        ],
+        "scalarized_utility": -144.05770874023438,
+        "trainer_stats": {
+          "value_loss": 10494.223693847656,
+          "action_loss": 20.344642758369446,
+          "entropy": 4.9726927280426025
+        },
+        "preference_seed": 1011,
+        "env_seed": 1011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_096",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_001_ckpt_096.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -1324.5416259765625,
+        -131.21697998046875,
+        -23.566667556762695
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 96,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 49664,
+        "rollout_return_estimate": [
+          -759.0437622070312,
+          -79.23594665527344,
+          -14.979994773864746
+        ],
+        "scalarized_utility": -131.21697998046875,
+        "trainer_stats": {
+          "value_loss": 11762.647216796875,
+          "action_loss": 14.31120890378952,
+          "entropy": 2.623940944671631
+        },
+        "preference_seed": 1011,
+        "env_seed": 1011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 5,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_001_ckpt_191.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -1368.949951171875,
+        -137.8852081298828,
+        -19.171667098999023
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -837.3561401367188,
+          -90.17373657226562,
+          -13.033746719360352
+        ],
+        "scalarized_utility": -137.8852081298828,
+        "trainer_stats": {
+          "value_loss": 13423.234741210938,
+          "action_loss": 13.474454402923584,
+          "entropy": 2.4324169903993607
+        },
+        "preference_seed": 1011,
+        "env_seed": 1011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 6,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_000",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_002_ckpt_000.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -1102.71044921875,
+        -141.30718994140625,
+        -21.03958511352539
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -819.0560913085938,
+          -93.59687805175781,
+          -13.228743553161621
+        ],
+        "scalarized_utility": -21.03958511352539,
+        "trainer_stats": {
+          "value_loss": 14375.107482910156,
+          "action_loss": 2.766211360692978,
+          "entropy": 4.972807049751282
+        },
+        "preference_seed": 2011,
+        "env_seed": 2011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 6,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_096",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_002_ckpt_096.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -1496.050048828125,
+        -163.94479370117188,
+        -0.2904166579246521
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 96,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 49664,
+        "rollout_return_estimate": [
+          -889.4496459960938,
+          -99.12503051757812,
+          -0.20000000298023224
+        ],
+        "scalarized_utility": -0.2904166579246521,
+        "trainer_stats": {
+          "value_loss": 15884.387329101562,
+          "action_loss": -0.6967737711966038,
+          "entropy": 0.16899391822516918
+        },
+        "preference_seed": 2011,
+        "env_seed": 2011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 7,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_002_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -889.4496459960938,
+          -99.05004119873047,
+          0.0
+        ],
+        "scalarized_utility": -0.02500000037252903,
+        "trainer_stats": {
+          "value_loss": 15239.696716308594,
+          "action_loss": -0.02010550966951996,
+          "entropy": 0.030723240110091865
+        },
+        "preference_seed": 2011,
+        "env_seed": 2011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 7,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_003_ckpt_000",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_003_ckpt_000.pt",
+      "preference": [
+        0.12145774066448212,
+        0.28477224707603455,
+        0.5937700271606445
+      ],
+      "objective_vector": [
+        -899.4603881835938,
+        -139.8699951171875,
+        -20.842500686645508
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -658.3062744140625,
+          -90.54093933105469,
+          -13.181242942810059
+        ],
+        "scalarized_utility": -161.45317157281806,
+        "trainer_stats": {
+          "value_loss": 10471.591796875,
+          "action_loss": 26.131678342819214,
+          "entropy": 4.973363131284714
+        },
+        "preference_seed": 3011,
+        "env_seed": 3011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 6,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_003_ckpt_096",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_003_ckpt_096.pt",
+      "preference": [
+        0.12145774066448212,
+        0.28477224707603455,
+        0.5937700271606445
+      ],
+      "objective_vector": [
+        -744.7562255859375,
+        -164.78500366210938,
+        -19.1512508392334
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 96,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 49664,
+        "rollout_return_estimate": [
+          -407.95635986328125,
+          -94.15780639648438,
+          -12.106244087219238
+        ],
+        "scalarized_utility": -148.75404301373874,
+        "trainer_stats": {
+          "value_loss": 3242.7471923828125,
+          "action_loss": 15.435933768749237,
+          "entropy": 3.058074429631233
+        },
+        "preference_seed": 3011,
+        "env_seed": 3011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 7,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_003_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_003_ckpt_191.pt",
+      "preference": [
+        0.12145774066448212,
+        0.28477224707603455,
+        0.5937700271606445
+      ],
+      "objective_vector": [
+        -498.89166259765625,
+        -126.8023910522461,
+        -31.154584884643555
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 3,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -319.4313049316406,
+          -82.49249267578125,
+          -19.068744659423828
+        ],
+        "scalarized_utility": -115.20271472315403,
+        "trainer_stats": {
+          "value_loss": 1564.2643966674805,
+          "action_loss": 11.027679324150085,
+          "entropy": 2.268002524971962
+        },
+        "preference_seed": 3011,
+        "env_seed": 3011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 8,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_000",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_004_ckpt_000.pt",
+      "preference": [
+        0.011584676802158356,
+        0.029490819200873375,
+        0.9589245319366455
+      ],
+      "objective_vector": [
+        -1109.5333251953125,
+        -155.40927124023438,
+        -20.750417709350586
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -542.5313110351562,
+          -91.13655090332031,
+          -13.431241989135742
+        ],
+        "scalarized_utility": -37.33481628332589,
+        "trainer_stats": {
+          "value_loss": 7376.650604248047,
+          "action_loss": 4.77854910492897,
+          "entropy": 4.972973614931107
+        },
+        "preference_seed": 4011,
+        "env_seed": 4011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 9,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_096",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_004_ckpt_096.pt",
+      "preference": [
+        0.011584676802158356,
+        0.029490819200873375,
+        0.9589245319366455
+      ],
+      "objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 96,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 49664,
+        "rollout_return_estimate": [
+          -530.706298828125,
+          -97.1753158569336,
+          -6.327497959136963
+        ],
+        "scalarized_utility": -22.60081578116379,
+        "trainer_stats": {
+          "value_loss": 5999.658416748047,
+          "action_loss": 1.4849034920334816,
+          "entropy": 2.1372835487127304
+        },
+        "preference_seed": 4011,
+        "env_seed": 4011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 8,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_004_ckpt_191.pt",
+      "preference": [
+        0.011584676802158356,
+        0.029490819200873375,
+        0.9589245319366455
+      ],
+      "objective_vector": [
+        -633.2645263671875,
+        -164.1605224609375,
+        -17.575416564941406
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -523.22509765625,
+          -102.9225082397461,
+          -9.884997367858887
+        ],
+        "scalarized_utility": -29.03089125918018,
+        "trainer_stats": {
+          "value_loss": 5400.676544189453,
+          "action_loss": 2.1913838535547256,
+          "entropy": 2.3217127323150635
+        },
+        "preference_seed": 4011,
+        "env_seed": 4011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 9,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_005_ckpt_000",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_005_ckpt_000.pt",
+      "preference": [
+        0.12935374677181244,
+        0.34182003140449524,
+        0.5288262367248535
+      ],
+      "objective_vector": [
+        -1077.5791015625,
+        -148.70687866210938,
+        -21.093751907348633
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 5,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -747.8310546875,
+          -97.78374481201172,
+          -13.299993515014648
+        ],
+        "scalarized_utility": -201.37481360403035,
+        "trainer_stats": {
+          "value_loss": 12445.434020996094,
+          "action_loss": 31.653643250465393,
+          "entropy": 4.972055375576019
+        },
+        "preference_seed": 5011,
+        "env_seed": 5011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 9,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_005_ckpt_096",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_005_ckpt_096.pt",
+      "preference": [
+        0.12935374677181244,
+        0.34182003140449524,
+        0.5288262367248535
+      ],
+      "objective_vector": [
+        -520.8562622070312,
+        -133.5578155517578,
+        -25.316667556762695
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 96,
+      "notes": {
+        "preference_index": 5,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 49664,
+        "rollout_return_estimate": [
+          -325.40631103515625,
+          -82.99188232421875,
+          -17.64124298095703
+        ],
+        "scalarized_utility": -126.41556378271571,
+        "trainer_stats": {
+          "value_loss": 1827.715087890625,
+          "action_loss": 14.178534746170044,
+          "entropy": 2.9568708688020706
+        },
+        "preference_seed": 5011,
+        "env_seed": 5011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 10,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_005_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_005_ckpt_191.pt",
+      "preference": [
+        0.12935374677181244,
+        0.34182003140449524,
+        0.5288262367248535
+      ],
+      "objective_vector": [
+        -638.4937744140625,
+        -136.81813049316406,
+        -19.145000457763672
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 5,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -495.88116455078125,
+          -91.89781951904297,
+          -12.471244812011719
+        ],
+        "scalarized_utility": -139.4831182169878,
+        "trainer_stats": {
+          "value_loss": 5343.668762207031,
+          "action_loss": 17.67687213420868,
+          "entropy": 2.3408729434013367
+        },
+        "preference_seed": 5011,
+        "env_seed": 5011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 9,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_000_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_000.pt",
+      "preference": null,
+      "objective_vector": [
+        -461.88751220703125,
+        -125.39823150634766,
+        -25.06041717529297
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_000_ckpt_096",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -487.410400390625,
+        -127.68093872070312,
+        -29.29125213623047
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.765328413248062,
+        "selection_rank": 1,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9401426911354065,
+        "constraint_risk": 0.8866022825241089,
+        "utility_coverage_gain": 0.8030303120613098,
+        "dynamic_beta": 1.0063639227390289,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.11339771747589111,
+          "progress": 0.0,
+          "strictness": 0.2726795434951782
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 25.52288818359375,
+        "ipo_stats": {
+          "value_loss": 1376.0895156860352,
+          "action_loss": 57.11365628242493,
+          "objective_surrogate": -539.8823928833008,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.7887220680713654,
+          "beta_used": 1.0063639227390289
+        },
+        "pareto_size_after_save": 7,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_001_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_001.pt",
+      "preference": null,
+      "objective_vector": [
+        -550.6708374023438,
+        -122.21395874023438,
+        -22.903751373291016
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_000_ckpt_096",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -487.410400390625,
+        -127.68093872070312,
+        -29.29125213623047
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.765328413248062,
+        "selection_rank": 1,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9401426911354065,
+        "constraint_risk": 0.8866022825241089,
+        "utility_coverage_gain": 0.8030303120613098,
+        "dynamic_beta": 1.0063145372355358,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.023516906425356865,
+          "low_risk": 0.11339771747589111,
+          "progress": 0.0,
+          "strictness": 0.2809104607440531
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 5.46697998046875,
+        "ipo_stats": {
+          "value_loss": 3523.9417877197266,
+          "action_loss": 13.459107220172882,
+          "objective_surrogate": -143.17088413238525,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.686575308442116,
+          "beta_used": 1.0063145372355358
+        },
+        "pareto_size_after_save": 7,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_002_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_002.pt",
+      "preference": null,
+      "objective_vector": [
+        -915.0374755859375,
+        -148.86041259765625,
+        -17.754167556762695
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_000_ckpt_096",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -487.410400390625,
+        -127.68093872070312,
+        -29.29125213623047
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.765328413248062,
+        "selection_rank": 1,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9401426911354065,
+        "constraint_risk": 0.8866022825241089,
+        "utility_coverage_gain": 0.8030303120613098,
+        "dynamic_beta": 1.0043896230876446,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.9401426911354065,
+          "low_risk": 0.11339771747589111,
+          "progress": 0.0,
+          "strictness": 0.6017294853925704
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 11.537084579467773,
+        "ipo_stats": {
+          "value_loss": 5082.058074951172,
+          "action_loss": -0.4398147091269493,
+          "objective_surrogate": -18.324353098869324,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.169194594025612,
+          "beta_used": 1.0043896230876446
+        },
+        "pareto_size_after_save": 8,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_003_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_003.pt",
+      "preference": null,
+      "objective_vector": [
+        -479.3187561035156,
+        -125.56187438964844,
+        -23.479167938232422
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_003_ckpt_191",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -498.89166259765625,
+        -126.8023910522461,
+        -31.154584884643555
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.612664771080017,
+        "selection_rank": 5,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.9972822070121765,
+        "utility_coverage_gain": 0.06060606241226196,
+        "dynamic_beta": 1.0064728345208802,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.011382917873561382,
+          "low_risk": 0.0027177929878234863,
+          "progress": 0.0,
+          "strictness": 0.2545275798533112
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 19.572906494140625,
+        "ipo_stats": {
+          "value_loss": 2057.3223190307617,
+          "action_loss": 65.08810067176819,
+          "objective_surrogate": -542.1651802062988,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.9018442183732986,
+          "beta_used": 1.0064728345208802
+        },
+        "pareto_size_after_save": 8,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_004_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_004.pt",
+      "preference": null,
+      "objective_vector": [
+        -534.7208251953125,
+        -116.14530944824219,
+        -23.418750762939453
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_003_ckpt_191",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -498.89166259765625,
+        -126.8023910522461,
+        -31.154584884643555
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.612664771080017,
+        "selection_rank": 5,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.9972822070121765,
+        "utility_coverage_gain": 0.06060606241226196,
+        "dynamic_beta": 1.0064967386484147,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.0027177929878234863,
+          "progress": 0.0,
+          "strictness": 0.2505435585975647
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 10.657081604003906,
+        "ipo_stats": {
+          "value_loss": 2201.407066345215,
+          "action_loss": 8.890659749507904,
+          "objective_surrogate": -129.41118335723877,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.864157736301422,
+          "beta_used": 1.0064967386484147
+        },
+        "pareto_size_after_save": 9,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_005_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_005.pt",
+      "preference": null,
+      "objective_vector": [
+        -1016.6145629882812,
+        -145.30853271484375,
+        -18.86458396911621
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_003_ckpt_191",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -498.89166259765625,
+        -126.8023910522461,
+        -31.154584884643555
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.612664771080017,
+        "selection_rank": 5,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.9972822070121765,
+        "utility_coverage_gain": 0.06060606241226196,
+        "dynamic_beta": 1.0043967386484147,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 1.0,
+          "low_risk": 0.0027177929878234863,
+          "progress": 0.0,
+          "strictness": 0.6005435585975647
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 12.290000915527344,
+        "ipo_stats": {
+          "value_loss": 7138.248474121094,
+          "action_loss": -0.6381455473601818,
+          "objective_surrogate": -18.97560679912567,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 2.349995344877243,
+          "beta_used": 1.0043967386484147
+        },
+        "pareto_size_after_save": 10,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_006_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_006.pt",
+      "preference": null,
+      "objective_vector": [
+        -586.9354248046875,
+        -148.0802001953125,
+        -17.24333381652832
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_002_ckpt_191",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6151515156030655,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.07575757801532745,
+        "dynamic_beta": 1.0044,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 1.0,
+          "low_risk": 0.0,
+          "progress": 0.0,
+          "strictness": 0.6
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 909.1146240234375,
+        "ipo_stats": {
+          "value_loss": 5549.628143310547,
+          "action_loss": 99.60845994949341,
+          "objective_surrogate": -766.675106048584,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.785671815276146,
+          "beta_used": 1.0044
+        },
+        "pareto_size_after_save": 9,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_007_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_007.pt",
+      "preference": null,
+      "objective_vector": [
+        -1094.612548828125,
+        -129.5465545654297,
+        -17.870834350585938
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_002_ckpt_191",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6151515156030655,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.07575757801532745,
+        "dynamic_beta": 1.0044170218348503,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.9918943643569946,
+          "low_risk": 0.0,
+          "progress": 0.0,
+          "strictness": 0.5971630275249481
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 34.3111572265625,
+        "ipo_stats": {
+          "value_loss": 9511.911071777344,
+          "action_loss": 11.19098150730133,
+          "objective_surrogate": -155.04036235809326,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.7195586264133453,
+          "beta_used": 1.0044170218348503
+        },
+        "pareto_size_after_save": 10,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_008_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_008.pt",
+      "preference": null,
+      "objective_vector": [
+        -1496.0916748046875,
+        -164.00042724609375,
+        -0.33250001072883606
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_002_ckpt_191",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6151515156030655,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.07575757801532745,
+        "dynamic_beta": 1.0065,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.0,
+          "progress": 0.0,
+          "strictness": 0.25
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": -0.3075000047683716,
+        "ipo_stats": {
+          "value_loss": 15139.135314941406,
+          "action_loss": -0.0022910442639840767,
+          "objective_surrogate": -0.32479230500757694,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.16063520591706038,
+          "beta_used": 1.0065
+        },
+        "pareto_size_after_save": 10,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_009_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_009.pt",
+      "preference": null,
+      "objective_vector": [
+        -573.3416748046875,
+        -151.12698364257812,
+        -21.554584503173828
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_096",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.687923538684845,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.6264117956161499,
+        "constraint_risk": 0.0,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0049539695605636,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.16477639973163605,
+          "low_risk": 1.0,
+          "progress": 0.0,
+          "strictness": 0.5076717399060726
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 80.26873779296875,
+        "ipo_stats": {
+          "value_loss": 2284.2154693603516,
+          "action_loss": 74.19893789291382,
+          "objective_surrogate": -656.9884796142578,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.780530944466591,
+          "beta_used": 1.0049539695605636
+        },
+        "pareto_size_after_save": 11,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_010_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_010.pt",
+      "preference": null,
+      "objective_vector": [
+        -803.6187133789062,
+        -159.8465576171875,
+        -17.05500030517578
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_096",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.687923538684845,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.6264117956161499,
+        "constraint_risk": 0.0,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.003984535229206,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.6264117956161499,
+          "low_risk": 1.0,
+          "progress": 0.0,
+          "strictness": 0.6692441284656525
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": -9.642593383789062,
+        "ipo_stats": {
+          "value_loss": 2930.5155029296875,
+          "action_loss": 17.54648494720459,
+          "objective_surrogate": -176.78836822509766,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.677726060152054,
+          "beta_used": 1.003984535229206
+        },
+        "pareto_size_after_save": 11,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_011_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_011.pt",
+      "preference": null,
+      "objective_vector": [
+        -1443.74169921875,
+        -164.14541625976562,
+        -2.6845831871032715
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_096",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.687923538684845,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.6264117956161499,
+        "constraint_risk": 0.0,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0045560292840003,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.3542717695236206,
+          "low_risk": 1.0,
+          "progress": 0.0,
+          "strictness": 0.5739951193332673
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 8.368749618530273,
+        "ipo_stats": {
+          "value_loss": 15775.219848632812,
+          "action_loss": -0.8201376385986805,
+          "objective_surrogate": -2.3190289586782455,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.46096206828951836,
+          "beta_used": 1.0045560292840003
+        },
+        "pareto_size_after_save": 12,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_012_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_012.pt",
+      "preference": null,
+      "objective_vector": [
+        -637.3374633789062,
+        -154.5338592529297,
+        -22.225418090820312
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_191",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -633.2645263671875,
+        -164.1605224609375,
+        -17.575416564941406
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6858942031860351,
+        "selection_rank": 3,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.5705289840698242,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0056809647276999,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.14460478723049164,
+          "low_risk": 0.4294710159301758,
+          "progress": 0.0,
+          "strictness": 0.3865058787167073
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": -4.07293701171875,
+        "ipo_stats": {
+          "value_loss": 2337.213134765625,
+          "action_loss": 75.5720043182373,
+          "objective_surrogate": -700.5720024108887,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.7098987102508545,
+          "beta_used": 1.0056809647276999
+        },
+        "pareto_size_after_save": 12,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_013_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_013.pt",
+      "preference": null,
+      "objective_vector": [
+        -811.3541870117188,
+        -136.44874572753906,
+        -19.61041831970215
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_191",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -633.2645263671875,
+        -164.1605224609375,
+        -17.575416564941406
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6858942031860351,
+        "selection_rank": 3,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.5705289840698242,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0038846347808839,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 1.0,
+          "low_risk": 0.4294710159301758,
+          "progress": 0.0,
+          "strictness": 0.6858942031860351
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 27.711776733398438,
+        "ipo_stats": {
+          "value_loss": 3245.9342651367188,
+          "action_loss": 10.942790389060974,
+          "objective_surrogate": -154.33352279663086,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.7876487374305725,
+          "beta_used": 1.0038846347808839
+        },
+        "pareto_size_after_save": 13,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_014_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_014.pt",
+      "preference": null,
+      "objective_vector": [
+        -1258.8040771484375,
+        -163.17584228515625,
+        -4.2420830726623535
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_191",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -633.2645263671875,
+        -164.1605224609375,
+        -17.575416564941406
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6858942031860351,
+        "selection_rank": 3,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.5705289840698242,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.00480068461895,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.5637857913970947,
+          "low_risk": 0.4294710159301758,
+          "progress": 0.0,
+          "strictness": 0.5332192301750183
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 13.333333969116211,
+        "ipo_stats": {
+          "value_loss": 13454.820861816406,
+          "action_loss": -0.7990408316254616,
+          "objective_surrogate": -4.077208966016769,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.9695655182003975,
+          "beta_used": 1.00480068461895
+        },
+        "pareto_size_after_save": 14,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_015_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_015.pt",
+      "preference": null,
+      "objective_vector": [
+        -652.7728881835938,
+        -134.2518768310547,
+        -22.476667404174805
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_001_ckpt_096",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -1324.5416259765625,
+        -131.21697998046875,
+        -23.566667556762695
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.5016376316547394,
+        "selection_rank": 6,
+        "crowding_score": 0.46506476402282715,
+        "expansion_potential": 0.8299606442451477,
+        "constraint_risk": 0.46465298533439636,
+        "utility_coverage_gain": 0.03030303120613098,
+        "dynamic_beta": 1.0049170690834521,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 0.46506476402282715,
+          "target_expansion": 0.8299606442451477,
+          "low_risk": 0.5353470146656036,
+          "progress": 0.0,
+          "strictness": 0.5138218194246291
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 671.7687377929688,
+        "ipo_stats": {
+          "value_loss": 6996.744842529297,
+          "action_loss": 121.11425447463989,
+          "objective_surrogate": -1290.589241027832,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 4.053811222314835,
+          "beta_used": 1.0049170690834521
+        },
+        "pareto_size_after_save": 15,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_016_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_016.pt",
+      "preference": null,
+      "objective_vector": [
+        -1214.6270751953125,
+        -127.64239501953125,
+        -22.055418014526367
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_001_ckpt_096",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -1324.5416259765625,
+        -131.21697998046875,
+        -23.566667556762695
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.5016376316547394,
+        "selection_rank": 6,
+        "crowding_score": 0.46506476402282715,
+        "expansion_potential": 0.8299606442451477,
+        "constraint_risk": 0.46465298533439636,
+        "utility_coverage_gain": 0.03030303120613098,
+        "dynamic_beta": 1.006411830639839,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 0.46506476402282715,
+          "target_expansion": 0.11816942691802979,
+          "low_risk": 0.5353470146656036,
+          "progress": 0.0,
+          "strictness": 0.26469489336013796
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 3.5745849609375,
+        "ipo_stats": {
+          "value_loss": 12145.137084960938,
+          "action_loss": 13.650169968605042,
+          "objective_surrogate": -144.84881019592285,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.824517458677292,
+          "beta_used": 1.006411830639839
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_017_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_017.pt",
+      "preference": null,
+      "objective_vector": [
+        -1347.3125,
+        -156.33917236328125,
+        -11.947916030883789
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_001_ckpt_096",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -1324.5416259765625,
+        -131.21697998046875,
+        -23.566667556762695
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.5016376316547394,
+        "selection_rank": 6,
+        "crowding_score": 0.46506476402282715,
+        "expansion_potential": 0.8299606442451477,
+        "constraint_risk": 0.46465298533439636,
+        "utility_coverage_gain": 0.03030303120613098,
+        "dynamic_beta": 1.0050718668937684,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 0.46506476402282715,
+          "target_expansion": 0.7562474012374878,
+          "low_risk": 0.5353470146656036,
+          "progress": 0.0,
+          "strictness": 0.4880221843719482
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 11.618751525878906,
+        "ipo_stats": {
+          "value_loss": 15496.043395996094,
+          "action_loss": -0.7811293601989746,
+          "objective_surrogate": -12.750120520591736,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 2.169337421655655,
+          "beta_used": 1.0050718668937684
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_018_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_018.pt",
+      "preference": null,
+      "objective_vector": [
+        -522.3353881835938,
+        -143.0198974609375,
+        -25.752500534057617
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_000_obj_0",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -461.88751220703125,
+        -125.39823150634766,
+        -25.06041717529297
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.7799818515777588,
+        "selection_rank": 1,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.9031210541725159,
+        "utility_coverage_gain": 0.8030303120613098,
+        "dynamic_beta": 1.005183745265007,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.09687894582748413,
+          "progress": 1.0,
+          "strictness": 0.4693757891654968
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": -60.4478759765625,
+        "ipo_stats": {
+          "value_loss": 2123.8883209228516,
+          "action_loss": 70.01261806488037,
+          "objective_surrogate": -577.6897087097168,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.852287992835045,
+          "beta_used": 1.005183745265007
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_019_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_019.pt",
+      "preference": null,
+      "objective_vector": [
+        -817.620849609375,
+        -115.14698028564453,
+        -23.481250762939453
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_000_obj_0",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -461.88751220703125,
+        -125.39823150634766,
+        -25.06041717529297
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.7799818515777588,
+        "selection_rank": 1,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.9031210541725159,
+        "utility_coverage_gain": 0.8030303120613098,
+        "dynamic_beta": 1.0047789308220147,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.19276878237724304,
+          "low_risk": 0.09687894582748413,
+          "progress": 1.0,
+          "strictness": 0.5368448629975319
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 10.251251220703125,
+        "ipo_stats": {
+          "value_loss": 3669.148239135742,
+          "action_loss": 9.032305717468262,
+          "objective_surrogate": -119.6680326461792,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.949391260743141,
+          "beta_used": 1.0047789308220147
+        },
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_020_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_020.pt",
+      "preference": null,
+      "objective_vector": [
+        -1247.75,
+        -152.08436584472656,
+        -11.686249732971191
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_000_obj_0",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -461.88751220703125,
+        -125.39823150634766,
+        -25.06041717529297
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.7799818515777588,
+        "selection_rank": 1,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.9031210541725159,
+        "utility_coverage_gain": 0.8030303120613098,
+        "dynamic_beta": 1.003083745265007,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 1.0,
+          "low_risk": 0.09687894582748413,
+          "progress": 1.0,
+          "strictness": 0.8193757891654969
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 13.374167442321777,
+        "ipo_stats": {
+          "value_loss": 10640.838684082031,
+          "action_loss": -1.3280220031738281,
+          "objective_surrogate": -11.89156049489975,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 1.9655085355043411,
+          "beta_used": 1.003083745265007
+        },
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_021_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_021.pt",
+      "preference": null,
+      "objective_vector": [
+        -507.70623779296875,
+        -134.90760803222656,
+        -20.997501373291016
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_004_obj_1",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -534.7208251953125,
+        -116.14530944824219,
+        -23.418750762939453
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.631349417567253,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9344262480735779,
+        "constraint_risk": 0.8812559247016907,
+        "utility_coverage_gain": 0.13636364042758942,
+        "dynamic_beta": 1.0050096097044647,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.07042733579874039,
+          "low_risk": 0.11874407529830933,
+          "progress": 1.0,
+          "strictness": 0.49839838258922103
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 27.01458740234375,
+        "ipo_stats": {
+          "value_loss": 1576.4189453125,
+          "action_loss": 57.573272705078125,
+          "objective_surrogate": -526.4024314880371,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.999553844332695,
+          "beta_used": 1.0050096097044647
+        },
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_022_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_022.pt",
+      "preference": null,
+      "objective_vector": [
+        -520.3458251953125,
+        -114.43572998046875,
+        -21.19750213623047
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_004_obj_1",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -534.7208251953125,
+        -116.14530944824219,
+        -23.418750762939453
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.631349417567253,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9344262480735779,
+        "constraint_risk": 0.8812559247016907,
+        "utility_coverage_gain": 0.13636364042758942,
+        "dynamic_beta": 1.0051575071096421,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.11874407529830933,
+          "progress": 1.0,
+          "strictness": 0.4737488150596619
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 1.7095794677734375,
+        "ipo_stats": {
+          "value_loss": 2681.9283142089844,
+          "action_loss": 3.9218655079603195,
+          "objective_surrogate": -121.5356125831604,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.9872515350580215,
+          "beta_used": 1.0051575071096421
+        },
+        "pareto_size_after_save": 13,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_023_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_023.pt",
+      "preference": null,
+      "objective_vector": [
+        -1268.2415771484375,
+        -162.87709045410156,
+        -12.03499984741211
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_004_obj_1",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -534.7208251953125,
+        -116.14530944824219,
+        -23.418750762939453
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.631349417567253,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9344262480735779,
+        "constraint_risk": 0.8812559247016907,
+        "utility_coverage_gain": 0.13636364042758942,
+        "dynamic_beta": 1.0031952119886876,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.9344262480735779,
+          "low_risk": 0.11874407529830933,
+          "progress": 1.0,
+          "strictness": 0.8007980018854142
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 11.383750915527344,
+        "ipo_stats": {
+          "value_loss": 10594.20263671875,
+          "action_loss": -1.337178535759449,
+          "objective_surrogate": -13.548655271530151,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 2.0119176283478737,
+          "beta_used": 1.0031952119886876
+        },
+        "pareto_size_after_save": 13,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_024_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_024.pt",
+      "preference": null,
+      "objective_vector": [
+        -554.375,
+        -146.60104370117188,
+        -18.709583282470703
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_002_ckpt_191",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6121212124824523,
+        "selection_rank": 5,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.06060606241226196,
+        "dynamic_beta": 1.0032,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 1.0,
+          "low_risk": 0.0,
+          "progress": 1.0,
+          "strictness": 0.8
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 941.675048828125,
+        "ipo_stats": {
+          "value_loss": 1924.4821243286133,
+          "action_loss": 63.826472997665405,
+          "objective_surrogate": -669.0076866149902,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 4.009402021765709,
+          "beta_used": 1.0032
+        },
+        "pareto_size_after_save": 14,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_025_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_025.pt",
+      "preference": null,
+      "objective_vector": [
+        -1094.28955078125,
+        -140.2546844482422,
+        -19.771251678466797
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_002_ckpt_191",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6121212124824523,
+        "selection_rank": 5,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.06060606241226196,
+        "dynamic_beta": 1.0032125870704651,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.9940061569213867,
+          "low_risk": 0.0,
+          "progress": 1.0,
+          "strictness": 0.7979021549224854
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 23.60302734375,
+        "ipo_stats": {
+          "value_loss": 10022.538513183594,
+          "action_loss": 10.917427062988281,
+          "objective_surrogate": -154.91888999938965,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.6981644481420517,
+          "beta_used": 1.0032125870704651
+        },
+        "pareto_size_after_save": 14,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_026_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_026.pt",
+      "preference": null,
+      "objective_vector": [
+        -1496.1334228515625,
+        -163.89938354492188,
+        -0.273333340883255
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_002_ckpt_191",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6121212124824523,
+        "selection_rank": 5,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.06060606241226196,
+        "dynamic_beta": 1.0053,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.0,
+          "progress": 1.0,
+          "strictness": 0.45
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": -0.24833333492279053,
+        "ipo_stats": {
+          "value_loss": 15139.0205078125,
+          "action_loss": 0.005856200426933356,
+          "objective_surrogate": -0.23752287030220032,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.11089779948815703,
+          "beta_used": 1.0053
+        },
+        "pareto_size_after_save": 14,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_027_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_027.pt",
+      "preference": null,
+      "objective_vector": [
+        -568.125,
+        -148.77438354492188,
+        -20.217500686645508
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_014_obj_2",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -1258.8040771484375,
+        -163.17584228515625,
+        -4.2420830726623535
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6602744698524475,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9798005819320679,
+        "constraint_risk": 0.6683285236358643,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0032837528347969,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.770591139793396,
+          "low_risk": 0.33167147636413574,
+          "progress": 1.0,
+          "strictness": 0.7860411942005157
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 690.6790771484375,
+        "ipo_stats": {
+          "value_loss": 3399.6739654541016,
+          "action_loss": 78.71871328353882,
+          "objective_surrogate": -639.5937118530273,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.7971429973840714,
+          "beta_used": 1.0032837528347969
+        },
+        "pareto_size_after_save": 14,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_028_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_028.pt",
+      "preference": null,
+      "objective_vector": [
+        -872.472900390625,
+        -148.66677856445312,
+        -18.042083740234375
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_014_obj_2",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -1258.8040771484375,
+        -163.17584228515625,
+        -4.2420830726623535
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6602744698524475,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9798005819320679,
+        "constraint_risk": 0.6683285236358643,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0028444130063057,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.9798005819320679,
+          "low_risk": 0.33167147636413574,
+          "progress": 1.0,
+          "strictness": 0.859264498949051
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 14.509063720703125,
+        "ipo_stats": {
+          "value_loss": 8864.818786621094,
+          "action_loss": 12.114033460617065,
+          "objective_surrogate": -162.9438238143921,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.967146411538124,
+          "beta_used": 1.0028444130063057
+        },
+        "pareto_size_after_save": 14,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_029_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_029.pt",
+      "preference": null,
+      "objective_vector": [
+        -1489.433349609375,
+        -164.02822875976562,
+        -2.307499885559082
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_014_obj_2",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -1258.8040771484375,
+        -163.17584228515625,
+        -4.2420830726623535
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6602744698524475,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9798005819320679,
+        "constraint_risk": 0.6683285236358643,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0045482604041696,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.1684446781873703,
+          "low_risk": 0.33167147636413574,
+          "progress": 1.0,
+          "strictness": 0.5752899326384068
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 1.9345831871032715,
+        "ipo_stats": {
+          "value_loss": 15038.943908691406,
+          "action_loss": -0.5387813709676266,
+          "objective_surrogate": -1.9562185257673264,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.2319426154717803,
+          "beta_used": 1.0045482604041696
+        },
+        "pareto_size_after_save": 15,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_030_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_030.pt",
+      "preference": null,
+      "objective_vector": [
+        -643.8999633789062,
+        -158.06312561035156,
+        -15.925833702087402
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_011_obj_2",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -1443.74169921875,
+        -164.14541625976562,
+        -2.6845831871032715
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6316117882728577,
+        "selection_rank": 3,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.8419410586357117,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0031165481984616,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.9494195580482483,
+          "low_risk": 0.15805894136428833,
+          "progress": 1.0,
+          "strictness": 0.8139086335897445
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 799.8417358398438,
+        "ipo_stats": {
+          "value_loss": 4473.723846435547,
+          "action_loss": 95.0715184211731,
+          "objective_surrogate": -973.738151550293,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.3231309056282043,
+          "beta_used": 1.0031165481984616
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_031_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_031.pt",
+      "preference": null,
+      "objective_vector": [
+        -1260.61669921875,
+        -150.81448364257812,
+        -17.950000762939453
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_011_obj_2",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -1443.74169921875,
+        -164.14541625976562,
+        -2.6845831871032715
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6316117882728577,
+        "selection_rank": 3,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.8419410586357117,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.003010329270363,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 1.0,
+          "low_risk": 0.15805894136428833,
+          "progress": 1.0,
+          "strictness": 0.8316117882728578
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 13.3309326171875,
+        "ipo_stats": {
+          "value_loss": 11725.535339355469,
+          "action_loss": 14.827966392040253,
+          "objective_surrogate": -168.5480718612671,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.8517811000347137,
+          "beta_used": 1.003010329270363
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_032_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_032.pt",
+      "preference": null,
+      "objective_vector": [
+        -1496.050048828125,
+        -163.89479064941406,
+        -2.06499981880188
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_011_obj_2",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -1443.74169921875,
+        -164.14541625976562,
+        -2.6845831871032715
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6316117882728577,
+        "selection_rank": 3,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.8419410586357117,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.004887240344286,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.10623282194137573,
+          "low_risk": 0.15805894136428833,
+          "progress": 1.0,
+          "strictness": 0.5187932759523392
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 0.6195833683013916,
+        "ipo_stats": {
+          "value_loss": 15671.390563964844,
+          "action_loss": -0.3991038464009762,
+          "objective_surrogate": -1.6783960163593292,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.05297531164251268,
+          "beta_used": 1.004887240344286
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_033_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_033.pt",
+      "preference": null,
+      "objective_vector": [
+        -608.7395629882812,
+        -141.26646423339844,
+        -21.127918243408203
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_096",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6076590955257416,
+        "selection_rank": 6,
+        "crowding_score": 0.8669668436050415,
+        "expansion_potential": 0.7095537185668945,
+        "constraint_risk": 0.32648536562919617,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.004302014183998,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 0.8669668436050415,
+          "target_expansion": 0.18538951873779297,
+          "low_risk": 0.6735146343708038,
+          "progress": 1.0,
+          "strictness": 0.6163309693336487
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 44.870849609375,
+        "ipo_stats": {
+          "value_loss": 1952.8619232177734,
+          "action_loss": 68.04591798782349,
+          "objective_surrogate": -655.370922088623,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.8002699613571167,
+          "beta_used": 1.004302014183998
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage2_ext_034_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_034.pt",
+      "preference": null,
+      "objective_vector": [
+        -867.4916381835938,
+        -141.7561492919922,
+        -17.574167251586914
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_096",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6076590955257416,
+        "selection_rank": 6,
+        "crowding_score": 0.8669668436050415,
+        "expansion_potential": 0.7095537185668945,
+        "constraint_risk": 0.32648536562919617,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.003201269364357,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 0.8669668436050415,
+          "target_expansion": 0.7095537185668945,
+          "low_risk": 0.6735146343708038,
+          "progress": 1.0,
+          "strictness": 0.7997884392738341
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 8.44781494140625,
+        "ipo_stats": {
+          "value_loss": 11758.671203613281,
+          "action_loss": 17.59408164024353,
+          "objective_surrogate": -172.69741344451904,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.6672955751419067,
+          "beta_used": 1.003201269364357
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_035_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_035.pt",
+      "preference": null,
+      "objective_vector": [
+        -1340.1041259765625,
+        -160.0511474609375,
+        -3.101249933242798
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_096",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6076590955257416,
+        "selection_rank": 6,
+        "crowding_score": 0.8669668436050415,
+        "expansion_potential": 0.7095537185668945,
+        "constraint_risk": 0.32648536562919617,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.003766262665391,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 0.8669668436050415,
+          "target_expansion": 0.44050928950309753,
+          "low_risk": 0.6735146343708038,
+          "progress": 1.0,
+          "strictness": 0.7056228891015053
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 7.952083587646484,
+        "ipo_stats": {
+          "value_loss": 13318.124755859375,
+          "action_loss": -0.6936346627771854,
+          "objective_surrogate": -3.6088650971651077,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.6364881619811058,
+          "beta_used": 1.003766262665391
+        },
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      }
+    }
+  ],
+  "pareto_front": [
+    {
+      "policy_id": "stage1_pref_002_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_002_ckpt_191.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -889.4496459960938,
+          -99.05004119873047,
+          0.0
+        ],
+        "scalarized_utility": -0.02500000037252903,
+        "trainer_stats": {
+          "value_loss": 15239.696716308594,
+          "action_loss": -0.02010550966951996,
+          "entropy": 0.030723240110091865
+        },
+        "preference_seed": 2011,
+        "env_seed": 2011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 7,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_004_ckpt_096",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_004_ckpt_096.pt",
+      "preference": [
+        0.011584676802158356,
+        0.029490819200873375,
+        0.9589245319366455
+      ],
+      "objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 96,
+      "notes": {
+        "preference_index": 4,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 49664,
+        "rollout_return_estimate": [
+          -530.706298828125,
+          -97.1753158569336,
+          -6.327497959136963
+        ],
+        "scalarized_utility": -22.60081578116379,
+        "trainer_stats": {
+          "value_loss": 5999.658416748047,
+          "action_loss": 1.4849034920334816,
+          "entropy": 2.1372835487127304
+        },
+        "preference_seed": 4011,
+        "env_seed": 4011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 8,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_005_ckpt_191",
+      "checkpoint_path": "/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_1663b18d/policy_pref_005_ckpt_191.pt",
+      "preference": [
+        0.12935374677181244,
+        0.34182003140449524,
+        0.5288262367248535
+      ],
+      "objective_vector": [
+        -638.4937744140625,
+        -136.81813049316406,
+        -19.145000457763672
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 191,
+      "notes": {
+        "preference_index": 5,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 98304,
+        "rollout_return_estimate": [
+          -495.88116455078125,
+          -91.89781951904297,
+          -12.471244812011719
+        ],
+        "scalarized_utility": -139.4831182169878,
+        "trainer_stats": {
+          "value_loss": 5343.668762207031,
+          "action_loss": 17.67687213420868,
+          "entropy": 2.3408729434013367
+        },
+        "preference_seed": 5011,
+        "env_seed": 5011,
+        "protocol_name": "cyborg_week2_three_seed",
+        "execution_mode": "parallel",
+        "pareto_size_after_save": 9,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_000_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_000.pt",
+      "preference": null,
+      "objective_vector": [
+        -461.88751220703125,
+        -125.39823150634766,
+        -25.06041717529297
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_000_ckpt_096",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -487.410400390625,
+        -127.68093872070312,
+        -29.29125213623047
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.765328413248062,
+        "selection_rank": 1,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9401426911354065,
+        "constraint_risk": 0.8866022825241089,
+        "utility_coverage_gain": 0.8030303120613098,
+        "dynamic_beta": 1.0063639227390289,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.11339771747589111,
+          "progress": 0.0,
+          "strictness": 0.2726795434951782
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 25.52288818359375,
+        "ipo_stats": {
+          "value_loss": 1376.0895156860352,
+          "action_loss": 57.11365628242493,
+          "objective_surrogate": -539.8823928833008,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.7887220680713654,
+          "beta_used": 1.0063639227390289
+        },
+        "pareto_size_after_save": 7,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_003_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_003.pt",
+      "preference": null,
+      "objective_vector": [
+        -479.3187561035156,
+        -125.56187438964844,
+        -23.479167938232422
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_003_ckpt_191",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -498.89166259765625,
+        -126.8023910522461,
+        -31.154584884643555
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.612664771080017,
+        "selection_rank": 5,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.9972822070121765,
+        "utility_coverage_gain": 0.06060606241226196,
+        "dynamic_beta": 1.0064728345208802,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.011382917873561382,
+          "low_risk": 0.0027177929878234863,
+          "progress": 0.0,
+          "strictness": 0.2545275798533112
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 19.572906494140625,
+        "ipo_stats": {
+          "value_loss": 2057.3223190307617,
+          "action_loss": 65.08810067176819,
+          "objective_surrogate": -542.1651802062988,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.9018442183732986,
+          "beta_used": 1.0064728345208802
+        },
+        "pareto_size_after_save": 8,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_006_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_006.pt",
+      "preference": null,
+      "objective_vector": [
+        -586.9354248046875,
+        -148.0802001953125,
+        -17.24333381652832
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_002_ckpt_191",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6151515156030655,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.07575757801532745,
+        "dynamic_beta": 1.0044,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 1.0,
+          "low_risk": 0.0,
+          "progress": 0.0,
+          "strictness": 0.6
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 909.1146240234375,
+        "ipo_stats": {
+          "value_loss": 5549.628143310547,
+          "action_loss": 99.60845994949341,
+          "objective_surrogate": -766.675106048584,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.785671815276146,
+          "beta_used": 1.0044
+        },
+        "pareto_size_after_save": 9,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_007_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_007.pt",
+      "preference": null,
+      "objective_vector": [
+        -1094.612548828125,
+        -129.5465545654297,
+        -17.870834350585938
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_002_ckpt_191",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6151515156030655,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.07575757801532745,
+        "dynamic_beta": 1.0044170218348503,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.9918943643569946,
+          "low_risk": 0.0,
+          "progress": 0.0,
+          "strictness": 0.5971630275249481
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 34.3111572265625,
+        "ipo_stats": {
+          "value_loss": 9511.911071777344,
+          "action_loss": 11.19098150730133,
+          "objective_surrogate": -155.04036235809326,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.7195586264133453,
+          "beta_used": 1.0044170218348503
+        },
+        "pareto_size_after_save": 10,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_011_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_011.pt",
+      "preference": null,
+      "objective_vector": [
+        -1443.74169921875,
+        -164.14541625976562,
+        -2.6845831871032715
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_096",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.687923538684845,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.6264117956161499,
+        "constraint_risk": 0.0,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0045560292840003,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.3542717695236206,
+          "low_risk": 1.0,
+          "progress": 0.0,
+          "strictness": 0.5739951193332673
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 8.368749618530273,
+        "ipo_stats": {
+          "value_loss": 15775.219848632812,
+          "action_loss": -0.8201376385986805,
+          "objective_surrogate": -2.3190289586782455,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.46096206828951836,
+          "beta_used": 1.0045560292840003
+        },
+        "pareto_size_after_save": 12,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_013_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_013.pt",
+      "preference": null,
+      "objective_vector": [
+        -811.3541870117188,
+        -136.44874572753906,
+        -19.61041831970215
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_191",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -633.2645263671875,
+        -164.1605224609375,
+        -17.575416564941406
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6858942031860351,
+        "selection_rank": 3,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.5705289840698242,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0038846347808839,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 1.0,
+          "low_risk": 0.4294710159301758,
+          "progress": 0.0,
+          "strictness": 0.6858942031860351
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 27.711776733398438,
+        "ipo_stats": {
+          "value_loss": 3245.9342651367188,
+          "action_loss": 10.942790389060974,
+          "objective_surrogate": -154.33352279663086,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.7876487374305725,
+          "beta_used": 1.0038846347808839
+        },
+        "pareto_size_after_save": 13,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_014_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_014.pt",
+      "preference": null,
+      "objective_vector": [
+        -1258.8040771484375,
+        -163.17584228515625,
+        -4.2420830726623535
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_191",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -633.2645263671875,
+        -164.1605224609375,
+        -17.575416564941406
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6858942031860351,
+        "selection_rank": 3,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.5705289840698242,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.00480068461895,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.5637857913970947,
+          "low_risk": 0.4294710159301758,
+          "progress": 0.0,
+          "strictness": 0.5332192301750183
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 13.333333969116211,
+        "ipo_stats": {
+          "value_loss": 13454.820861816406,
+          "action_loss": -0.7990408316254616,
+          "objective_surrogate": -4.077208966016769,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.9695655182003975,
+          "beta_used": 1.00480068461895
+        },
+        "pareto_size_after_save": 14,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_021_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_021.pt",
+      "preference": null,
+      "objective_vector": [
+        -507.70623779296875,
+        -134.90760803222656,
+        -20.997501373291016
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_004_obj_1",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -534.7208251953125,
+        -116.14530944824219,
+        -23.418750762939453
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.631349417567253,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9344262480735779,
+        "constraint_risk": 0.8812559247016907,
+        "utility_coverage_gain": 0.13636364042758942,
+        "dynamic_beta": 1.0050096097044647,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.07042733579874039,
+          "low_risk": 0.11874407529830933,
+          "progress": 1.0,
+          "strictness": 0.49839838258922103
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 27.01458740234375,
+        "ipo_stats": {
+          "value_loss": 1576.4189453125,
+          "action_loss": 57.573272705078125,
+          "objective_surrogate": -526.4024314880371,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.999553844332695,
+          "beta_used": 1.0050096097044647
+        },
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_022_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_022.pt",
+      "preference": null,
+      "objective_vector": [
+        -520.3458251953125,
+        -114.43572998046875,
+        -21.19750213623047
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_004_obj_1",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -534.7208251953125,
+        -116.14530944824219,
+        -23.418750762939453
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.631349417567253,
+        "selection_rank": 4,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9344262480735779,
+        "constraint_risk": 0.8812559247016907,
+        "utility_coverage_gain": 0.13636364042758942,
+        "dynamic_beta": 1.0051575071096421,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.11874407529830933,
+          "progress": 1.0,
+          "strictness": 0.4737488150596619
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 1.7095794677734375,
+        "ipo_stats": {
+          "value_loss": 2681.9283142089844,
+          "action_loss": 3.9218655079603195,
+          "objective_surrogate": -121.5356125831604,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.9872515350580215,
+          "beta_used": 1.0051575071096421
+        },
+        "pareto_size_after_save": 13,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_024_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_024.pt",
+      "preference": null,
+      "objective_vector": [
+        -554.375,
+        -146.60104370117188,
+        -18.709583282470703
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_002_ckpt_191",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -1496.050048828125,
+        -163.8577117919922,
+        -0.02500000037252903
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6121212124824523,
+        "selection_rank": 5,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.06060606241226196,
+        "dynamic_beta": 1.0032,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 1.0,
+          "low_risk": 0.0,
+          "progress": 1.0,
+          "strictness": 0.8
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 941.675048828125,
+        "ipo_stats": {
+          "value_loss": 1924.4821243286133,
+          "action_loss": 63.826472997665405,
+          "objective_surrogate": -669.0076866149902,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 4.009402021765709,
+          "beta_used": 1.0032
+        },
+        "pareto_size_after_save": 14,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_029_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_029.pt",
+      "preference": null,
+      "objective_vector": [
+        -1489.433349609375,
+        -164.02822875976562,
+        -2.307499885559082
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_014_obj_2",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -1258.8040771484375,
+        -163.17584228515625,
+        -4.2420830726623535
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6602744698524475,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.9798005819320679,
+        "constraint_risk": 0.6683285236358643,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0045482604041696,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.1684446781873703,
+          "low_risk": 0.33167147636413574,
+          "progress": 1.0,
+          "strictness": 0.5752899326384068
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 1.9345831871032715,
+        "ipo_stats": {
+          "value_loss": 15038.943908691406,
+          "action_loss": -0.5387813709676266,
+          "objective_surrogate": -1.9562185257673264,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.2319426154717803,
+          "beta_used": 1.0045482604041696
+        },
+        "pareto_size_after_save": 15,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_030_obj_0",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_030.pt",
+      "preference": null,
+      "objective_vector": [
+        -643.8999633789062,
+        -158.06312561035156,
+        -15.925833702087402
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage2_ext_011_obj_2",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -1443.74169921875,
+        -164.14541625976562,
+        -2.6845831871032715
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6316117882728577,
+        "selection_rank": 3,
+        "crowding_score": 1.0,
+        "expansion_potential": 1.0,
+        "constraint_risk": 0.8419410586357117,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.0031165481984616,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.9494195580482483,
+          "low_risk": 0.15805894136428833,
+          "progress": 1.0,
+          "strictness": 0.8139086335897445
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 799.8417358398438,
+        "ipo_stats": {
+          "value_loss": 4473.723846435547,
+          "action_loss": 95.0715184211731,
+          "objective_surrogate": -973.738151550293,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.3231309056282043,
+          "beta_used": 1.0031165481984616
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_034_obj_1",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_034.pt",
+      "preference": null,
+      "objective_vector": [
+        -867.4916381835938,
+        -141.7561492919922,
+        -17.574167251586914
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_096",
+      "target_objective": 1,
+      "base_objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6076590955257416,
+        "selection_rank": 6,
+        "crowding_score": 0.8669668436050415,
+        "expansion_potential": 0.7095537185668945,
+        "constraint_risk": 0.32648536562919617,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.003201269364357,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 0.8669668436050415,
+          "target_expansion": 0.7095537185668945,
+          "low_risk": 0.6735146343708038,
+          "progress": 1.0,
+          "strictness": 0.7997884392738341
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 8.44781494140625,
+        "ipo_stats": {
+          "value_loss": 11758.671203613281,
+          "action_loss": 17.59408164024353,
+          "objective_surrogate": -172.69741344451904,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 3.6672955751419067,
+          "beta_used": 1.003201269364357
+        },
+        "pareto_size_after_save": 16,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage2_ext_035_obj_2",
+      "checkpoint_path": "cmorl_cyborg/outputs/fair_compare/no_constraint_stage2_fair/seed_0011/run_33dbdd25/policy_stage2_035.pt",
+      "preference": null,
+      "objective_vector": [
+        -1340.1041259765625,
+        -160.0511474609375,
+        -3.101249933242798
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_004_ckpt_096",
+      "target_objective": 2,
+      "base_objective_vector": [
+        -653.6104125976562,
+        -150.20396423339844,
+        -11.053333282470703
+      ],
+      "update_index": 1,
+      "notes": {
+        "extension_round": 1,
+        "selection_score": 0.6076590955257416,
+        "selection_rank": 6,
+        "crowding_score": 0.8669668436050415,
+        "expansion_potential": 0.7095537185668945,
+        "constraint_risk": 0.32648536562919617,
+        "utility_coverage_gain": 0.0,
+        "dynamic_beta": 1.003766262665391,
+        "beta_mode": "dynamic",
+        "extension_mode": "unconstrained",
+        "beta_components": {
+          "crowding": 0.8669668436050415,
+          "target_expansion": 0.44050928950309753,
+          "low_risk": 0.6735146343708038,
+          "progress": 1.0,
+          "strictness": 0.7056228891015053
+        },
+        "successful_constrained_updates": 5,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": -2.0,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": null,
+        "objective_improvement": 7.952083587646484,
+        "ipo_stats": {
+          "value_loss": 13318.124755859375,
+          "action_loss": -0.6936346627771854,
+          "objective_surrogate": -3.6088650971651077,
+          "barrier_bonus": 0.0,
+          "min_constraint_margin": 0.0,
+          "feasible_ratio": 1.0,
+          "entropy": 0.6364881619811058,
+          "beta_used": 1.003766262665391
+        },
+        "pareto_size_after_save": 17,
+        "is_nondominated_after_save": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+seed: 19
+stage1_buffer: ""
+num_extension_policies: 2
+extension_rounds: 1
+constrained_updates: 1
+extension_mode: constrained
+constraint_tolerance: 0.000001
+total_timesteps_per_update: 256
+output_dir: cmorl_cyborg/outputs/smoke/stage2
+env:
+  num_envs: 2
+  red_policy: bline
+  max_episode_steps: 20
+  seed: 19
+  scenario_name: Scenario2
+  gym_wrapper_name: ChallengeWrapper
+  blue_agent_name: Blue
+  red_agent_name: Red
+  obs_mode: vector
+  state_mode: true
+model:
+  hidden_size: 64
+  obj_dim: 3
+rollout:
+  num_steps: 16
+eval:
+  eval_episodes: 1
+  preference_step: 0.5
+selection:
+  mode: adaptive
+ipo:
+  beta_mode: dynamic

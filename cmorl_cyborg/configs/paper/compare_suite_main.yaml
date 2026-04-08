@@ -1,0 +1,102 @@
+output_dir: cmorl_cyborg/outputs/paper_table_a
+eval_episodes: 3
+conditioned_eval_workers: 3
+preference_eval_workers: 4
+# Week-2 frozen protocol.
+# Scenario layer remains Scenario2 for experiments, now via scenario profile.
+# Frozen seeds: dev=7, holdout=11, three_seed=[7, 11, 19].
+# Frozen main-table-A method set:
+# - ours_stage2
+# - stage1_only
+# - weighted_sum
+# - preference_conditioned_ppo
+# - pcn (appendix-first; promote to main table only if 3-seed stable)
+# Entries are interpreted by `cmorl_cyborg.main_table_a`.
+# `artifact_path_glob` expects the frozen seed layout:
+#   <root>/seed_0007/run_*/...
+entries:
+  - method_name: ours_stage2
+    artifact_kind: buffer
+    artifact_path: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0007/run_ddb937f9/solution_buffer.json
+    display_group: Ours Stage2
+    seed: 7
+  - method_name: ours_stage2
+    artifact_kind: buffer
+    artifact_path: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0011/run_3006e442/solution_buffer.json
+    display_group: Ours Stage2
+    seed: 11
+  - method_name: ours_stage2
+    artifact_kind: buffer
+    artifact_path: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0019/run_05e9f8d6/solution_buffer.json
+    display_group: Ours Stage2
+    seed: 19
+
+  - method_name: stage1_only
+    artifact_kind: buffer
+    artifact_path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0007/run_*/solution_buffer.json
+    display_group: Stage1 Only
+    seed: 7
+  - method_name: stage1_only
+    artifact_kind: buffer
+    artifact_path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_*/solution_buffer.json
+    display_group: Stage1 Only
+    seed: 11
+  - method_name: stage1_only
+    artifact_kind: buffer
+    artifact_path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0019/run_*/solution_buffer.json
+    display_group: Stage1 Only
+    seed: 19
+
+  - method_name: weighted_sum
+    artifact_kind: buffer
+    artifact_path_glob: cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0007/run_*/solution_buffer.json
+    display_group: Weighted-Sum
+    seed: 7
+  - method_name: weighted_sum
+    artifact_kind: buffer
+    artifact_path_glob: cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0011/run_*/solution_buffer.json
+    display_group: Weighted-Sum
+    seed: 11
+  - method_name: weighted_sum
+    artifact_kind: buffer
+    artifact_path_glob: cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0019/run_*/solution_buffer.json
+    display_group: Weighted-Sum
+    seed: 19
+
+  - method_name: preference_conditioned_ppo
+    artifact_kind: conditioned_run_metadata
+    artifact_path_glob: cmorl_cyborg/outputs/paper_table_a/preference_conditioned_ppo/seed_0007/run_*/conditioned_run_metadata.json
+    display_group: Preference-Conditioned PPO
+    seed: 7
+  - method_name: preference_conditioned_ppo
+    artifact_kind: conditioned_run_metadata
+    artifact_path_glob: cmorl_cyborg/outputs/paper_table_a/preference_conditioned_ppo/seed_0011/run_*/conditioned_run_metadata.json
+    display_group: Preference-Conditioned PPO
+    seed: 11
+  - method_name: preference_conditioned_ppo
+    artifact_kind: conditioned_run_metadata
+    artifact_path_glob: cmorl_cyborg/outputs/paper_table_a/preference_conditioned_ppo/seed_0019/run_*/conditioned_run_metadata.json
+    display_group: Preference-Conditioned PPO
+    seed: 19
+
+  - method_name: pcn
+    artifact_kind: conditioned_run_metadata
+    artifact_path_glob: cmorl_cyborg/outputs/paper_appendix/pcn/seed_0007/run_*/conditioned_run_metadata.json
+    display_group: PCN
+    seed: 7
+  - method_name: pcn
+    artifact_kind: conditioned_run_metadata
+    artifact_path_glob: cmorl_cyborg/outputs/paper_appendix/pcn/seed_0011/run_*/conditioned_run_metadata.json
+    display_group: PCN
+    seed: 11
+  - method_name: pcn
+    artifact_kind: conditioned_run_metadata
+    artifact_path_glob: cmorl_cyborg/outputs/paper_appendix/pcn/seed_0019/run_*/conditioned_run_metadata.json
+    display_group: PCN
+    seed: 19
+preference_step: 0.1
+reference_strategy: data_min_range
+reference_margin: 0.25
+reference_point: []
+hv_max_exact_points: 18
+hv_mc_samples: 100000

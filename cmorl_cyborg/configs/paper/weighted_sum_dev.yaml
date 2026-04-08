@@ -1,0 +1,32 @@
+seed: 7
+total_timesteps: 4096
+num_policies: 6
+preference_strategy: explicit
+stage1_protocol_name: cyborg_week2_one_seed_dev
+explicit_preferences:
+  - [1.0, 0.0, 0.0]
+  - [0.0, 1.0, 0.0]
+  - [0.0, 0.0, 1.0]
+  - [0.5, 0.5, 0.0]
+  - [0.5, 0.0, 0.5]
+  - [0.0, 0.5, 0.5]
+output_dir: cmorl_cyborg/outputs/dev_tuning/week2_baselines/weighted_sum
+env:
+  num_envs: 4
+  red_policy: bline
+  max_episode_steps: 40
+  seed: 7
+  scenario_name: Scenario2
+  gym_wrapper_name: ChallengeWrapper
+  blue_agent_name: Blue
+  red_agent_name: Red
+  obs_mode: vector
+  state_mode: true
+model:
+  hidden_size: 128
+  obj_dim: 3
+rollout:
+  num_steps: 32
+eval:
+  eval_episodes: 2
+  preference_step: 0.25

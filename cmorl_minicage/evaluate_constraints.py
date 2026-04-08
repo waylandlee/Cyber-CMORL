@@ -138,6 +138,181 @@ def _select_record(
     return max(records, key=score)
 
 
+def _normalize_metric(values: list[float]) -> list[float]:
+    if not values:
+        return []
+    arr = np.asarray(values, dtype=np.float32)
+    vmin = float(np.min(arr))
+    vmax = float(np.max(arr))
+    if np.isclose(vmax, vmin):
+        return [0.0 for _ in values]
+    return ((arr - vmin) / (vmax - vmin)).astype(np.float32).tolist()
+
+
+def _select_record_semantic_aware(
+    records: list[dict[str, Any]],
+    metadata: dict[str, Any],
+    buffer_anchor: str | Path,
+    thresholds: dict[str, float],
+    *,
+    eval_episodes: int,
+    semantic_metric_weights: dict[str, float],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    if not records:
+        raise ValueError("No candidate records available for constraint selection")
+
+    evaluated_candidates: list[dict[str, Any]] = []
+    for record in records:
+        baseline_kind = record.get("notes", {}).get("baseline_kind")
+        metrics = _evaluate_actor_critic_record(
+            (
+                _resolve_path(buffer_anchor, record["checkpoint_path"])
+                if record.get("checkpoint_path")
+                else None
+            ),
+            metadata,
+            thresholds,
+            eval_episodes=eval_episodes,
+            baseline_kind=baseline_kind,
+        )
+        evaluated_candidates.append(
+            {
+                "record": record,
+                "metrics": metrics,
+            }
+        )
+
+    weight_total = max(
+        float(sum(float(weight) for weight in semantic_metric_weights.values())),
+        1e-8,
+    )
+    normalized_by_metric: dict[str, list[float]] = {}
+    for metric_name in semantic_metric_weights:
+        normalized_by_metric[metric_name] = _normalize_metric(
+            [float(entry["metrics"][metric_name]) for entry in evaluated_candidates]
+        )
+
+    for index, entry in enumerate(evaluated_candidates):
+        semantic_risk = 0.0
+        for metric_name, weight in semantic_metric_weights.items():
+            semantic_risk += float(weight) * float(normalized_by_metric[metric_name][index])
+        semantic_risk /= weight_total
+        entry["semantic_risk"] = float(semantic_risk)
+
+    selected_entry = max(
+        evaluated_candidates,
+        key=lambda entry: (
+            float(entry["metrics"]["feasible_rate"]),
+            -float(entry["metrics"]["mean_violation"]),
+            -float(entry["semantic_risk"]),
+            float(entry["metrics"]["security_return"]),
+        ),
+    )
+
+    diagnostics = {
+        "selection_policy": "semantic_aware",
+        "semantic_metric_weights": {
+            key: float(value) for key, value in semantic_metric_weights.items()
+        },
+        "evaluated_candidates": [
+            {
+                "policy_id": entry["record"]["policy_id"],
+                "objective_vector": entry["record"]["objective_vector"],
+                "semantic_risk": float(entry["semantic_risk"]),
+                "feasible_rate": float(entry["metrics"]["feasible_rate"]),
+                "mean_violation": float(entry["metrics"]["mean_violation"]),
+                "security_return": float(entry["metrics"]["security_return"]),
+                "final_critical_compromised_hosts": float(
+                    entry["metrics"]["final_critical_compromised_hosts"]
+                ),
+                "critical_impact_count": float(entry["metrics"]["critical_impact_count"]),
+                "high_disruption_action_rate": float(
+                    entry["metrics"]["high_disruption_action_rate"]
+                ),
+            }
+            for entry in sorted(
+                evaluated_candidates,
+                key=lambda entry: (
+                    -float(entry["metrics"]["feasible_rate"]),
+                    float(entry["metrics"]["mean_violation"]),
+                    float(entry["semantic_risk"]),
+                    -float(entry["metrics"]["security_return"]),
+                    entry["record"]["policy_id"],
+                ),
+            )
+        ],
+    }
+    return selected_entry["record"], diagnostics
+
+
+def _select_record_semantic_balanced(
+    records: list[dict[str, Any]],
+    metadata: dict[str, Any],
+    buffer_anchor: str | Path,
+    thresholds: dict[str, float],
+    *,
+    eval_episodes: int,
+    semantic_metric_weights: dict[str, float],
+    security_margin: float,
+    feasible_rate_tolerance: float,
+    mean_violation_tolerance: float,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    selected, diagnostics = _select_record_semantic_aware(
+        records,
+        metadata,
+        buffer_anchor,
+        thresholds,
+        eval_episodes=eval_episodes,
+        semantic_metric_weights=semantic_metric_weights,
+    )
+    evaluated_candidates = list(diagnostics["evaluated_candidates"])
+    best_feasible_rate = max(float(entry["feasible_rate"]) for entry in evaluated_candidates)
+    min_mean_violation = min(float(entry["mean_violation"]) for entry in evaluated_candidates)
+
+    shortlist = [
+        entry
+        for entry in evaluated_candidates
+        if float(entry["feasible_rate"]) >= best_feasible_rate - float(feasible_rate_tolerance)
+        and float(entry["mean_violation"]) <= min_mean_violation + float(mean_violation_tolerance)
+    ]
+    if not shortlist:
+        shortlist = evaluated_candidates
+
+    best_security = max(float(entry["security_return"]) for entry in shortlist)
+    security_shortlist = [
+        entry
+        for entry in shortlist
+        if float(entry["security_return"]) >= best_security - float(security_margin)
+    ]
+    if not security_shortlist:
+        security_shortlist = shortlist
+
+    selected_entry = max(
+        security_shortlist,
+        key=lambda entry: (
+            float(entry["security_return"]),
+            -float(entry["semantic_risk"]),
+            float(entry["feasible_rate"]),
+            -float(entry["mean_violation"]),
+        ),
+    )
+    policy_id = str(selected_entry["policy_id"])
+    selected_record = next(record for record in records if record["policy_id"] == policy_id)
+    diagnostics.update(
+        {
+            "selection_policy": "semantic_balanced",
+            "security_margin": float(security_margin),
+            "feasible_rate_tolerance": float(feasible_rate_tolerance),
+            "mean_violation_tolerance": float(mean_violation_tolerance),
+            "shortlist_policy_ids": [entry["policy_id"] for entry in shortlist],
+            "security_shortlist_policy_ids": [
+                entry["policy_id"] for entry in security_shortlist
+            ],
+        }
+    )
+    return selected_record, diagnostics
+
+
 def _evaluate_actor_critic_record(
     checkpoint_path: str | Path | None,
     metadata: dict[str, Any],
@@ -240,8 +415,13 @@ def evaluate_constraints(
     input_kind: str,
     input_path: str | Path,
     selection_source: str,
+    selection_policy: str,
     thresholds_path: str | Path,
     eval_episodes: int,
+    semantic_metric_weights: dict[str, float] | None = None,
+    security_margin: float = 120.0,
+    feasible_rate_tolerance: float = 0.10,
+    mean_violation_tolerance: float = 0.50,
 ) -> dict[str, Any]:
     thresholds = _load_thresholds(thresholds_path)
 
@@ -253,7 +433,30 @@ def evaluate_constraints(
             candidates = list(payload.get("records", []))
         else:
             raise ValueError(f"Unsupported selection_source: {selection_source}")
-        selected = _select_record(candidates, thresholds)
+        selection_diagnostics = None
+        if selection_policy == "semantic_aware":
+            selected, selection_diagnostics = _select_record_semantic_aware(
+                candidates,
+                payload.get("metadata", {}),
+                input_path,
+                thresholds,
+                eval_episodes=eval_episodes,
+                semantic_metric_weights=semantic_metric_weights or {},
+            )
+        elif selection_policy == "semantic_balanced":
+            selected, selection_diagnostics = _select_record_semantic_balanced(
+                candidates,
+                payload.get("metadata", {}),
+                input_path,
+                thresholds,
+                eval_episodes=eval_episodes,
+                semantic_metric_weights=semantic_metric_weights or {},
+                security_margin=security_margin,
+                feasible_rate_tolerance=feasible_rate_tolerance,
+                mean_violation_tolerance=mean_violation_tolerance,
+            )
+        else:
+            selected = _select_record(candidates, thresholds)
         baseline_kind = selected.get("notes", {}).get("baseline_kind")
         metrics = _evaluate_actor_critic_record(
             (
@@ -272,10 +475,13 @@ def evaluate_constraints(
             "input_kind": input_kind,
             "input_path": str(input_path),
             "selection_source": selection_source,
+            "selection_policy": selection_policy,
             "selected_policy_id": selected["policy_id"],
             "selected_objective_vector": selected["objective_vector"],
             **metrics,
         }
+        if selection_diagnostics is not None:
+            result["selection_diagnostics"] = selection_diagnostics
         return result
 
     if input_kind == "single_policy":
@@ -293,6 +499,7 @@ def evaluate_constraints(
             "input_kind": input_kind,
             "input_path": str(input_path),
             "selection_source": selection_source,
+            "selection_policy": selection_policy,
             "selected_policy_id": metadata.get("policy_id", "single_policy"),
             "selected_objective_vector": metadata.get("final_objective_vector"),
             **metrics,
@@ -314,6 +521,7 @@ def main() -> None:
     parser.add_argument("--input-kind", choices=("buffer", "single_policy"), default=None)
     parser.add_argument("--input-path", default=None)
     parser.add_argument("--selection-source", choices=("pareto", "records"), default=None)
+    parser.add_argument("--selection-policy", choices=("objective", "semantic_aware", "semantic_balanced"), default=None)
     parser.add_argument("--thresholds-path", default=None)
     parser.add_argument("--output-path", default=None)
     args = parser.parse_args()
@@ -332,6 +540,8 @@ def main() -> None:
         config.input_path = args.input_path
     if args.selection_source is not None:
         config.selection_source = args.selection_source
+    if args.selection_policy is not None:
+        config.selection_policy = args.selection_policy
     if args.thresholds_path is not None:
         config.thresholds_path = args.thresholds_path
     if args.output_path is not None:
@@ -346,8 +556,13 @@ def main() -> None:
         input_kind=config.input_kind,
         input_path=config.input_path,
         selection_source=config.selection_source,
+        selection_policy=config.selection_policy,
         thresholds_path=config.thresholds_path,
         eval_episodes=config.eval_episodes,
+        semantic_metric_weights=config.semantic_metric_weights,
+        security_margin=config.security_margin,
+        feasible_rate_tolerance=config.feasible_rate_tolerance,
+        mean_violation_tolerance=config.mean_violation_tolerance,
     )
     output_path = (
         Path(config.output_path)

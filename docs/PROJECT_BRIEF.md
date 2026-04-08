@@ -2,7 +2,14 @@
 
 ## 项目目标
 
-本项目当前的主线是：在 [cmorl_minicage](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage) 中复现论文 *Efficient Discovery of Pareto Front for Multi-Objective Reinforcement Learning (C-MORL)* 的核心训练流程，并将其迁移到 MiniCAGE 网络安全场景。
+本项目当前的主线已经分成两层：
+
+- 历史复现与升级探索线：
+  [cmorl_minicage](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage)
+- 正式环境结果线：
+  [cmorl_cyborg](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg)
+
+当前对外口径应优先以 `cmorl_cyborg` 为准；`cmorl_minicage` 主要用于保留算法迁移背景、历史探索和升级思路。
 
 当前目标聚焦在四件事：
 
@@ -15,7 +22,7 @@
 
 当前实现最准确的定位是：
 
-**“论文 C-MORL 方法在 MiniCAGE 上的高保真迁移复现版”**
+**“C-MORL 在 MiniCAGE 完成迁移验证，并在正式 CybORG 上形成统一 3-seed 对比口径的双线项目”**
 
 而不是：
 
@@ -90,76 +97,47 @@
 
 ## 当前正式结果概况
 
-截至 2026-04-01，当前结果应分两层阅读。
+截至 `2026-04-08`，项目文档应优先阅读 `cmorl_cyborg` 的正式环境 `3-seed` 结果。
 
-### Formal 主线
+### CybORG 主表 B
 
-- `Stage-1`
-  - [run_446acb6c](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage1/run_446acb6c)
-- `Stage-2`
-  - [run_46e57616](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616)
+原始主表 B 的 `ours_stage2` 聚合结果位于：
 
-统一参考点下：
+- [ours_stage2.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_b/aggregated/ours_stage2.json)
+- [main_table_b_bar.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_b/main_table_b_bar.png)
 
-- `Stage-1`
-  - `HV = 362094.86`
-  - `EU = -170.55`
-  - `Pareto Count = 4`
-- `Stage-2`
-  - `HV = 601513.12`
-  - `EU = -114.70`
-  - `Pareto Count = 6`
+其代表性指标为：
 
-这说明在当前正式 reward 口径下，`Stage-2` 已经显著优于 `Stage-1`。
+- `security_return = -518.70 ± 17.16`
+- `feasible_rate = 0.800 ± 0.089`
+- `mean_violation = 0.380 ± 0.300`
+- `final_critical_compromised_hosts = 0.817 ± 0.024`
+- `high_disruption_action_rate = 0.954 ± 0.012`
 
-### 5-Baseline Suite
+### CybORG Fair Compare + Coverage
 
-当前已重跑并统一评估的 baseline 套餐包括：
+新增 coverage 公平比较结果位于：
 
-- `sleep`
-- `random-valid`
-- `stage1-only`
-- `single-objective`
-- `weighted-sum`
+- [coverage_combo_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
+- [coverage_more_parents_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_loose.json)
+- [fair_compare_table_b_loose_with_coverage.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_loose_with_coverage.png)
+- [fair_compare_table_b_tight_with_coverage.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_tight_with_coverage.png)
 
-统一参考点下的关键结果：
+当前最保守的结论是：
 
-- `Stage-2`
-  - `HV = 1699877.00`
-  - `EU = -114.69`
-  - `Pareto Count = 6`
-- `Stage-1 Only`
-  - `HV = 1436297.75`
-  - `EU = -170.55`
-  - `Pareto Count = 4`
-- `Single-Objective`
-  - `HV = 1412946.75`
-  - `EU = -170.83`
-  - `Pareto Count = 3`
-- `Sleep`
-  - `HV = 714105.19`
-  - `EU = -229.84`
-  - `Pareto Count = 1`
-- `Weighted-Sum`
-  - `HV = 618307.75`
-  - `EU = -189.66`
-  - `Pareto Count = 3`
-- `Random Valid`
-  - `HV = 26100.41`
-  - `EU = -454.18`
-  - `Pareto Count = 1`
+- `Loose` 下，`coverage_combo_fair` 比原始 `ours_stage2` 有更好的 `security_return`、更低的 `mean_violation`，但 `feasible_rate` 明显更低，因此不是严格改进。
+- `coverage_combo_fair` 与 `coverage_more_parents_fair` 在 `Loose` 下选中了同一组 policy id，说明二者效果接近，`combo` 只是在聚合结果上更均衡。
+- `Loose` 下最稳的可行性基线仍是 `no_constraint_stage2_fair`，其 `feasible_rate = 0.892 ± 0.042`，`mean_violation = 0.084 ± 0.054`。
+- `Tight` 下所有方法的可行性都明显变差，coverage 变体没有形成清晰优势，因此当前不宜围绕 `tight` 结果写强 claim。
 
 ## 当前主结果判断
 
 截至当前代码和实验状态，最稳妥的判断是：
 
-- `Stage-2` 是当前项目里表现最强的正式主方法结果。
-- `Stage-2` 不仅优于 formal `Stage-1`，也优于当前保留的 5 个 baseline。
-- `Stage-2` 的优势不仅体现在 `HV / EU / Pareto Count`，也体现在核心网络安全语义指标上。
-- 当前最需要推进的工作，已经从“证明方法能工作”转向：
-  - 继续让前沿更满、更均匀
-  - 推进 `independent Stage-1 + AdaCS-DCS` 升级线
-  - 在更厚的 `Stage-1` 候选池上验证 `AdaCS` 是否能显出独立收益
+- `cmorl_cyborg` 已经具备可以支撑论文写作的 `3-seed` 主表 B 和公平比较产物。
+- 原始 `ours_stage2` 仍然是当前正式主线的重要参照，但不应再被表述成“无条件最好”。
+- 新的 `coverage_combo_fair` 更像偏重回报与平均违约的替代方案，不是对原始 `ours_stage2` 的严格升级。
+- `fair_compare_eval` 的价值主要在于帮助收紧 claim，而不是证明 coverage 机制已经稳定优于所有旧方法。
 
 ## 当前升级线状态
 
