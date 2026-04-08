@@ -130,6 +130,32 @@
 - `Loose` 下最稳的可行性基线仍是 `no_constraint_stage2_fair`，其 `feasible_rate = 0.892 ± 0.042`，`mean_violation = 0.084 ± 0.054`。
 - `Tight` 下所有方法的可行性都明显变差，coverage 变体没有形成清晰优势，因此当前不宜围绕 `tight` 结果写强 claim。
 
+### 当前结果保留策略
+
+截至 `2026-04-08`，仓库中的实验输出已经按“正式结果优先、历史证据次之”的原则清理过一轮。
+
+- `cmorl_cyborg` 当前保留：
+  `paper_table_a/`、`paper_table_b/`、`paper_appendix/`、
+  `fair_compare_eval/`、`fair_compare_eval_inputs/`、
+  `paper_table_b_semantic_selection/`、
+  `paper_table_b_semantic_balanced/`、`paper_week2_runner/`，以及
+  `dev_tuning/holdout_seed/` 中少量仍用于解释选择过程的候选实验
+- `cmorl_cyborg` 已移除：
+  `preformal_*`、`fair_compare_lite/`、`fair_compare_smoke/`、
+  `fair_compare_mirror/`、week2 draft 导表目录，以及大部分已被正式
+  `3-seed` 结果替代的 tuning 试跑
+- `cmorl_minicage` 当前保留：
+  `paper_table_a/`、`paper_table_b/`、`paper_appendix/`、
+  `formal_c2/`、`formal_c2_independent/`、
+  `formal_c2_independent_stage1_density/`、
+  `formal_c2_independent_adacs_dcs/`、
+  `baselines_formal_c2/`、`baselines_formal_c2_suite/`、
+  `ablation_adacs_dcs_dense/`、`ablation_adacs_dcs_marginal/`、
+  `plots/`
+- `cmorl_minicage` 已移除：
+  早期 `ablation_adacs_dcs/` 目录；当前文档默认以 dense / marginal
+  两条更有代表性的升级线为准
+
 ## 当前主结果判断
 
 截至当前代码和实验状态，最稳妥的判断是：

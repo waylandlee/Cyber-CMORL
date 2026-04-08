@@ -57,3 +57,20 @@ The current reading of those results is:
 
 Use `cmorl_cyborg/outputs/` for all formal-environment runs so they stay
 separate from the MiniCAGE outputs already tracked in this repository.
+
+As of `2026-04-08`, the retained result set is intentionally curated:
+
+- formal paper outputs:
+  `paper_table_a/`, `paper_table_b/`, `paper_appendix/`
+- fair-compare outputs:
+  `fair_compare_eval/`, `fair_compare_eval_inputs/`
+- supporting analysis outputs:
+  `paper_table_b_semantic_selection/`,
+  `paper_table_b_semantic_balanced/`, `paper_week2_runner/`
+- selected development evidence:
+  `dev_tuning/holdout_seed/` with the documented holdout candidates and
+  coverage-selection runs
+
+Older preformal tables, smoke/lite fair-compare drafts, week2 draft exports,
+and superseded tuning outputs have been removed to keep the repository focused
+on paper-facing or historically explanatory artifacts.
