@@ -1,0 +1,342 @@
+%\documentclass[sigconf]{acmart}
+% 审稿版可改为以下两种之一（以具体 CFP 为准）：
+%\documentclass[manuscript,screen,review]{acmart}
+\documentclass[sigconf,review,anonymous]{acmart}
+
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+% =========================
+% Packages
+% =========================
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+% =========================
+% Rights / Conference info
+% 投稿审稿阶段通常可先注释或按会议要求保留
+% 录用后再替换成会议提供的正式信息
+% =========================
+% \setcopyright{acmlicensed}
+% \copyrightyear{2026}
+% \acmYear{2026}
+% \acmDOI{XXXXXXX.XXXXXXX}
+% \acmConference[Conference Acronym '26]{Full Conference Name}{Month DD--DD, 2026}{City, Country}
+% \acmISBN{978-1-4503-XXXX-X/2026/XX}
+
+% 如果投稿系统提供 submission ID，可打开
+% \acmSubmissionID{123-A56-BU3}
+
+% =========================
+% Title
+% =========================
+\title[Constrained MORL for Cyber Defense]{Constrained Multi-Objective Reinforcement Learning for Autonomous Cyber Defense in CybORG}
+
+% =========================
+% Authors
+% 审稿双盲时请改成 anonymous 版本，或按会议要求处理作者信息
+% =========================
+\author{First Author}
+\affiliation{%
+  \institution{Your University}
+  \city{Your City}
+  \country{Your Country}}
+\email{first.author@xxx.edu}
+
+\author{Second Author}
+\affiliation{%
+  \institution{Your University}
+  \city{Your City}
+  \country{Your Country}}
+\email{second.author@xxx.edu}
+
+\renewcommand{\shortauthors}{First Author et al.}
+
+% =========================
+% Abstract
+% 这是一版“能直接用来继续改”的 starter abstract
+% =========================
+\begin{abstract}
+Autonomous cyber defense requires sequential decision making under competing operational objectives. 
+A defender must contain attacker progress while limiting business disruption and defense overhead, making the problem naturally multi-objective and constrained. 
+In this paper, we study constrained multi-objective reinforcement learning for autonomous cyber defense in the CybORG environment. 
+We formulate blue-team defense as a partially observable sequential decision problem with three objectives: security effect, business impact, and defense cost, while enforcing operational constraints on unacceptable side effects. 
+We propose a two-stage learning framework that first discovers an initial set of preference-diverse defense policies and then expands the Pareto set under constraints. 
+We evaluate the method against scalarized and constraint-handling baselines using Pareto-front and utility-oriented metrics, including hypervolume and expected utility, together with cyber-semantic metrics such as critical asset protection and attack-impact suppression. 
+Results are expected to show that the proposed approach achieves a better trade-off frontier and stronger policy assignment quality across diverse defense preferences.
+\end{abstract}
+
+% =========================
+% CCS Concepts
+% 这里先放占位，正式投稿前请用 ACM CCS 工具生成并替换
+% =========================
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>10002978.10002991.10002994</concept_id>
+  <concept_desc>Security and privacy~Intrusion/anomaly detection and malware mitigation</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10010147.10010257.10010293.10010294</concept_id>
+  <concept_desc>Computing methodologies~Reinforcement learning</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Security and privacy~Intrusion/anomaly detection and malware mitigation}
+\ccsdesc[500]{Computing methodologies~Reinforcement learning}
+
+% =========================
+% Keywords
+% =========================
+\keywords{
+autonomous cyber defense,
+constrained multi-objective reinforcement learning,
+Pareto optimization,
+CybORG,
+network security
+}
+
+\begin{document}
+
+\maketitle
+
+% =========================
+% 1. Introduction
+% =========================
+\section{Introduction}
+Autonomous cyber defense is inherently a multi-objective decision-making problem. 
+A blue agent must slow or stop attacker progression, preserve business continuity, and limit the operational cost of defensive actions. 
+Optimizing only one objective often leads to undesirable trade-offs, such as aggressive containment with excessive disruption or low-cost defense with insufficient protection.
+
+Recent progress in reinforcement learning has made it possible to learn adaptive defense policies in cyber environments. 
+However, most prior work either optimizes a single scalar reward or handles constraints without explicitly modeling the full Pareto trade-off among competing defense objectives. 
+This gap is particularly important in cyber operations, where different organizations may prioritize security, business continuity, and intervention cost differently.
+
+In this work, we investigate constrained multi-objective reinforcement learning (C-MORL) for autonomous cyber defense in CybORG. 
+Our setting focuses on a blue defender interacting with an adversarial red process under partial observability. 
+We model three objectives: security effect, business impact, and defense cost. 
+On top of this multi-objective formulation, we impose operational constraints to avoid unacceptable defense behavior.
+
+The main contributions of this paper are as follows:
+\begin{itemize}
+    \item We formulate autonomous cyber defense as a constrained multi-objective sequential decision problem with security, business, and cost objectives.
+    \item We adapt a two-stage Pareto-oriented learning framework to the CybORG cyber-defense setting.
+    \item We design a cyber-specific evaluation protocol combining Pareto metrics, utility metrics, and semantic defense metrics.
+    \item We empirically compare the proposed method with scalarization and constraint-focused baselines.
+\end{itemize}
+
+% =========================
+% 2. Background and Related Work
+% =========================
+\section{Background and Related Work}
+\subsection{Autonomous Cyber Defense}
+Briefly introduce RL-based cyber defense, CybORG, and why partial observability matters.
+
+\subsection{Multi-Objective Reinforcement Learning}
+Introduce MORL, Pareto front discovery, preference-conditioned methods, and policy assignment.
+
+\subsection{Constrained Reinforcement Learning}
+Introduce operational constraints, Lagrangian/CPO-style ideas, and why constraints matter in cyber defense.
+
+\subsection{Positioning of This Work}
+Explain that your paper focuses on transferring and adapting constrained MORL to a cyber-defense environment, rather than solving a fully general game-theoretic equilibrium problem.
+
+% =========================
+% 3. Problem Formulation
+% =========================
+\section{Problem Formulation}
+We consider autonomous cyber defense as a partially observable decision problem. 
+At each time step, the blue defender observes a partial view of host and network status and selects a defensive action from a discrete action set. 
+The environment evolves under the interaction between defender actions and attacker behavior.
+
+\subsection{Observation, Action, and Transition}
+Define observation $o_t$, action $a_t$, latent state $s_t$, and transition dynamics.
+
+\subsection{Multi-Objective Return}
+We define a vector reward
+\begin{equation}
+\mathbf{r}_t = \bigl[r_t^{\text{sec}},\; r_t^{\text{biz}},\; r_t^{\text{cost}}\bigr],
+\end{equation}
+where $r_t^{\text{sec}}$ captures security effect, $r_t^{\text{biz}}$ measures business impact, and $r_t^{\text{cost}}$ measures defense overhead.
+
+The corresponding discounted return is
+\begin{equation}
+\mathbf{G}_t = \sum_{k=0}^{T-t} \gamma^k \mathbf{r}_{t+k}.
+\end{equation}
+
+\subsection{Operational Constraints}
+Let $c_t$ denote a constraint signal encoding unacceptable side effects, such as excessive disruption or unsafe intervention frequency. 
+The policy must satisfy
+\begin{equation}
+\mathbb{E}_{\pi}\left[\sum_{t=0}^{T} \gamma^t c_t \right] \leq \tau,
+\end{equation}
+where $\tau$ is a predefined budget or threshold.
+
+\subsection{Preference-Conditioned Utility}
+For evaluation, a preference vector $\mathbf{w}$ induces utility
+\begin{equation}
+U(\mathbf{G}; \mathbf{w}) = \mathbf{w}^{\top}\mathbf{G},
+\end{equation}
+with $\mathbf{w} \in \Delta^{2}$ for the three-objective case.
+
+% =========================
+% 4. Method
+% =========================
+\section{Method}
+\subsection{Overview}
+Our method follows a two-stage learning pipeline. 
+Stage~1 learns an initial set of preference-diverse defense policies. 
+Stage~2 expands and refines the policy set under explicit operational constraints, aiming to improve Pareto-front coverage while maintaining safe behavior.
+
+\subsection{Stage 1: Preference-Diverse Policy Initialization}
+Describe how multiple policies are trained under different preference vectors to obtain an initial approximation of the Pareto set.
+
+\subsection{Stage 2: Constrained Pareto Expansion}
+Describe how candidate policies are expanded/refined under the constraint mechanism. 
+Explain whether the constraint is enforced through a penalty, Lagrangian update, projection, or another optimization component.
+
+\subsection{Policy Selection / Assignment}
+At test time, given a user preference vector $\mathbf{w}$, select the policy from the learned policy set that maximizes utility:
+\begin{equation}
+\pi^{*}(\mathbf{w}) = \arg\max_{\pi \in \Pi} U(\mathbf{J}(\pi); \mathbf{w}),
+\end{equation}
+where $\mathbf{J}(\pi)$ denotes the estimated objective vector of policy $\pi$.
+
+% =========================
+% 5. Environment and Experimental Setup
+% =========================
+\section{Environment and Experimental Setup}
+\subsection{Cyber Environment}
+State which CybORG scenario / wrapper / action space is used. 
+Clarify whether the red side is fixed, scripted, sampled from a family, or learned.
+
+\subsection{Reward Design}
+Specify the exact definitions of:
+\begin{itemize}
+    \item security effect,
+    \item business impact,
+    \item defense cost,
+    \item constraint signal(s).
+\end{itemize}
+
+\subsection{Baselines}
+Include the most relevant baselines, for example:
+\begin{itemize}
+    \item Weighted-Sum PPO,
+    \item Preference-Conditioned PPO,
+    \item PCN,
+    \item Lagrangian-PPO / constrained single-objective baseline,
+    \item w/o constraint,
+    \item w/o Pareto expansion.
+\end{itemize}
+
+\subsection{Evaluation Metrics}
+We report both general MORL metrics and cyber-semantic metrics.
+General metrics include Hypervolume (HV), Expected Utility (EU), and additional Pareto-set quality indicators if needed.
+Cyber-semantic metrics include critical asset protection rate, red impact success rate, average business impact, and average defense cost.
+
+\subsection{Implementation Details}
+Provide training budget, seeds, optimizer, learning rate, rollout length, and hardware.
+
+% =========================
+% 6. Results
+% =========================
+\section{Results}
+
+\subsection{Main Pareto and Utility Results}
+Present the main comparison table on Pareto-front quality and utility.
+
+\subsection{Constraint Satisfaction Results}
+Present the main comparison table on constraint handling and safety behavior.
+
+\subsection{Cyber-Semantic Evaluation}
+Interpret the results from the perspective of practical defense outcomes.
+
+\subsection{Ablation Studies}
+Include ablations such as:
+\begin{itemize}
+    \item without constrained expansion,
+    \item without Pareto extension,
+    \item different preference distributions,
+    \item different attacker settings.
+\end{itemize}
+
+% =========================
+% 7. Discussion
+% =========================
+\section{Discussion}
+Discuss why the proposed method works in cyber defense, under which preference regimes it is strongest, and where the main limitations remain.
+
+% =========================
+% 8. Conclusion
+% =========================
+\section{Conclusion}
+This paper studies constrained multi-objective reinforcement learning for autonomous cyber defense in CybORG. 
+By jointly modeling security effect, business impact, and defense cost under operational constraints, the proposed framework aims to provide a more realistic and decision-relevant defense policy set than single-objective alternatives. 
+Future work will extend the approach to broader attacker uncertainty, richer constraints, and stronger multi-agent interaction models.
+
+% =========================
+% Figure example
+% 用时取消注释
+% =========================
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=\linewidth]{figs/overview.pdf}
+%   \caption{Overview of the proposed two-stage constrained MORL framework for autonomous cyber defense.}
+%   \Description{A pipeline diagram showing stage-1 preference-diverse policy initialization, stage-2 constrained Pareto expansion, and test-time policy assignment.}
+%   \label{fig:overview}
+% \end{figure}
+
+% =========================
+% Table example
+% 用时取消注释
+% =========================
+% \begin{table}[t]
+%   \caption{Main Pareto and utility comparison.}
+%   \label{tab:main_results}
+%   \centering
+%   \begin{tabular}{lccc}
+%     \toprule
+%     Method & HV $\uparrow$ & EU $\uparrow$ & Constraint Violation $\downarrow$ \\
+%     \midrule
+%     Weighted-Sum PPO & -- & -- & -- \\
+%     PCN & -- & -- & -- \\
+%     Lagrangian-PPO & -- & -- & -- \\
+%     Ours & -- & -- & -- \\
+%     \bottomrule
+%   \end{tabular}
+% \end{table}
+
+% =========================
+% Acknowledgments
+% =========================
+\begin{acks}
+This work was supported by XXX.
+We thank XXX for helpful discussions and infrastructure support.
+\end{acks}
+
+% =========================
+% Bibliography
+% =========================
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+
+% =========================
+% Appendix
+% =========================
+\appendix
+
+\section{Additional Experimental Details}
+Provide reward coefficients, constraint thresholds, scenario details, and training hyperparameters.
+
+\section{Additional Results}
+Provide extra tables, sensitivity analyses, and extended attacker-setting results.
+
+\end{document}
