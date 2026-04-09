@@ -7,6 +7,53 @@
 - `Blocked`
 - `Done`
 
+## CybORG Paper Lock
+
+### 当前主叙事
+
+- `In Progress` 当前论文主线统一锁定为 `集合价值（set value） + 部署价值（deployment value）` 两层结构。
+- `Planned` 主文实验固定组织为 4 个模块：
+  - `Table A = Set Quality Table`
+  - `Table B = Deployment Table`
+  - `Figure C = Preference Coverage`
+  - `Figure D = Tight Feasible Set Quality`
+- `Planned` 当前正式结果口径优先使用 `cmorl_cyborg`，不把 `cmorl_minicage` 的探索升级结果直接混入主文主结果。
+- `Planned` 主文只保留少量核心图表；扩展图与更多消融默认下放 appendix。
+
+### 当前主方法集合
+
+- `Planned` `Table A = Set Quality Table` 固定方法组：
+  - `ours_stage2`
+  - `stage1_only`
+  - `weighted_sum`
+  - `preference_conditioned_ppo`
+  - `pcn`
+- `Planned` `Table B = Deployment Table` 固定方法组：
+  - `ours_stage2`
+  - `lagrangian_ppo`
+  - `weighted_sum`
+  - `stage1_only`
+  - `no_constraint_stage2`
+  - `single_objective`
+- `Planned` 主文核心消融默认只保留：
+  - `ours_stage2`
+  - `stage1_only`
+  - `no_constraint_stage2`
+  - `weighted_sum` 仅在版面允许时加入
+- `Planned` 若某方法尚未在正式 CybORG 线完成统一聚合，则不强行进入主文主表，先放 appendix。
+
+### 当前 claim 约束
+
+- `Planned` 主文允许的强度：
+  - `ours_stage2` 在集合级 `HV / EU` 上最好
+  - `ours_stage2` 提供更高质量、更广覆盖的候选集合
+  - 部署结果强调 `trade-off-aware deployment quality`，不表述为“全指标绝对最优”
+  - 严格约束下的价值通过 `tight feasible set` 统计来支撑
+- `Planned` 主文禁止直接写：
+  - “无条件最优”
+  - “在所有指标上都显著领先”
+  - “探索线方法已经稳定全面超越正式主线”
+
 ## 当前优先级
 
 ### P0 最高优先级

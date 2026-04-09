@@ -4,12 +4,14 @@ shared_thresholds_path: cmorl_cyborg/outputs/paper_table_b/shared_thresholds.jso
 eval_episodes: 5
 
 # Week-2 frozen Scenario2 protocol for Day 4-5.
-# The experiment layer remains Scenario2; these globs assume the 3-seed runs
-# are organized under stable seed directories and each seed contains one run_*.
+# The experiment layer remains Scenario2; these globs assume the stable seed
+# layout and extend key methods to a minimal 5-seed evaluation.
 threshold_buffer_sources:
   - path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0007/run_*/solution_buffer.json
   - path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0011/run_*/solution_buffer.json
   - path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0019/run_*/solution_buffer.json
+  - path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0023/run_*/solution_buffer.json
+  - path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0029/run_*/solution_buffer.json
 
 entries:
   - method_name: ours_stage2
@@ -27,6 +29,16 @@ entries:
     input_kind: buffer
     input_path: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0019/run_05e9f8d6/solution_buffer.json
     selection_source: pareto
+  - method_name: ours_stage2
+    seed: 23
+    input_kind: buffer
+    input_path: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0023/run_99754924/solution_buffer.json
+    selection_source: pareto
+  - method_name: ours_stage2
+    seed: 29
+    input_kind: buffer
+    input_path: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0029/run_543d538f/solution_buffer.json
+    selection_source: pareto
 
   - method_name: stage1_only
     seed: 7
@@ -43,6 +55,16 @@ entries:
     input_kind: buffer
     input_path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0019/run_*/solution_buffer.json
     selection_source: pareto
+  - method_name: stage1_only
+    seed: 23
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0023/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: stage1_only
+    seed: 29
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0029/run_*/solution_buffer.json
+    selection_source: pareto
 
   - method_name: weighted_sum
     seed: 7
@@ -58,6 +80,16 @@ entries:
     seed: 19
     input_kind: buffer
     input_path_glob: cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0019/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: weighted_sum
+    seed: 23
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0023/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: weighted_sum
+    seed: 29
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0029/run_*/solution_buffer.json
     selection_source: pareto
 
   - method_name: no_constraint_stage2

@@ -153,6 +153,9 @@ def generate_main_table_b(config_path: str | Path) -> Path:
             input_kind=str(entry.get("input_kind", "buffer")),
             input_path=input_path,
             selection_source=str(entry.get("selection_source", "pareto")),
+            selection_policy=str(
+                entry.get("selection_policy", config.get("selection_policy", "objective"))
+            ),
             thresholds_path=shared_thresholds_path,
             eval_episodes=int(entry.get("eval_episodes", config.get("eval_episodes", 5))),
         )
