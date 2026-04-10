@@ -48,6 +48,13 @@ def _import_matplotlib():
     return plt
 
 
+def _method_label(raw_label: str, label_map: dict[str, str] | None = None) -> str:
+    mapped = raw_label
+    if label_map is not None:
+        mapped = label_map.get(raw_label, raw_label)
+    return _display_label(mapped)
+
+
 def _display_label(label: str) -> str:
     return (
         label.replace("Preference-Conditioned PPO", "Pref-Cond PPO")
@@ -98,6 +105,7 @@ def _method_summary_rows(compare_summary: dict[str, Any]) -> list[dict[str, Any]
 def plot_main_table_a(
     compare_summary_path: str | Path,
     output_path: str | Path | None = None,
+    title: str = "Formal CybORG Main Table A",
 ) -> Path:
     plt = _import_matplotlib()
     compare_summary = load_json(compare_summary_path)
@@ -109,7 +117,7 @@ def plot_main_table_a(
     x = np.arange(len(labels))
 
     fig, axes = plt.subplots(2, 3, figsize=(18, 9.5))
-    fig.suptitle("Formal CybORG Main Table A", fontsize=16, y=0.98)
+    fig.suptitle(title, fontsize=16, y=0.98)
 
     for axis, (metric_key, title, color, direction) in zip(axes.flatten(), TABLE_A_PANELS):
         means = [float(row.get(metric_key, {}).get("mean", 0.0)) for row in rows]
@@ -160,17 +168,22 @@ def plot_main_table_b(
     table_b_summary_path: str | Path | None = None,
     aggregated_paths: Sequence[str | Path] | None = None,
     output_path: str | Path | None = None,
+    title: str = "Formal CybORG Main Table B",
+    label_map: dict[str, str] | None = None,
 ) -> Path:
     plt = _import_matplotlib()
     rows = _load_table_b_rows(
         table_b_summary_path=table_b_summary_path,
         aggregated_paths=aggregated_paths,
     )
-    labels = [_display_label(str(row.get("method_name", "method"))) for row in rows]
+    labels = [
+        _method_label(str(row.get("method_name", "method")), label_map=label_map)
+        for row in rows
+    ]
     x = np.arange(len(labels))
 
     fig, axes = plt.subplots(2, 4, figsize=(24, 9.5))
-    fig.suptitle("Formal CybORG Main Table B", fontsize=16, y=0.98)
+    fig.suptitle(title, fontsize=16, y=0.98)
 
     for axis, (metric_key, title, color, direction) in zip(axes.flatten(), TABLE_B_PANELS):
         means = [float(row.get(metric_key, 0.0)) for row in rows]
@@ -211,21 +224,26 @@ def plot_fair_compare_table_b(
     *,
     aggregated_paths: Sequence[str | Path],
     output_path: str | Path | None = None,
+    title: str = "Fair Comparison: Constrained vs Unconstrained Stage2",
+    label_map: dict[str, str] | None = None,
 ) -> Path:
     plt = _import_matplotlib()
     rows = _load_table_b_rows(aggregated_paths=aggregated_paths)
+    default_label_map = {
+        "ours_stage2_fair": "Ours Stage2 Fair",
+        "no_constraint_stage2_fair": "No-Constraint Stage2 Fair",
+    }
+    combined_label_map = dict(default_label_map)
+    if label_map is not None:
+        combined_label_map.update(label_map)
     labels = [
-        _display_label(
-            str(row.get("method_name", "method"))
-            .replace("ours_stage2_fair", "Ours Stage2 Fair")
-            .replace("no_constraint_stage2_fair", "No-Constraint Stage2 Fair")
-        )
+        _method_label(str(row.get("method_name", "method")), label_map=combined_label_map)
         for row in rows
     ]
     x = np.arange(len(labels))
 
     fig, axes = plt.subplots(2, 4, figsize=(24, 9.5))
-    fig.suptitle("Fair Comparison: Constrained vs Unconstrained Stage2", fontsize=16, y=0.98)
+    fig.suptitle(title, fontsize=16, y=0.98)
 
     for axis, (metric_key, title, color, direction) in zip(axes.flatten(), TABLE_B_PANELS):
         means = [float(row.get(metric_key, 0.0)) for row in rows]

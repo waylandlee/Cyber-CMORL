@@ -1,0 +1,37 @@
+seed: 7
+stage1_buffer: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0007/run_0f4d9065/solution_buffer.json
+num_extension_policies: 6
+extension_rounds: 2
+constrained_updates: 5
+extension_mode: constrained
+constraint_tolerance: -2.0
+total_timesteps_per_update: 1536
+output_dir: cmorl_cyborg/outputs/fair_compare/crowding_dynamic_stage2_fair/seed_0007
+env:
+  num_envs: 8
+  red_policy: bline
+  max_episode_steps: 100
+  seed: 7
+  scenario_name: Scenario2
+  gym_wrapper_name: ChallengeWrapper
+  blue_agent_name: Blue
+  red_agent_name: Red
+  obs_mode: vector
+  state_mode: true
+model:
+  hidden_size: 128
+  obj_dim: 3
+rollout:
+  num_steps: 64
+eval:
+  eval_episodes: 3
+  preference_step: 0.1
+selection:
+  mode: crowding
+  coverage_mode: static
+  keep_extremes: true
+ipo:
+  beta_mode: dynamic
+  beta_min: 1.002
+  beta_max: 1.008
+  barrier_coef: 20.0

@@ -15,6 +15,15 @@ The current paper artifact is centered on:
 
 The canonical paper source is [`main.tex`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/paper/main.tex).
 
+## Interpretation Rule
+
+The current manuscript uses two different comparison roles:
+
+- `Table B` is the broad deployment comparison table across the fixed main-paper baseline set.
+- The `ours` vs `no_constraint_stage2` causal ablation should be interpreted through the locked `fair_compare` line, where the constrained and unconstrained Stage-2 runs share the same Stage-2 budget and differ only in `extension_mode`.
+
+This distinction is important because the main-paper `ours_stage2` and `no_constraint_stage2` artifacts are not the strict matched pair for causal interpretation, while the `fair_compare` artifacts are.
+
 ## Canonical Inputs
 
 The current locked configs are:
@@ -22,6 +31,12 @@ The current locked configs are:
 - [`compare_suite_main.yaml`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
 - [`table_b_suite_main.yaml`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/table_b_suite_main.yaml)
 - [`export_tables_main.yaml`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/export_tables_main.yaml)
+
+The locked matched ablation configs for `ours` vs `no_constraint_stage2` are:
+
+- [`stage2_fair_constrained_seed_0007.yaml`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare/stage2_fair_constrained_seed_0007.yaml)
+- [`stage2_fair_unconstrained_seed_0007.yaml`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare/stage2_fair_unconstrained_seed_0007.yaml)
+- and the corresponding `0011` / `0019` fair-compare seed configs in the same directory
 
 The current 5-seed runner artifacts are tracked in:
 
@@ -116,6 +131,13 @@ This refreshes:
 - [`tight_feasible_set_summary.csv`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/tight_feasible_set_summary.csv)
 - [`tight_feasible_set_summary.json`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/tight_feasible_set_summary.json)
 - [`tight_feasible_set_quality.png`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/tight_feasible_set_quality.png)
+
+This figure is also the canonical matched comparison line for:
+
+- `ours_stage2_fair`
+- `no_constraint_stage2_fair`
+
+and should be preferred over the broad Table-B line when discussing whether constraint-aware expansion matters causally.
 
 ### 7. Export appendix business/cost semantics
 

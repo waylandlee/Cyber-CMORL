@@ -19,6 +19,11 @@ The paper also explicitly records the current seed protocol:
 - three-seed default: `7, 11, 19`
 - five-seed extension for key methods: `7, 11, 19, 23, 29`
 
+For comparison-role clarity, the paper now treats:
+
+- `Table B` as the broad deployment comparison table
+- `fair_compare` as the canonical matched ablation line for `ours_stage2` vs `no_constraint_stage2`
+
 ## Result Blocks Reflected In Narrative Form
 
 These outputs are not directly `\input`-ed, but they are already represented in the prose:
@@ -28,6 +33,13 @@ These outputs are not directly `\input`-ed, but they are already represented in 
 - [`tight_feasible_set_summary.json`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/tight_feasible_set_summary.json)
 - [`business_cost_semantics.json`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/business_cost_semantics/business_cost_semantics.json)
 - [`attacker_shift_summary.json`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/attacker_shift/attacker_shift_summary.json)
+
+The fair matched ablation line is also part of the intended manuscript interpretation, even when not directly `\input`-ed as a standalone table:
+
+- [`stage2_fair_constrained_seed_0007.yaml`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare/stage2_fair_constrained_seed_0007.yaml)
+- [`stage2_fair_unconstrained_seed_0007.yaml`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare/stage2_fair_unconstrained_seed_0007.yaml)
+- the corresponding `0011` / `0019` fair configs in the same directory
+- [`reevaluated_tight_feasible_set_summary.json`](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/reevaluated_tight_feasible_set_summary.json)
 
 ## Not Explicitly Recorded In `paper/main.tex`
 
@@ -57,6 +69,7 @@ These are the main remaining “do we want this in the paper?” decisions:
 - whether to add a short appendix sentence pointing readers to the exact 5-seed manifest and logs
 - whether to add one appendix sentence clarifying that Figure D still uses the fair-compare tight-threshold line rather than the full main-paper method set
 - whether to add an appendix note that the attacker-shift result is a held-out evaluation without retraining
+- whether to add an explicit appendix table for the matched `ours_stage2_fair` vs `no_constraint_stage2_fair` ablation, rather than relying only on prose
 
 ## Suggested Submission-Time Bundle
 

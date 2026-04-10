@@ -2,7 +2,8 @@
 
 ## 当前待办
 
-- 补 `no_constraint_stage2_matched`，用于表 B 公平消融
+- 固化 `fair_compare` 为 `ours_stage2` vs `no_constraint_stage2` 的公平消融口径
+- 决定是否仍需要额外单独补 `no_constraint_stage2_matched` 主文表
 - 决定是否进入 `5-seed formal`
 - 把现有 `3-seed` 结果整理成论文可直接使用的结果总结
 - 明确 semantic-aware / semantic-balanced 是否放入附录
