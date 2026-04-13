@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import torch
 import torch.nn.functional as F
 
+from cmorl_minicage.storage.scalar_rollout_storage import ScalarRolloutStorage
 from cmorl_minicage.storage.rollout_storage import VectorRolloutStorage
 
 
@@ -39,6 +40,9 @@ class IPOTrainer:
         reference_objectives,
         beta_override: float | None = None,
         use_barrier: bool = True,
+        risk_storage: ScalarRolloutStorage | None = None,
+        risk_objective_mode: str = "none",
+        risk_penalty_coef: float = 0.0,
     ) -> dict[str, float]:
         reference = torch.as_tensor(
             reference_objectives, device=storage.device, dtype=torch.float32
@@ -53,21 +57,46 @@ class IPOTrainer:
         margin_epoch = 0.0
         feasible_epoch = 0.0
         entropy_epoch = 0.0
+        risk_epoch = 0.0
         updates = 0
+        batch_size = storage.num_steps * storage.num_envs
+        mini_batch_size = batch_size // self.config.num_mini_batch
+        if mini_batch_size == 0:
+            raise ValueError("num_mini_batch is too large for collected rollouts")
+
+        obs = storage.obs[:-1].reshape(batch_size, storage.obs_dim)
+        actions = storage.actions.reshape(batch_size)
+        old_log_probs = storage.log_probs.reshape(batch_size)
+        returns = storage.returns[:-1].reshape(batch_size, storage.obj_dim)
+        value_preds = storage.value_preds[:-1].reshape(batch_size, storage.obj_dim)
+        advantages = storage.advantages().reshape(batch_size, storage.obj_dim)
+
+        risk_advantages = None
+        if risk_storage is not None and risk_objective_mode != "none":
+            risk_advantages = risk_storage.advantages().reshape(batch_size)
 
         for _ in range(self.config.ppo_epochs):
-            for batch in storage.feed_forward_generator(self.config.num_mini_batch):
+            sampler = torch.randperm(batch_size, device=storage.device)
+            for start in range(0, batch_size, mini_batch_size):
+                indices = sampler[start : start + mini_batch_size]
+                if len(indices) == 0:
+                    continue
+                batch_obs = obs[indices]
+                batch_actions = actions[indices]
+                batch_old_log_probs = old_log_probs[indices]
+                batch_returns = returns[indices]
+                batch_advantages = advantages[indices]
                 values, log_probs, entropy = self.actor_critic.evaluate_actions(
-                    batch.obs, batch.actions
+                    batch_obs, batch_actions
                 )
-                ratio = torch.exp(log_probs - batch.old_log_probs)
+                ratio = torch.exp(log_probs - batch_old_log_probs)
                 clipped_ratio = torch.clamp(
                     ratio,
                     1.0 - self.config.clip_param,
                     1.0 + self.config.clip_param,
                 )
 
-                objective_adv = batch.advantages[:, objective_idx]
+                objective_adv = batch_advantages[:, objective_idx]
                 clipped_objective_gain = torch.min(
                     ratio * objective_adv,
                     clipped_ratio * objective_adv,
@@ -75,15 +104,25 @@ class IPOTrainer:
                 objective_surrogate = reference[objective_idx] + clipped_objective_gain.mean()
                 action_loss = -clipped_objective_gain.mean()
 
+                risk_action_loss = torch.zeros((), device=storage.device)
+                if risk_advantages is not None and risk_objective_mode == "ppo_cost_surrogate":
+                    batch_risk_advantages = risk_advantages[indices]
+                    neg_risk_advantages = -batch_risk_advantages
+                    clipped_risk_gain = torch.min(
+                        ratio * neg_risk_advantages,
+                        clipped_ratio * neg_risk_advantages,
+                    )
+                    risk_action_loss = -clipped_risk_gain.mean()
+
                 barrier_terms = []
                 margin_values = []
                 if use_barrier:
-                    for idx in range(batch.advantages.shape[1]):
+                    for idx in range(batch_advantages.shape[1]):
                         if idx == objective_idx:
                             continue
                         clipped_constraint_gain = torch.min(
-                            ratio * batch.advantages[:, idx],
-                            clipped_ratio * batch.advantages[:, idx],
+                            ratio * batch_advantages[:, idx],
+                            clipped_ratio * batch_advantages[:, idx],
                         )
                         surrogate_return = reference[idx] + clipped_constraint_gain.mean()
                         margin = surrogate_return - beta_value * reference[idx]
@@ -105,12 +144,13 @@ class IPOTrainer:
                     min_margin = torch.zeros((), device=storage.device)
                     feasible_ratio = torch.ones((), device=storage.device)
 
-                value_loss = F.mse_loss(values, batch.returns)
+                value_loss = F.mse_loss(values, batch_returns)
                 entropy_bonus = entropy.mean()
 
                 self.optimizer.zero_grad()
                 total_loss = (
                     action_loss
+                    + float(risk_penalty_coef) * risk_action_loss
                     + self.config.value_loss_coef * value_loss
                     - barrier_bonus
                     - self.config.entropy_coef * entropy_bonus
@@ -128,6 +168,7 @@ class IPOTrainer:
                 margin_epoch += float(min_margin.item())
                 feasible_epoch += float(feasible_ratio.item())
                 entropy_epoch += float(entropy_bonus.item())
+                risk_epoch += float(risk_action_loss.item())
                 updates += 1
 
         if updates == 0:
@@ -135,6 +176,7 @@ class IPOTrainer:
         return {
             "value_loss": value_loss_epoch / updates,
             "action_loss": action_loss_epoch / updates,
+            "risk_action_loss": risk_epoch / updates,
             "objective_surrogate": objective_epoch / updates,
             "barrier_bonus": barrier_epoch / updates,
             "min_constraint_margin": margin_epoch / updates,

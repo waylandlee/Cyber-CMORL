@@ -13,6 +13,16 @@ def _format_mean_std(entry: dict[str, float]) -> str:
     return f"{entry['mean']:.4f} $\\pm$ {entry['std']:.4f}"
 
 
+def _infer_constraint_method_name(path: str | Path, payload: dict[str, Any]) -> str:
+    explicit = payload.get("method_name")
+    if explicit:
+        return str(explicit)
+    parent_name = Path(path).parent.name
+    if parent_name and parent_name not in {"aggregated"}:
+        return parent_name
+    return Path(path).stem
+
+
 def _write_csv(path: str | Path, fieldnames: list[str], rows: list[dict[str, Any]]) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -78,22 +88,28 @@ def _table_b_rows(paths: list[str]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for path in paths:
         payload = load_json(path)
+        metrics = payload.get("deployment_summary", payload.get("metrics", payload))
         rows.append(
             {
-                "method_name": payload.get("method_name", Path(path).stem),
+                "method_name": _infer_constraint_method_name(path, payload),
+                "evaluation_mode": payload.get("evaluation_mode", metrics.get("mode", "")),
                 "selected_policy_id": payload.get("selected_policy_id", ""),
-                "security_return": f"{float(payload.get('security_return', 0.0)):.4f}",
-                "business_return": f"{float(payload.get('business_return', 0.0)):.4f}",
-                "cost_return": f"{float(payload.get('cost_return', 0.0)):.4f}",
-                "feasible_rate": f"{float(payload.get('feasible_rate', 0.0)):.4f}",
-                "mean_violation": f"{float(payload.get('mean_violation', 0.0)):.4f}",
+                "selection_rate": f"{float(metrics.get('selection_rate', payload.get('feasible_rate', 0.0))):.4f}",
+                "strict_hit_rate": f"{float(metrics.get('strict_hit_rate', 0.0)):.4f}",
+                "hybrid_fallback_rate": f"{float(metrics.get('hybrid_fallback_rate', 0.0)):.4f}",
+                "security_return": f"{float(metrics.get('security_return', payload.get('security_return', 0.0))):.4f}",
+                "business_return": f"{float(metrics.get('business_return', payload.get('business_return', 0.0))):.4f}",
+                "cost_return": f"{float(metrics.get('cost_return', payload.get('cost_return', 0.0))):.4f}",
+                "feasible_rate": f"{float(payload.get('feasible_rate', metrics.get('selection_rate', 0.0))):.4f}",
+                "mean_violation": f"{float(metrics.get('mean_violation', payload.get('mean_violation', 0.0))):.4f}",
                 "final_critical_compromised_hosts": (
-                    f"{float(payload.get('final_critical_compromised_hosts', 0.0)):.4f}"
+                    f"{float(metrics.get('final_critical_compromised_hosts', payload.get('final_critical_compromised_hosts', 0.0))):.4f}"
                 ),
-                "critical_impact_count": f"{float(payload.get('critical_impact_count', 0.0)):.4f}",
+                "critical_impact_count": f"{float(metrics.get('critical_impact_count', payload.get('critical_impact_count', 0.0))):.4f}",
                 "high_disruption_action_rate": (
-                    f"{float(payload.get('high_disruption_action_rate', 0.0)):.4f}"
+                    f"{float(metrics.get('high_disruption_action_rate', payload.get('high_disruption_action_rate', 0.0))):.4f}"
                 ),
+                "source_path": path,
             }
         )
     return rows
@@ -138,6 +154,12 @@ def export_tables(config_path: str | Path) -> Path:
     table_b_columns = list(table_b_rows[0].keys()) if table_b_rows else ["method_name"]
     _write_csv(output_dir / "table_b_constraints.csv", table_b_columns, table_b_rows)
     _write_tex(output_dir / "table_b_constraints.tex", table_b_columns, table_b_rows)
+    strict_rows = [row for row in table_b_rows if row.get("evaluation_mode") == "strict"]
+    hybrid_rows = [row for row in table_b_rows if row.get("evaluation_mode") == "hybrid"]
+    _write_csv(output_dir / "table_b_strict.csv", table_b_columns, strict_rows)
+    _write_tex(output_dir / "table_b_strict.tex", table_b_columns, strict_rows)
+    _write_csv(output_dir / "table_b_hybrid.csv", table_b_columns, hybrid_rows)
+    _write_tex(output_dir / "table_b_hybrid.tex", table_b_columns, hybrid_rows)
 
     appendix_rows = _appendix_rows(config.appendix_metrics_paths)
     appendix_columns = list(appendix_rows[0].keys()) if appendix_rows else ["source_path"]
@@ -149,6 +171,8 @@ def export_tables(config_path: str | Path) -> Path:
         "appendix_metrics_paths": list(config.appendix_metrics_paths),
         "table_a_row_count": len(table_a_rows),
         "table_b_row_count": len(table_b_rows),
+        "table_b_strict_row_count": len(strict_rows),
+        "table_b_hybrid_row_count": len(hybrid_rows),
         "appendix_row_count": len(appendix_rows),
     }
     summary_path = output_dir / "export_summary.json"

@@ -8,7 +8,12 @@ from typing import Sequence
 import numpy as np
 import torch
 
-from cmorl_minicage.algorithms.assignment import assign_policy
+from cmorl_minicage.algorithms.assignment import (
+    assign_policy,
+    assign_policy_hybrid,
+    assign_policy_strict,
+)
+from cmorl_minicage.algorithms.dual_archive import normalized_archive_sets
 from cmorl_minicage.algorithms.selection import nondominated_filter
 from cmorl_minicage.buffer import load_policy_buffer
 from cmorl_minicage.config import DEFAULT_EVALUATE_CONFIG, load_evaluate_config
@@ -313,24 +318,33 @@ def _assignment_weighted_semantic_metrics(
     return weighted_metrics
 
 
-def evaluate_policy_buffer(
-    buffer_path: str | Path,
-    preference_step: float | None = None,
-    *,
-    reference_strategy: str = "data_min_margin",
-    reference_margin: float = 1.0,
-    reference_point: Sequence[float] | None = None,
-    hv_max_exact_points: int = 18,
-    hv_mc_samples: int = 50000,
-    semantic_eval_batches: int | None = None,
-) -> dict:
-    payload = load_policy_buffer(buffer_path)
-    records = payload["records"]
-    pareto_records = nondominated_filter(records)
-    if not records:
-        raise ValueError("buffer contains no records")
+def _dedupe_by_policy_id(records: Sequence[dict]) -> list[dict]:
+    by_id: dict[str, dict] = {}
+    for record in records:
+        by_id.setdefault(str(record["policy_id"]), dict(record))
+    return list(by_id.values())
 
-    obj_dim = len(records[0]["objective_vector"])
+
+def _archive_sets(
+    payload: dict,
+    *,
+    buffer_path: str | Path,
+    semantic_eval_batches: int,
+) -> dict[str, list[dict]]:
+    metadata = payload.get("metadata", {})
+    return normalized_archive_sets(
+        payload,
+        buffer_path=buffer_path,
+        cons_thresholds=metadata.get("cons_thresholds", None),
+        uc_thresholds=metadata.get("uc_thresholds", None),
+        selector_penalty_weights=(
+            metadata.get("selector_defaults", {}) or {}
+        ).get("penalty_weights", None),
+        semantic_eval_episodes=semantic_eval_batches,
+    )
+
+
+def _preference_grid(preference_step: float | None, obj_dim: int) -> tuple[list[list[float]], float]:
     if preference_step is None:
         if obj_dim == 2:
             preference_step = 0.01
@@ -340,8 +354,166 @@ def evaluate_policy_buffer(
             preference_step = 0.5
         else:
             preference_step = 0.1
+    return simplex_grid(float(preference_step), obj_dim), float(preference_step)
 
-    preferences = simplex_grid(preference_step, obj_dim)
+
+def _record_metric(record: dict, *keys: str, default: float = 0.0) -> float:
+    for key in keys:
+        value = record.get(key)
+        if value is not None:
+            return float(value)
+    return float(default)
+
+
+def _selected_objective_summary(assignments: Sequence[dict]) -> dict[str, float]:
+    selected = [assignment for assignment in assignments if assignment.get("policy_id") is not None]
+    if not selected:
+        return {
+            "selected_count": 0,
+            "security_return": 0.0,
+            "business_return": 0.0,
+            "cost_return": 0.0,
+            "mean_violation": 0.0,
+            "final_critical_compromised": 0.0,
+            "final_critical_compromised_hosts": 0.0,
+            "critical_impact_count": 0.0,
+            "high_disruption_rate": 0.0,
+            "high_disruption_action_rate": 0.0,
+            "selected_utility": 0.0,
+            "selected_penalized_utility": 0.0,
+        }
+    vectors = [np.asarray(entry["objective_vector"], dtype=np.float32) for entry in selected]
+    utilities = [
+        float(entry["utility"])
+        for entry in selected
+        if entry.get("utility") is not None
+    ]
+    penalized = [
+        float(entry["penalized_utility"])
+        for entry in selected
+        if entry.get("penalized_utility") is not None
+    ]
+    return {
+        "selected_count": len(selected),
+        "security_return": float(np.mean([vector[0] for vector in vectors])) if vectors and vectors[0].size >= 1 else 0.0,
+        "business_return": float(np.mean([vector[1] for vector in vectors])) if vectors and vectors[0].size >= 2 else 0.0,
+        "cost_return": float(np.mean([vector[2] for vector in vectors])) if vectors and vectors[0].size >= 3 else 0.0,
+        "mean_violation": float(np.mean([_record_metric(entry, "mean_violation") for entry in selected])),
+        "final_critical_compromised": float(
+            np.mean(
+                [
+                    _record_metric(
+                        entry,
+                        "final_critical_compromised",
+                        "final_critical_compromised_hosts",
+                    )
+                    for entry in selected
+                ]
+            )
+        ),
+        "final_critical_compromised_hosts": float(
+            np.mean(
+                [
+                    _record_metric(
+                        entry,
+                        "final_critical_compromised_hosts",
+                        "final_critical_compromised",
+                    )
+                    for entry in selected
+                ]
+            )
+        ),
+        "critical_impact_count": float(
+            np.mean([_record_metric(entry, "critical_impact_count") for entry in selected])
+        ),
+        "high_disruption_rate": float(
+            np.mean(
+                [
+                    _record_metric(
+                        entry,
+                        "high_disruption_rate",
+                        "high_disruption_action_rate",
+                    )
+                    for entry in selected
+                ]
+            )
+        ),
+        "high_disruption_action_rate": float(
+            np.mean(
+                [
+                    _record_metric(
+                        entry,
+                        "high_disruption_action_rate",
+                        "high_disruption_rate",
+                    )
+                    for entry in selected
+                ]
+            )
+        ),
+        "selected_utility": float(np.mean(utilities)) if utilities else 0.0,
+        "selected_penalized_utility": float(np.mean(penalized)) if penalized else 0.0,
+    }
+
+
+def _assignment_counts(assignments: Sequence[dict]) -> tuple[dict[str, int], dict[str, float]]:
+    assignment_counts: dict[str, int] = {}
+    assignment_utility_sum: dict[str, float] = {}
+    for assigned in assignments:
+        policy_id = assigned.get("policy_id")
+        if policy_id is None:
+            continue
+        assignment_counts[policy_id] = assignment_counts.get(policy_id, 0) + 1
+        assignment_utility_sum[policy_id] = assignment_utility_sum.get(policy_id, 0.0) + float(
+            assigned.get("utility") or 0.0
+        )
+    return assignment_counts, assignment_utility_sum
+
+
+def _semantic_payload_for_assignments(
+    *,
+    assignments: Sequence[dict],
+    records: Sequence[dict],
+    metadata: dict,
+    buffer_path: str | Path,
+    semantic_eval_batches: int,
+) -> tuple[dict[str, float], dict[str, dict[str, float]]]:
+    assignment_counts, _ = _assignment_counts(assignments)
+    policy_lookup = {record["policy_id"]: record for record in records}
+    per_policy_semantic_metrics = {
+        policy_id: _semantic_metrics_for_record(
+            policy_lookup[policy_id],
+            metadata,
+            buffer_path,
+            eval_batches=semantic_eval_batches,
+        )
+        for policy_id in sorted(assignment_counts)
+        if policy_id in policy_lookup
+    }
+    return (
+        _assignment_weighted_semantic_metrics(assignment_counts, per_policy_semantic_metrics),
+        per_policy_semantic_metrics,
+    )
+
+
+def _evaluate_union_mode(
+    *,
+    payload: dict,
+    archive_sets: dict[str, list[dict]],
+    buffer_path: str | Path,
+    preferences: Sequence[Sequence[float]],
+    preference_step: float,
+    reference_strategy: str,
+    reference_margin: float,
+    reference_point: Sequence[float] | None,
+    hv_max_exact_points: int,
+    hv_mc_samples: int,
+    semantic_eval_batches: int,
+) -> dict:
+    records = archive_sets["records"]
+    pareto_records = nondominated_filter(archive_sets["union"])
+    if archive_sets["union_front"]:
+        pareto_records = nondominated_filter(archive_sets["union_front"])
+    obj_dim = len(records[0]["objective_vector"])
     points = np.asarray([record["objective_vector"] for record in pareto_records], dtype=np.float32)
     reference = resolve_reference_point(
         points,
@@ -350,17 +522,8 @@ def evaluate_policy_buffer(
         reference_margin=reference_margin,
         reference_point=reference_point,
     )
-
-    assignments = [assign_policy(pref, pareto_records) for pref in preferences]
-    assignment_counts: dict[str, int] = {}
-    assignment_utility_sum: dict[str, float] = {}
-    for assigned in assignments:
-        policy_id = assigned["policy_id"]
-        assignment_counts[policy_id] = assignment_counts.get(policy_id, 0) + 1
-        assignment_utility_sum[policy_id] = assignment_utility_sum.get(policy_id, 0.0) + float(
-            assigned["utility"]
-        )
-
+    assignments = [assign_policy(pref, pareto_records, mode="plain", source_set="union") for pref in preferences]
+    assignment_counts, assignment_utility_sum = _assignment_counts(assignments)
     hv_value, hv_method = hypervolume(
         points,
         reference,
@@ -368,6 +531,7 @@ def evaluate_policy_buffer(
         mc_samples=hv_mc_samples,
     )
     assignment_summary = {
+        "mode": "union",
         "num_preferences": len(preferences),
         "unique_assigned_policies": len(assignment_counts),
         "coverage_ratio": (
@@ -385,27 +549,20 @@ def evaluate_policy_buffer(
             for policy_id in assignment_counts
         },
     }
-    if semantic_eval_batches is None:
-        semantic_eval_batches = int(payload.get("metadata", {}).get("evaluation", {}).get("eval_episodes", 1))
-    policy_lookup = {record["policy_id"]: record for record in records}
-    assigned_policy_ids = sorted(assignment_counts)
-    per_policy_semantic_metrics = {
-        policy_id: _semantic_metrics_for_record(
-            policy_lookup[policy_id],
-            payload.get("metadata", {}),
-            buffer_path,
-            eval_batches=semantic_eval_batches,
-        )
-        for policy_id in assigned_policy_ids
-        if policy_id in policy_lookup
-    }
-    semantic_metrics = _assignment_weighted_semantic_metrics(
-        assignment_counts,
-        per_policy_semantic_metrics,
+    semantic_metrics, per_policy_semantic_metrics = _semantic_payload_for_assignments(
+        assignments=assignments,
+        records=records,
+        metadata=payload.get("metadata", {}),
+        buffer_path=buffer_path,
+        semantic_eval_batches=semantic_eval_batches,
     )
     metrics = {
+        "mode": "union",
         "num_records": len(records),
         "num_pareto_records": len(pareto_records),
+        "num_cons_records": len(archive_sets["cons"]),
+        "num_uc_records": len(archive_sets["uc"]),
+        "num_union_records": len(archive_sets["union"]),
         "hypervolume": hv_value,
         "hypervolume_method": hv_method,
         "expected_utility": expected_utility(pareto_records, preferences),
@@ -420,6 +577,7 @@ def evaluate_policy_buffer(
     return {
         "schema_version": payload.get("schema_version"),
         "metadata": payload.get("metadata", {}),
+        "evaluation_mode": "union",
         "metrics": metrics,
         "pareto_front": pareto_records,
         "assignments": assignments,
@@ -430,12 +588,421 @@ def evaluate_policy_buffer(
     }
 
 
+def _evaluate_deployment_mode(
+    *,
+    payload: dict,
+    archive_sets: dict[str, list[dict]],
+    buffer_path: str | Path,
+    preferences: Sequence[Sequence[float]],
+    preference_step: float,
+    mode: str,
+    penalty_weights: dict[str, float] | None,
+    strict_require_tight: bool,
+    semantic_eval_batches: int,
+) -> dict:
+    records = archive_sets["records"]
+    cons_records = archive_sets["cons"]
+    union_records = archive_sets["union"]
+    if mode == "strict":
+        assignments = [
+            assign_policy_strict(
+                pref,
+                cons_records,
+                require_tight=strict_require_tight,
+                source_set="cons",
+            )
+            for pref in preferences
+        ]
+    elif mode == "hybrid":
+        assignments = [
+            assign_policy_hybrid(
+                pref,
+                cons_records,
+                union_records,
+                penalty_weights=penalty_weights,
+                require_tight=strict_require_tight,
+            )
+            for pref in preferences
+        ]
+    else:
+        raise ValueError(f"Unsupported deployment evaluation mode: {mode}")
+
+    assignment_counts, assignment_utility_sum = _assignment_counts(assignments)
+    selected_count = sum(1 for assignment in assignments if assignment.get("policy_id") is not None)
+    strict_hit_count = sum(1 for assignment in assignments if assignment.get("strict_hit") is True)
+    fallback_count = sum(1 for assignment in assignments if assignment.get("fallback_used") is True)
+    miss_count = len(preferences) - selected_count
+    selected_summary = _selected_objective_summary(assignments)
+    semantic_metrics, per_policy_semantic_metrics = _semantic_payload_for_assignments(
+        assignments=assignments,
+        records=records,
+        metadata=payload.get("metadata", {}),
+        buffer_path=buffer_path,
+        semantic_eval_batches=semantic_eval_batches,
+    )
+    deployment_summary = {
+        "mode": mode,
+        "num_preferences": len(preferences),
+        "selected_count": selected_count,
+        "strict_hit_count": strict_hit_count,
+        "strict_miss_count": len(preferences) - strict_hit_count,
+        "fallback_count": fallback_count,
+        "miss_count": miss_count,
+        "strict_hit_rate": float(strict_hit_count / len(preferences)) if preferences else 0.0,
+        "hybrid_fallback_rate": float(fallback_count / len(preferences)) if preferences else 0.0,
+        "selection_rate": float(selected_count / len(preferences)) if preferences else 0.0,
+        "strict_require_tight": bool(strict_require_tight),
+        **selected_summary,
+    }
+    assignment_summary = {
+        "mode": mode,
+        "num_preferences": len(preferences),
+        "unique_assigned_policies": len(assignment_counts),
+        "coverage_ratio": (
+            float(len(assignment_counts) / len(cons_records if mode == "strict" else union_records))
+            if (cons_records if mode == "strict" else union_records)
+            else 0.0
+        ),
+        "max_assignment_count": max(assignment_counts.values(), default=0),
+        "mean_assignment_count": (
+            float(np.mean(list(assignment_counts.values()))) if assignment_counts else 0.0
+        ),
+        "mean_assigned_utility": deployment_summary["selected_utility"],
+        "per_policy_mean_utility": {
+            policy_id: assignment_utility_sum[policy_id] / assignment_counts[policy_id]
+            for policy_id in assignment_counts
+        },
+    }
+    metrics = {
+        "mode": mode,
+        "num_records": len(records),
+        "num_cons_records": len(cons_records),
+        "num_uc_records": len(archive_sets["uc"]),
+        "num_union_records": len(union_records),
+        "preference_step": preference_step,
+        "obj_dim": len(records[0]["objective_vector"]),
+        "semantic_eval_batches": semantic_eval_batches,
+        **deployment_summary,
+    }
+    return {
+        "schema_version": payload.get("schema_version"),
+        "metadata": payload.get("metadata", {}),
+        "evaluation_mode": mode,
+        "metrics": metrics,
+        "deployment_summary": deployment_summary,
+        "assignments": assignments,
+        "assignment_counts": assignment_counts,
+        "assignment_summary": assignment_summary,
+        "semantic_metrics": semantic_metrics,
+        "semantic_policy_metrics": per_policy_semantic_metrics,
+    }
+
+
+def evaluate_policy_buffer(
+    buffer_path: str | Path,
+    preference_step: float | None = None,
+    *,
+    mode: str = "union",
+    penalty_weights: dict[str, float] | None = None,
+    strict_require_tight: bool = False,
+    reference_strategy: str = "data_min_margin",
+    reference_margin: float = 1.0,
+    reference_point: Sequence[float] | None = None,
+    hv_max_exact_points: int = 18,
+    hv_mc_samples: int = 50000,
+    semantic_eval_batches: int | None = None,
+) -> dict:
+    payload = load_policy_buffer(buffer_path)
+    if semantic_eval_batches is None:
+        semantic_eval_batches = int(payload.get("metadata", {}).get("evaluation", {}).get("eval_episodes", 1))
+    archive_sets = _archive_sets(
+        payload,
+        buffer_path=buffer_path,
+        semantic_eval_batches=semantic_eval_batches,
+    )
+    records = archive_sets["records"]
+    if not records:
+        raise ValueError("buffer contains no records")
+    obj_dim = len(records[0]["objective_vector"])
+    preferences, preference_step = _preference_grid(preference_step, obj_dim)
+    mode = mode.lower()
+    if mode == "union":
+        return _evaluate_union_mode(
+            payload=payload,
+            archive_sets=archive_sets,
+            buffer_path=buffer_path,
+            preferences=preferences,
+            preference_step=preference_step,
+            reference_strategy=reference_strategy,
+            reference_margin=reference_margin,
+            reference_point=reference_point,
+            hv_max_exact_points=hv_max_exact_points,
+            hv_mc_samples=hv_mc_samples,
+            semantic_eval_batches=semantic_eval_batches,
+        )
+    if mode in {"strict", "hybrid"}:
+        return _evaluate_deployment_mode(
+            payload=payload,
+            archive_sets=archive_sets,
+            buffer_path=buffer_path,
+            preferences=preferences,
+            preference_step=preference_step,
+            mode=mode,
+            penalty_weights=penalty_weights,
+            strict_require_tight=strict_require_tight,
+            semantic_eval_batches=semantic_eval_batches,
+        )
+    raise ValueError(f"Unsupported evaluation mode: {mode}")
+
+
+def evaluate_policy_buffer_all_modes(
+    buffer_path: str | Path,
+    preference_step: float | None = None,
+    *,
+    penalty_weights: dict[str, float] | None = None,
+    strict_require_tight: bool = False,
+    reference_strategy: str = "data_min_margin",
+    reference_margin: float = 1.0,
+    reference_point: Sequence[float] | None = None,
+    hv_max_exact_points: int = 18,
+    hv_mc_samples: int = 50000,
+    semantic_eval_batches: int | None = None,
+) -> dict[str, dict]:
+    return {
+        mode: evaluate_policy_buffer(
+            buffer_path,
+            preference_step,
+            mode=mode,
+            penalty_weights=penalty_weights,
+            strict_require_tight=strict_require_tight,
+            reference_strategy=reference_strategy,
+            reference_margin=reference_margin,
+            reference_point=reference_point,
+            hv_max_exact_points=hv_max_exact_points,
+            hv_mc_samples=hv_mc_samples,
+            semantic_eval_batches=semantic_eval_batches,
+        )
+        for mode in ("union", "strict", "hybrid")
+    }
+
+
+def archive_diagnostics_payload(
+    buffer_path: str | Path,
+    *,
+    strict_payload: dict | None = None,
+    hybrid_payload: dict | None = None,
+) -> dict:
+    payload = load_policy_buffer(buffer_path)
+    semantic_eval_batches = int(
+        payload.get("metadata", {}).get("evaluation", {}).get("eval_episodes", 1)
+    )
+    archive_sets = _archive_sets(
+        payload,
+        buffer_path=buffer_path,
+        semantic_eval_batches=semantic_eval_batches,
+    )
+    records = archive_sets["records"]
+    route_counts = {
+        "from_original_to_cons": 0,
+        "from_original_to_uc": 0,
+        "from_adacs_to_cons": 0,
+        "from_adacs_to_uc": 0,
+        "from_unknown_to_cons": 0,
+        "from_unknown_to_uc": 0,
+    }
+    for record in records:
+        operator = record.get("operator_source")
+        role = record.get("archive_role")
+        if role not in {"cons", "uc"}:
+            continue
+        operator_key = "unknown"
+        if operator == "original":
+            operator_key = "original"
+        elif operator == "adacs_dcs":
+            operator_key = "adacs"
+        key = f"from_{operator_key}_to_{role}"
+        route_counts[key] = route_counts.get(key, 0) + 1
+
+    strict_candidates = [
+        record
+        for record in archive_sets["cons"]
+        if bool(record.get("tight_feasible_flag")) or bool(record.get("near_feasible_flag"))
+    ]
+    metadata = payload.get("metadata", {})
+    shadow_keys = (
+        "saved_route_preview_cons_accept_count",
+        "shadow_route_preview_cons_accept_count",
+        "saved_route_preview_near_feasible_count",
+        "shadow_route_preview_near_feasible_count",
+        "saved_route_fail_primary_counts",
+        "shadow_route_fail_primary_counts",
+        "saved_route_fail_component_counts",
+        "shadow_route_fail_component_counts",
+        "saved_final_critical_threshold_counts",
+        "shadow_final_critical_threshold_counts",
+        "saved_final_critical_value_summary",
+        "shadow_final_critical_value_summary",
+        "saved_objective_delta_vs_parent_summary",
+        "shadow_objective_delta_vs_parent_summary",
+        "saved_spread_gain_summary",
+        "shadow_spread_gain_summary",
+        "gap_direction_summary",
+    )
+    shadow_available = any(key in metadata for key in shadow_keys)
+    strict_summary = (strict_payload or {}).get("deployment_summary", {})
+    hybrid_summary = (hybrid_payload or {}).get("deployment_summary", {})
+    diagnostics = {
+        "buffer_path": str(buffer_path),
+        "archive_mode": metadata.get("archive_mode", "single"),
+        "archive_rule_version": metadata.get(
+            "archive_rule_version", "legacy"
+        ),
+        "archive_seed_thresholds": metadata.get(
+            "archive_seed_thresholds", {}
+        ),
+        "num_records": len(records),
+        "num_cons_records": len(archive_sets["cons"]),
+        "num_uc_records": len(archive_sets["uc"]),
+        "num_union_records": len(archive_sets["union"]),
+        "num_union_pareto_records": len(nondominated_filter(archive_sets["union"])),
+        "strict_candidate_count": len(strict_candidates),
+        "strict_hit_rate": float(strict_summary.get("strict_hit_rate", 0.0)),
+        "hybrid_fallback_rate": float(hybrid_summary.get("hybrid_fallback_rate", 0.0)),
+        "route_counts": route_counts,
+        "cons_attempted_children": int(
+            metadata.get("cons_attempted_children", 0)
+        ),
+        "cons_successful_children": int(
+            metadata.get("cons_successful_children", 0)
+        ),
+        "cons_routed_children": int(
+            metadata.get("cons_routed_children", 0)
+        ),
+        "cons_rejected_by_cost_gate": int(
+            metadata.get("cons_rejected_by_cost_gate", 0)
+        ),
+        "cons_rejected_by_feasibility": int(
+            metadata.get("cons_rejected_by_feasibility", 0)
+        ),
+        "cons_risk_mode": metadata.get("cons_risk_mode", "none"),
+        "cons_cvar_alpha": float(metadata.get("cvar_alpha", 0.25)),
+        "cons_cvar_metric": metadata.get(
+            "cvar_metric", "final_critical_compromised_hosts"
+        ),
+        "cvar_metric_weights": metadata.get("cvar_metric_weights", {}),
+        "cons_risk_objective_mode": metadata.get(
+            "cons_risk_objective_mode", "none"
+        ),
+        "cons_risk_penalty_coef": float(
+            metadata.get("cons_risk_penalty_coef", 0.0)
+        ),
+        "cons_cvar_estimate_mean": float(
+            metadata.get("cons_cvar_estimate_mean", 0.0)
+        ),
+        "cons_cvar_estimate_tail": float(
+            metadata.get("cons_cvar_estimate_tail", 0.0)
+        ),
+        "cons_risk_penalty_mean": float(
+            metadata.get("cons_risk_penalty_mean", 0.0)
+        ),
+        "cons_rejected_by_risk_gate": int(
+            metadata.get("cons_rejected_by_risk_gate", 0)
+        ),
+        "cons_risk_rollout_count": int(
+            metadata.get("cons_risk_rollout_count", 0)
+        ),
+        "cons_tail_env_count": int(
+            metadata.get("cons_tail_env_count", 0)
+        ),
+        "cons_tail_risk_mean": float(
+            metadata.get("cons_tail_risk_mean", 0.0)
+        ),
+        "cons_tail_risk_max": float(
+            metadata.get("cons_tail_risk_max", 0.0)
+        ),
+        "cons_episode_risk_mean": float(
+            metadata.get("cons_episode_risk_mean", 0.0)
+        ),
+        "cons_episode_risk_tail": float(
+            metadata.get("cons_episode_risk_tail", 0.0)
+        ),
+        "cons_child_failed_by_violation": int(
+            metadata.get("cons_child_failed_by_violation", 0)
+        ),
+        "cons_child_failed_by_final_critical": int(
+            metadata.get("cons_child_failed_by_final_critical", 0)
+        ),
+        "cons_child_failed_by_disruption": int(
+            metadata.get("cons_child_failed_by_disruption", 0)
+        ),
+        "cons_child_failed_by_multiple": int(
+            metadata.get("cons_child_failed_by_multiple", 0)
+        ),
+        "saved_vs_shadow_diagnostics": {
+            "available": bool(shadow_available),
+            "saved_route_preview_cons_accept_count": int(
+                metadata.get("saved_route_preview_cons_accept_count", 0)
+            ),
+            "shadow_route_preview_cons_accept_count": int(
+                metadata.get("shadow_route_preview_cons_accept_count", 0)
+            ),
+            "saved_route_preview_near_feasible_count": int(
+                metadata.get("saved_route_preview_near_feasible_count", 0)
+            ),
+            "shadow_route_preview_near_feasible_count": int(
+                metadata.get("shadow_route_preview_near_feasible_count", 0)
+            ),
+            "saved_route_fail_primary_counts": metadata.get(
+                "saved_route_fail_primary_counts", {}
+            ),
+            "shadow_route_fail_primary_counts": metadata.get(
+                "shadow_route_fail_primary_counts", {}
+            ),
+            "saved_route_fail_component_counts": metadata.get(
+                "saved_route_fail_component_counts", {}
+            ),
+            "shadow_route_fail_component_counts": metadata.get(
+                "shadow_route_fail_component_counts", {}
+            ),
+            "saved_final_critical_threshold_counts": metadata.get(
+                "saved_final_critical_threshold_counts", {}
+            ),
+            "shadow_final_critical_threshold_counts": metadata.get(
+                "shadow_final_critical_threshold_counts", {}
+            ),
+            "saved_final_critical_value_summary": metadata.get(
+                "saved_final_critical_value_summary", {}
+            ),
+            "shadow_final_critical_value_summary": metadata.get(
+                "shadow_final_critical_value_summary", {}
+            ),
+            "saved_objective_delta_vs_parent_summary": metadata.get(
+                "saved_objective_delta_vs_parent_summary", {}
+            ),
+            "shadow_objective_delta_vs_parent_summary": metadata.get(
+                "shadow_objective_delta_vs_parent_summary", {}
+            ),
+            "saved_spread_gain_summary": metadata.get(
+                "saved_spread_gain_summary", {}
+            ),
+            "shadow_spread_gain_summary": metadata.get(
+                "shadow_spread_gain_summary", {}
+            ),
+            "gap_direction_summary": metadata.get("gap_direction_summary", {}),
+        },
+    }
+    diagnostics.update(route_counts)
+    return diagnostics
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate C-MORL MiniCAGE policy buffer.")
     parser.add_argument("--config", default=str(DEFAULT_EVALUATE_CONFIG))
     parser.add_argument("--buffer-path", default=None)
     parser.add_argument("--preference-step", type=float, default=None)
     parser.add_argument("--output-path", default=None)
+    parser.add_argument("--mode", choices=("union", "strict", "hybrid"), default=None)
+    parser.add_argument("--strict-require-tight", action="store_true")
     args = parser.parse_args()
 
     config = load_evaluate_config(args.config)
@@ -445,25 +1012,52 @@ def main() -> None:
         config.output_path = args.output_path
     if args.preference_step is not None:
         config.preference_step = args.preference_step
+    if args.mode is not None:
+        config.selector_mode = args.mode
+    if args.strict_require_tight:
+        config.strict_require_tight = True
     if not config.buffer_path:
         raise ValueError("buffer_path must be set via config file or --buffer-path")
 
-    result = evaluate_policy_buffer(
+    results = evaluate_policy_buffer_all_modes(
         config.buffer_path,
         config.preference_step,
+        penalty_weights=config.hybrid_penalty_weights,
+        strict_require_tight=config.strict_require_tight,
         reference_strategy=config.reference_strategy,
         reference_margin=config.reference_margin,
         reference_point=config.reference_point,
         hv_max_exact_points=config.hv_max_exact_points,
         hv_mc_samples=config.hv_mc_samples,
     )
-    output_path = (
-        Path(config.output_path)
-        if config.output_path
-        else Path(config.buffer_path).with_name("metrics.json")
+    output_path = Path(config.output_path) if config.output_path else Path(config.buffer_path).with_name("metrics.json")
+    output_dir = output_path.parent
+    output_dir.mkdir(parents=True, exist_ok=True)
+    mode_paths = {
+        "union": output_dir / "metrics_union.json",
+        "strict": output_dir / "metrics_strict.json",
+        "hybrid": output_dir / "metrics_hybrid.json",
+    }
+    for mode, result in results.items():
+        save_json(mode_paths[mode], result)
+    diagnostics = archive_diagnostics_payload(
+        config.buffer_path,
+        strict_payload=results["strict"],
+        hybrid_payload=results["hybrid"],
     )
-    save_json(output_path, result)
-    print(f"Saved evaluation to {output_path}")
+    diagnostics_path = output_dir / "archive_diagnostics.json"
+    save_json(diagnostics_path, diagnostics)
+    selected_mode = config.selector_mode if config.selector_mode in results else "union"
+    save_json(output_path, results[selected_mode])
+    if output_path.name != "metrics.json":
+        save_json(output_dir / "metrics.json", results["union"])
+    else:
+        save_json(output_path, results["union"])
+    print(f"Saved union evaluation to {mode_paths['union']}")
+    print(f"Saved strict evaluation to {mode_paths['strict']}")
+    print(f"Saved hybrid evaluation to {mode_paths['hybrid']}")
+    print(f"Saved archive diagnostics to {diagnostics_path}")
+    print(f"Saved selected evaluation ({selected_mode}) to {output_path}")
 
 
 if __name__ == "__main__":

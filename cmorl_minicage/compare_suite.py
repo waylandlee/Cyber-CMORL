@@ -9,7 +9,12 @@ import numpy as np
 
 from cmorl_minicage.buffer import load_policy_buffer
 from cmorl_minicage.config import load_compare_suite_config
-from cmorl_minicage.evaluate import evaluate_policy_buffer, resolve_reference_point
+from cmorl_minicage.evaluate import (
+    archive_diagnostics_payload,
+    evaluate_policy_buffer,
+    evaluate_policy_buffer_all_modes,
+    resolve_reference_point,
+)
 from cmorl_minicage.evaluate_conditioned import (
     evaluate_conditioned_points_payload,
 )
@@ -159,19 +164,38 @@ def compare_suite(config_path: str | Path) -> Path:
 
     per_run_rows: list[dict[str, Any]] = []
     metrics_paths: list[str] = []
+    metrics_paths_by_mode: dict[str, list[str]] = {"union": [], "strict": [], "hybrid": []}
+    diagnostics_paths: list[str] = []
     for entry in config.entries:
         method_dir = output_dir / entry["method_name"] / f"seed_{int(entry.get('seed', 0)):04d}"
         method_dir.mkdir(parents=True, exist_ok=True)
         if entry["artifact_kind"] == "buffer":
-            metrics_payload = evaluate_policy_buffer(
+            all_metrics = evaluate_policy_buffer_all_modes(
                 entry["artifact_path"],
                 entry.get("preference_step", config.preference_step),
+                penalty_weights=entry.get("hybrid_penalty_weights"),
+                strict_require_tight=bool(entry.get("strict_require_tight", False)),
                 reference_strategy=config.reference_strategy,
                 reference_margin=config.reference_margin,
                 reference_point=reference_point,
                 hv_max_exact_points=config.hv_max_exact_points,
                 hv_mc_samples=config.hv_mc_samples,
             )
+            for mode, payload in all_metrics.items():
+                mode_path = method_dir / f"metrics_shared_ref_{mode}.json"
+                save_json(mode_path, payload)
+                metrics_paths_by_mode[mode].append(str(mode_path))
+            diagnostics_path = method_dir / "archive_diagnostics.json"
+            save_json(
+                diagnostics_path,
+                archive_diagnostics_payload(
+                    entry["artifact_path"],
+                    strict_payload=all_metrics["strict"],
+                    hybrid_payload=all_metrics["hybrid"],
+                ),
+            )
+            diagnostics_paths.append(str(diagnostics_path))
+            metrics_payload = all_metrics["union"]
         elif entry["artifact_kind"] == "conditioned_points":
             payload = _load_conditioned_payload(entry["artifact_path"])
             metrics_payload = evaluate_conditioned_points_payload(
@@ -190,6 +214,11 @@ def compare_suite(config_path: str | Path) -> Path:
         save_json(metrics_path, metrics_payload)
         row = _summary_row(entry, metrics_payload)
         row["metrics_path"] = str(metrics_path)
+        if entry["artifact_kind"] == "buffer":
+            row["metrics_union_path"] = str(method_dir / "metrics_shared_ref_union.json")
+            row["metrics_strict_path"] = str(method_dir / "metrics_shared_ref_strict.json")
+            row["metrics_hybrid_path"] = str(method_dir / "metrics_shared_ref_hybrid.json")
+            row["archive_diagnostics_path"] = str(method_dir / "archive_diagnostics.json")
         per_run_rows.append(row)
         metrics_paths.append(str(metrics_path))
 
@@ -199,6 +228,8 @@ def compare_suite(config_path: str | Path) -> Path:
         "per_run": per_run_rows,
         "method_summary": _aggregate_method_rows(per_run_rows),
         "metrics_paths": metrics_paths,
+        "metrics_paths_by_mode": metrics_paths_by_mode,
+        "archive_diagnostics_paths": diagnostics_paths,
     }
     summary_path = output_dir / "table_a_summary.json"
     save_json(summary_path, summary)

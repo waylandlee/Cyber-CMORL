@@ -1,0 +1,91 @@
+seed: 19
+stage1_buffer: /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_appendix/stage1_only/seed_0019/run_24701c23/solution_buffer.json
+archive_mode: dual
+num_extension_policies: 4
+num_cons_parents: 2
+num_uc_parents: 2
+route_mode: exclusive
+cons_operator_mode: adacs_dcs
+uc_operator_mode: adacs_dcs
+cons_risk_mode: strict_aligned_cvar
+cvar_alpha: 0.25
+cvar_metric: strict_aligned_composite
+cons_risk_objective_mode: ppo_cost_surrogate
+cons_risk_penalty_coef: 0.5
+cvar_metric_weights:
+  final_critical_compromised_hosts: 4.0
+  mean_violation: 1.0
+  high_disruption_excess: 0.5
+extension_rounds: 1
+constrained_updates: 1
+max_consecutive_constraint_failures: 1
+extension_mode: constrained
+constraint_tolerance: -0.25
+total_timesteps_per_update: 256
+output_dir: cmorl_cyborg/outputs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a1_s2a_fc_w4
+cons_thresholds:
+  violation: 0.5
+  high_disruption: 1.0
+  cost_margin: 0.0
+  cost_delta_tolerance: 3.0
+  final_critical_near: 0.25
+uc_thresholds:
+  delta_eu: 0.001
+  delta_coverage: 0.01
+  novelty: 5.0
+  spread_gain: 5.0
+selector_mode_default: strict
+selector_penalty_weights:
+  violation: 1.0
+  high_disruption: 1.0
+  final_critical: 1.0
+env:
+  num_envs: 2
+  red_policy: bline
+  max_episode_steps: 20
+  seed: 19
+  scenario_name: Scenario2
+  gym_wrapper_name: ChallengeWrapper
+  blue_agent_name: Blue
+  red_agent_name: Red
+  obs_mode: vector
+  state_mode: true
+model:
+  hidden_size: 128
+  obj_dim: 3
+rollout:
+  num_steps: 16
+eval:
+  eval_episodes: 1
+  preference_step: 0.5
+selection:
+  mode: adaptive
+  score_weights:
+    crowding: 0.30
+    expansion: 0.30
+    low_risk: 0.20
+    coverage: 0.20
+  utility_tolerance: 0.02
+  coverage_mode: static
+  keep_extremes: true
+ipo:
+  clip_param: 0.2
+  ppo_epochs: 1
+  num_mini_batch: 4
+  value_loss_coef: 0.5
+  entropy_coef: 0.01
+  learning_rate: 3.0e-4
+  max_grad_norm: 0.5
+  barrier_coef: 20.0
+  beta: 0.9
+  beta_mode: dynamic
+  beta_min: 0.85
+  beta_max: 0.95
+  schedule_weights:
+    crowding: 0.25
+    expansion: 0.35
+    low_risk: 0.20
+    progress: 0.20
+  gamma: 0.995
+  gae_lambda: 0.95
+  eps: 1.0e-8

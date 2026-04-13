@@ -462,6 +462,254 @@ v2 smoke 相比 B-fix 出现了一个弱正向信号：
 > conservative branch 的主要瓶颈仍然不仅是 risk objective，  
 > 而是 `operator -> feasible child generation -> archive routing -> strict deployment pool` 这一整条链路，在正式预算下没有真正打通。
 
+## 八、Task 5 v3-A 结果补充
+
+在 v2 失败之后，我继续执行了 `Task 5 v3-A 2×2 可归因优化计划`。  
+v3-A 固定保留：
+
+- `strict_aligned_cvar`
+- `ppo_cost_surrogate`
+- `cons_risk_penalty_coef = 0.5`
+
+只做两条轴的 2×2 主消融：
+
+- `operator`:
+  - `original`
+  - `adacs_dcs`
+- `failure protocol`:
+  - `max_consecutive_constraint_failures = 1`
+  - `max_consecutive_constraint_failures = 2`
+
+对应四组：
+
+- `A0`: `original + fail=1`
+- `A1`: `adacs_dcs + fail=1`
+- `A2`: `original + fail=2`
+- `A3`: `adacs_dcs + fail=2`
+
+### v3-A smoke 结论
+
+smoke 上四组结果完全一致：
+
+- `cons_attempted_children = 6`
+- `cons_successful_children = 6`
+- `cons_routed_children = 0`
+- `best_near_feasible_children = 1`
+
+这说明：
+
+> smoke 只能验证配置矩阵和新增 diagnostics 正常工作，  
+> 但它不足以区分 operator 与 failure protocol 的真实作用。
+
+### v3-A fair-budget `seed_0007` 结论
+
+到了正式 fair `seed_0007`，2×2 消融出现了清晰分离：
+
+- `A0`
+  - `cons_successful_children = 0`
+  - `cons_routed_children = 0`
+  - `best_near_feasible_children = 0`
+  - `failure_stage = constraint_margin_fail` 共 18 次
+- `A1`
+  - `cons_successful_children = 5`
+  - `cons_routed_children = 0`
+  - `best_near_feasible_children = 0`
+  - `failure_stage = route_rejected_after_save` 共 5 次
+- `A2`
+  - `cons_successful_children = 0`
+  - `cons_routed_children = 0`
+  - `best_near_feasible_children = 0`
+  - `failure_stage = constraint_margin_fail` 共 18 次
+- `A3`
+  - `cons_successful_children = 4`
+  - `cons_routed_children = 0`
+  - `best_near_feasible_children = 0`
+  - `failure_stage = route_rejected_after_save` 共 4 次
+
+### v3-A 正式归因
+
+因此，按 v3-A 的 2×2 判读规则：
+
+- `A1 > A0`
+- `A2 ≈ A0`
+- `A3` 没有明显优于 `A1`
+
+可以正式得出：
+
+> **operator 是当前 `A_cons` 的第一主瓶颈。**
+
+更具体地说：
+
+1. 只切换到 `adacs_dcs`，就能把 fair 中的 `cons_successful_children` 从 `0` 拉到 `5`。
+2. 只放宽 `max_consecutive_constraint_failures`，并不能单独恢复 successful child。
+3. 两者同时上也没有超过 `A1`，说明 failure protocol 不是当前第一决定因素。
+
+### v3-A 之后的新瓶颈
+
+v3-A 同时也告诉我们：
+
+- `A1` / `A3` 已经能生成 successful child
+- 但这些 child 全部被 route 到 `A_uc`
+- `best_near_feasible_children` 仍然是 `0`
+- `cons_routed_children` 仍然是 `0`
+
+所以当前主问题已经从：
+
+- “生成不出 conservative child”
+
+转移为：
+
+- “生成出的 child 仍然不满足 near / tight conservative semantics，因此进不了 `A_cons`”
+
+换句话说，v3-A 的最终结论不是“Task 5 已成功”，而是：
+
+> **v3-A 成功完成了归因，但没有完成 conservative route 恢复。**
+
+最重要的实质性收获是：
+
+> 下一步如果继续推进，不应再优先纠结 `failure protocol`，  
+> 而应把 `A1` 作为新的最强基线，转向分析 successful child 为什么全部在 route 后变成 `accepted_uc`，以及 near / tight feasibility 语义为什么仍然过不去。
+
+### A1 的 5 个 successful child：为什么都“只差一步”却还是没进 `A_cons`
+
+这里需要先澄清一个容易误读的点：
+
+- `extension_results` 里的 `feasible_flag / near_feasible_flag`
+  - 表示的是 **IPO 训练时的 constraint-margin 可行性**
+  - 它回答的是“这个 child 是否已经不再因为约束更新连续失败而中止”
+- `A_cons` route 真正使用的则是 archive strict semantics：
+  - `relative_cost_ok = True`
+  - `mean_violation <= 0.5`
+  - `final_critical_compromised_hosts <= 0.25`
+  - `high_disruption_action_rate <= 1.0`
+  - 满足这些条件后，才会得到 `best_near_feasible_flag = True` 或 `best_tight_feasible_flag = True`
+
+因此，A1 的 5 个 successful child 看起来都“只差一步”，更准确地说是：
+
+- 它们都已经跨过了 “生成失败 / 保存失败” 这一步
+- 但还没有跨过 “strict deployment semantics” 这一步
+
+也正因为如此，A1 中同时出现了下面这个表面矛盾、但其实合理的现象：
+
+- `cons_successful_children = 5`
+- `strict_candidate_count = 5`
+- `best_near_feasible_children = 0`
+- `cons_routed_children = 0`
+
+含义是：
+
+- 这 5 个 child 都是可保存、且语义字段齐全的 child
+- 但它们在 strict 语义下没有一个真正达到 near-feasible
+- 所以都没进 `A_cons`
+- 同时又因为它们都有足够的 `spread_gain`，最后全部被 `A_uc` 吸收
+
+#### 1. `stage2_ext_000_obj_0`
+
+- parent: `stage1_pref_001_ckpt_191`
+- `route_decision = accepted_uc`
+- `cons_reason = rejected_feasibility`
+- `relative_cost_ok = True`
+- `spread_gain = 20.22`
+- 训练侧 margin 语义上它已经是 successful child
+- 但 archive strict 语义下它仍同时卡在两条线：
+  - `mean_violation = 0.8824 > 0.5`
+  - `final_critical_compromised_hosts = 1.0 > 0.25`
+
+所以它离 `A_cons` 并不是“只差一个 route 开关”，而是：
+
+> 已经跨过保存门，但 conservative semantics 还差 violation 和 final-critical 两条线。
+
+#### 2. `stage2_ext_001_obj_1`
+
+- parent: `stage1_pref_001_ckpt_191`
+- `route_decision = accepted_uc`
+- `cons_reason = rejected_feasibility`
+- `relative_cost_ok = True`
+- `spread_gain = 28.43`
+- 它的 `final_critical` 曾短暂改善到 `0.9583`
+- 但最终记录仍然没有进入 near/tight：
+  - `mean_violation = 1.1768 > 0.5`
+  - `final_critical_compromised_hosts = 1.0 > 0.25`
+
+这说明它虽然在 operator 侧已经能产出“可保存”的 child，但这个 child 仍然明显不够保守。
+
+#### 3. `stage2_ext_002_obj_0`
+
+- parent: `stage1_pref_005_ckpt_191`
+- `route_decision = accepted_uc`
+- `cons_reason = rejected_feasibility`
+- `relative_cost_ok = True`
+- `spread_gain = 5.54`
+- 它是 5 个 successful child 里最接近 `A_uc` 下限的一个，但仍然足以被 `uc` 接纳
+- 它没有进 `A_cons` 的原因仍然是两条 near 语义都没过：
+  - `mean_violation = 0.8305 > 0.5`
+  - `final_critical_compromised_hosts = 1.0 > 0.25`
+
+因此它说明的不是 “route 偶然偏向了 `uc`”，而是：
+
+> 只要 conservative semantics 还不过线，而 `spread_gain` 又达到 `uc` 门槛，child 就会稳定流向 `A_uc`。
+
+#### 4. `stage2_ext_008_obj_1`
+
+- parent: `stage1_pref_001_ckpt_191`
+- `route_decision = accepted_uc`
+- `cons_reason = rejected_feasibility`
+- `relative_cost_ok = True`
+- `spread_gain = 6.96`
+- 这是第二轮里最接近 “one more push” 的一个：
+  - `mean_violation = 0.7998`
+  - `final_critical_compromised_hosts = 0.9583`
+- 但它仍然没有真正进入 near：
+  - `mean_violation` 仍高于 `0.5`
+  - `final_critical` 仍远高于 `0.25`
+
+所以它看起来“很像已经差不多了”，其实仍然同时差着 violation 和 final-critical 两条语义线。
+
+#### 5. `stage2_ext_009_obj_1`
+
+- parent: `stage1_pref_005_ckpt_000`
+- `route_decision = accepted_uc`
+- `cons_reason = rejected_feasibility`
+- `relative_cost_ok = True`
+- `spread_gain = 43.99`
+- 这是 5 个 child 里**唯一一个真的只差一步**的例子：
+  - `mean_violation = 0.0439 <= 0.5`
+  - `high_disruption_action_rate = 0.8942 <= 1.0`
+  - `relative_cost_ok = True`
+  - 但 `final_critical_compromised_hosts = 1.0 > 0.25`
+
+也就是说，它离 `A_cons` 的最后阻塞项已经不再是 margin、也不再是 cost，而是：
+
+> **关键资产最终失陷风险根本没有压下来。**
+
+这也是为什么它虽然在表面上最像“almost there”，最终还是只能被 route 到 `A_uc`。
+
+### 这个拆解告诉我们的精确结论
+
+如果把 A1 的 5 个 successful child 全部拆开，最准确的说法不是：
+
+> “这 5 个 child 都只差同一小步，route 稍微放宽就能进 `A_cons`。”
+
+而是：
+
+- 从 pipeline 阶段上看，它们确实都只差最后的 route 这一步
+- 但从 strict semantics 上看，并不是 5 个都只差一条 conservative 条件
+- 其中：
+  - 4 个 child 仍然同时差 `mean_violation` 和 `final_critical`
+  - 只有 `stage2_ext_009_obj_1` 真正只差 `final_critical` 这一条
+
+因此，A1 的真正信息是：
+
+> `adacs_dcs` 已经把 conservative branch 从“完全生成不出 child”推进到了“能生成并保存 child”，  
+> 但这些 child 大多仍然停留在 margin-feasible / uc-useful，  
+> 还没有进入 strict-deployable / cons-acceptable。
+
+这意味着下一步最值得检查的，不是继续单独放宽 failure protocol，而是：
+
+- 为什么 operator 生成出的 child 在 `final_critical` 上几乎都还停在 `0.9583 ~ 1.0`
+- 为什么一旦 child 有 `spread_gain >= 5.0`，它就会稳定被 `A_uc` 吸走
+- 是否需要把 `A_cons` 的 near/tight 语义与训练目标再做一次更直接的对齐
+
 因此，后续若继续推进 `mainline A`，不应再只做 penalty 形式上的局部增强，而应优先审视：
 
 - conservative operator 本身是否足够产生可部署 child

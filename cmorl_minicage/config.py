@@ -136,6 +136,50 @@ class Stage2Config:
     eval: EvalConfig = field(default_factory=EvalConfig)
     selection: SelectionConfig = field(default_factory=SelectionConfig)
     ipo: IPOHyperConfig = field(default_factory=IPOHyperConfig)
+    archive_mode: str = "single"
+    num_cons_parents: int = 3
+    num_uc_parents: int = 3
+    route_mode: str = "exclusive"
+    cons_operator_mode: str = "original"
+    uc_operator_mode: str = "adacs_dcs"
+    cons_risk_mode: str = "none"
+    cvar_alpha: float = 0.25
+    cvar_metric: str = "final_critical_compromised_hosts"
+    cvar_penalty_coef: float = 0.25
+    cvar_metric_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "final_critical_compromised_hosts": 1.0,
+            "mean_violation": 1.0,
+            "high_disruption_excess": 0.5,
+        }
+    )
+    cons_risk_objective_mode: str = "none"
+    cons_risk_penalty_coef: float = 0.5
+    cons_thresholds: dict[str, float] = field(
+        default_factory=lambda: {
+            "violation": 0.5,
+            "high_disruption": 1.0,
+            "cost_margin": 0.0,
+            "cost_delta_tolerance": 3.0,
+            "final_critical_near": 0.25,
+        }
+    )
+    uc_thresholds: dict[str, float] = field(
+        default_factory=lambda: {
+            "delta_eu": 0.001,
+            "delta_coverage": 0.01,
+            "novelty": 5.0,
+            "spread_gain": 5.0,
+        }
+    )
+    selector_mode_default: str = "strict"
+    selector_penalty_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "violation": 1.0,
+            "high_disruption": 1.0,
+            "final_critical": 1.0,
+        }
+    )
 
 
 @dataclass
@@ -143,6 +187,16 @@ class EvaluateConfig:
     buffer_path: str = ""
     output_path: str = ""
     preference_step: float | None = None
+    selector_mode: str = "union"
+    archive_source: str = "union"
+    strict_require_tight: bool = False
+    hybrid_penalty_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "mean_violation": 1.0,
+            "high_disruption_rate": 1.0,
+            "final_critical_compromised": 1.0,
+        }
+    )
     reference_strategy: str = "data_min_margin"
     reference_margin: float = 1.0
     reference_point: list[float] = field(default_factory=list)

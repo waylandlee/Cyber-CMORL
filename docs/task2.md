@@ -1,575 +1,375 @@
-## 一、先说最重要的结论
+## AdaCS-DCS-CMORL 升格为主贡献后的任务调整
 
-你要做的表格结构我建议调整成下面这样：
+### 当前策略决策（主贡献版本）
 
-### 主表 A：Pareto / utility
-
-- **Ours (Stage-2 / current best method)**
-- **Weighted-Sum**
-- **Preference-Conditioned PPO**
-- **PCN**
-
-### 主表 B：约束处理
-
-- **Ours (从 Pareto set 中取满足约束且主目标最优的策略)**
-- **Lagrangian-PPO**
-
-### 补充实验
-
-- **No Pareto Extension** = `stage1-only`（这个其实已经有了）
-- **No Constraint** = 需要新增
-- **Single-Objective**（我建议补上，已经有现成入口，几乎零成本）
-- **Multiseed stability**（至少 3 seeds，最好 5 seeds）
-
-这里最关键的是：你仓库里当前 baseline 入口只正式支持 `sleep / random-valid / stage1-only / single-objective / weighted-sum`，其中 `weighted-sum` 和 `stage1-only` 已经能直接复用；但 **Preference-Conditioned PPO、PCN、Lagrangian-PPO 目前都没有现成训练入口**。同时，当前 `ActorCritic` 完全不接收 preference 输入，所以 **Preference-Conditioned PPO 不是调个配置就能跑**，必须新增条件化模型和训练脚本。
-
----
-
-## 二、你仓库当前“已经有”的东西
-
-### 1. 你的方法主线已经完整
-
-仓库 README 和项目文档都说明了，当前 `cmorl_minicage` 已经具备：
-
-- MiniCAGE 多目标包装
-- Stage-1 Pareto initialization
-- Stage-2 IPO-style extension
-- SMP assignment
-- HV / EU / SP evaluation
-- YAML 驱动配置
-- 统一 buffer / summary / metrics 输出  
-    而 formal 主线目前推荐配置就是 `stage1_c2.yaml + stage2_c2.yaml + evaluate.yaml`。
-
-### 2. Weighted-Sum 已经有现成实现
-
-`baselines.py` 里的 `run_weighted_sum_baseline()` 已经存在，而且它本质上是复用 `train_stage1()`，用一组显式固定 preference 训练一组独立 policy。当前默认 preference 是 5 组固定权重。
-
-### 3. “去掉 Pareto extension” 其实已经有
-
-你补充实验里写的 “去掉 Pareto extension”，在当前仓库里其实就是 `stage1-only`。`baselines.py` 已经有 `run_stage1_only_baseline()`；项目文档里也把 `stage1-only` 作为当前正式 baseline suite 的一部分。
-
-### 4. 你已经有 multiseed 验证框架
-
-`multiseed.py` 已经可以批量跑 `Stage-1 -> Stage-2`，然后在**共享 reference point** 下汇总稳定性指标。这个脚本非常重要，因为你后面做主表时，不应该只给单 seed 结果。
+- `In Progress` 当前论文主算法从“cyber-defense-oriented constrained MORL framework”升级为：
+  - **AdaCS-DCS-CMORL**
+  - 全称：Adaptive Candidate Selection and Dynamic Constraint Scheduling for Constrained MORL in Autonomous Cyber Defense
+- `In Progress` 当前论文不再只强调“将两阶段 C-MORL 迁移到 CybORG”，而是明确主张：
+  - 在原始两阶段 C-MORL 的基础上，
+  - 提出新的 `Stage-2` 机制：
+    - `AdaCS`：Adaptive Candidate Selection
+    - `DCS`：Dynamic Constraint Scheduling
+  - 并证明二者在正式 CybORG 自主防御场景中提升：
+    - Pareto candidate set quality
+    - preference coverage
+    - strict-constraint feasible set quality
+    - deployment-oriented utility
+- `In Progress` 当前正式主线必须从“原始 ours_stage2”切换为“**AdaCS-DCS-CMORL vs 原始 C-MORL Stage-2**”。
+- `Planned` 论文中“新算法”表述仅在以下条件满足后启用：
+  - 正式 `cmorl_cyborg` 线完成一致口径重跑
+  - 关键消融能证明 AdaCS 和 DCS 各自的独立贡献
+  - 多 seed 下趋势稳定
+  - tight / loose 约束设定下有一致结论或清晰 trade-off
+- `Planned` 若上述条件任一未满足，则回退为：
+  - “AdaCS-DCS-CMORL is a promising algorithmic enhancement”
+  - 而非“我们提出新的主算法”
 
 ---
 
-## 三、你仓库当前“还没有”的东西
+### 为什么必须这样调整
 
-### 1. 没有 Preference-Conditioned PPO
-
-当前 `ActorCritic` 的输入只有 `obs`，没有 `preference`；actor 输出离散动作分布，critic 输出向量 value。也就是说，它只支持“固定 preference 训练多个 policy”的 Stage-1，不支持“一个 policy 接收 preference 条件输入”。
-
-### 2. 没有 PCN 的数据与训练链路
-
-当前仓库没有轨迹归档、目标 return 条件输入、PCN-style command training 这条线。你现在有的是在线 PPO 和 Stage-2 extension，不是 PCN 需要的 command-conditioned imitation / archive pipeline。这个是你计划里最难的一块。
-
-### 3. 没有 Lagrangian-PPO
-
-虽然你的论文主方法和上传的 C-MORL 论文都涉及 constrained optimization / Lagrangian 思路，但仓库里当前并没有独立的 Lagrangian baseline 训练入口；`TASKS.md` 也把 CPO 分支列为未来工作。
-
-### 4. 当前 `evaluate.py` 不适合直接评估单策略条件基线
-
-`evaluate.py` 的逻辑是：  
-读一个 `solution_buffer.json`，从中拿一组策略，做 Pareto filtering，再通过 `assign_policy()` 在 Pareto set 上做 SMP 分配并算 EU。这个逻辑天然适合 **multi-policy** 方法。
-
-但你上传的 C-MORL 论文明确区分了两类评估方式：
-
-- **multi-policy**：直接用 Pareto set 算 HV/SP
-- **single preference-conditioned policy**：先在 evaluation preference grid 上逐个跑，再从这些结果里提 non-dominated solutions 去算 HV/SP。
-
-所以，**Preference-Conditioned PPO 和 PCN 不能直接拿当前 `evaluate.py` 生搬硬套**，必须加一个 `evaluate_conditioned.py`。
+- `Done` 原始 C-MORL 的主干已经包括：
+  - two-stage Pareto initialization + extension
+  - crowd-distance-based policy selection
+  - fixed-β constrained extension
+  - policy assignment
+- `Done` 原始论文也已经对：
+  - `policy selection`（crowd vs random）
+  - `β` 参数
+  做过分析，因此如果要把 AdaCS / DCS 抬成主贡献，本轮必须围绕这两处做“**相对原始方法的增量证明**”，而不能只展示最终结果更好。:contentReference[oaicite:2]{index=2} :contentReference[oaicite:3]{index=3}
 
 ---
 
-## 四、我建议 Codex 先锁死的“统一实验协议”
+### P0 最高优先级：把 AdaCS-DCS-CMORL 变成正式主算法
 
-这个部分最重要。你让 Codex 做实验，第一件事不是写算法，而是**冻结 protocol**。
+#### A-001 统一命名与对外口径
 
-### 1. 统一环境与 reward 口径
+- `Planned` 在以下位置统一使用：
+  - `AdaCS-DCS-CMORL`
+  - 中文可写为：自适应候选选择与动态约束调度的受限多目标强化学习算法
+- `Planned` 更新：
+  - `README.md`
+  - `docs/PROJECT_BRIEF.md`
+  - `docs/ARCHITECTURE.md`
+  - `paper/main.tex`
+- `Planned` 明确区分以下三者：
+  - `Original C-MORL-style Stage-2`
+  - `AdaCS-only`
+  - `DCS-only`
+  - `AdaCS-DCS full`
+- `验收标准`
+  - 文档和图表标题中不再混用 “ours_stage2 / upgraded stage2 / chase / adaptive / gentle”
+  - 正式主文可直接把 AdaCS-DCS-CMORL 当作方法名写入标题、摘要、贡献点
 
-所有方法统一使用当前 formal 主线的环境和 reward 定义：
+#### A-002 固化“原始 C-MORL-style Stage-2”作为算法基线
 
-- `red_policy: bline`
-- `num_envs: 8`
-- `remove_bugs: true`
-- `max_episode_steps: 100`
-- `obj_dim: 3`
-- reward 仍然是当前仓库正式采用的 `security / business / cost` 三目标  
-    不要改 env，不要改 reward，不要改 reference 策略。
-
-### 2. 主表 A 统一评估网格与 reference
-
-所有方法统一使用：
-
-- `preference_step: 0.1`
-- `reference_strategy: data_min_range`
-- `reference_margin: 0.25`
-- `hv_max_exact_points: 18`
-- `hv_mc_samples: 100000`  
-    这和你当前 formal `evaluate.yaml` 一致。
-
-### 3. 所有方法必须用**共享 reference point**
-
-不能每个方法各算各的 reference point。  
-你仓库当前 multiseed 里已经实现了 `_combine_reference_point()` 的思路，可以直接推广到“多方法共享 reference point”版本。
-
-### 4. 训练预算必须统一
-
-这是很多人最容易忽略的点。
-
-按你当前 formal 配置：
-
-- Stage-1：`num_policies=6`，每个 policy `total_timesteps=8192`  
-    所以 Stage-1 总预算 = `6 × 8192 = 49152`
-- Stage-2：`extension_rounds=2 × num_extension_policies=4 × obj_dim=3 × constrained_updates=2 × total_timesteps_per_update=1024`  
-    所以 Stage-2 总预算 = `2 × 4 × 3 × 2 × 1024 = 49152`
-
-于是 **Ours 总预算正好是 `98304` env steps**。  
-我建议你让 Codex 统一把：
-
-- Weighted-Sum
-- Preference-Conditioned PPO
-- PCN
-- Lagrangian-PPO
-
-都按 **98304 env steps** 来配预算。这样最公平。这个总预算推导来自当前 formal 配置和 `train_stage1.py / train_stage2.py` 的循环结构。
+- `Planned` 在正式 CybORG 线中单独固化一个对照版本：
+  - `crowding + fixed beta`
+- `Planned` 该版本在论文里承担“原始 C-MORL 风格 Stage-2”的角色
+- `Planned` 所有 AdaCS / DCS 实验与图表默认都要与该版本直接对比
+- `验收标准`
+  - `cmorl_cyborg` 中存在独立、可复现、命名清晰的 `original_stage2` 或等价目录
+  - 所有主消融都以同一 Stage-1 buffer、同一 evaluation protocol 为前提
 
 ---
 
-## 五、我建议 Codex 的实现顺序
+### P0 最高优先级：补齐“独立增益”主消融
 
-### Phase 0：先补“评估与对比骨架”，不要先写 PCN
+#### A-101 完成 2×2 核心消融矩阵（必须）
 
-这是最稳的顺序。
+- `Planned` 在正式 `cmorl_cyborg` 主线中固定以下四组核心消融：
+  1. `crowding + fixed beta`
+  2. `adaptive selection + fixed beta`
+  3. `crowding + dynamic beta`
+  4. `adaptive selection + dynamic beta`
+- `Planned` 这四组实验共享：
+  - 同一 Stage-1 source buffer
+  - 同一 seed 集
+  - 同一 evaluation config
+  - 同一 reference point / thresholds
+- `验收标准`
+  - 可以清楚回答：
+    - AdaCS 单独带来了什么
+    - DCS 单独带来了什么
+    - 二者组合是否超过单独使用
+  - 若无法回答，则不得在主文中写“新算法”
 
-先让 Codex做 4 个基础脚本：
+#### A-102 为 2×2 消融输出主指标与集合级指标
 
-1. `cmorl_minicage/evaluate_conditioned.py`  
-    用于 Preference-Conditioned PPO / PCN
-2. `cmorl_minicage/evaluate_constraints.py`  
-    用于表 B
-3. `cmorl_minicage/compare_suite.py`  
-    输入多个方法结果，计算共享 reference point，导出主表 A CSV/JSON
-4. `cmorl_minicage/configs/paper/`  
-    专门放 paper configs，不污染 formal 旧配置
+- `Planned` 对四组消融统一导出以下指标：
+  - `hypervolume`
+  - `expected_utility`
+  - `coverage_ratio`
+  - `unique_assigned_policies`
+  - `num_pareto_records`
+  - `tight_feasible_candidate_count`
+  - `tight_feasible_ratio`
+  - `best_feasible_security_return`
+- `Planned` 新增：
+  - `adacs_dcs_ablation_set_quality.csv`
+  - `adacs_dcs_ablation_deployment.csv`
+  - `adacs_dcs_ablation_tight_feasible.csv`
+- `验收标准`
+  - 主文至少有 1 张 AdaCS/DCS 核心消融表
+  - appendix 至少有 1 张更完整的 2×2 结果表
 
-原因是：  
-如果没有这 4 个骨架，就算 Preference-Conditioned PPO 训出来了，你也没法和现有 `solution_buffer.json` 体系公平合并。
+#### A-103 证明 AdaCS / DCS 不是“调参增益”
 
----
-
-## 六、每个方法，Codex 应该怎么实现
-
-## A. Ours
-
-这个最简单，直接复用当前 formal 主线：
-
-- `stage1_c2.yaml`
-- `stage2_c2.yaml`
-- `evaluate.yaml`
-
-然后额外做两个补充：
-
-- `stage1-only`
-- `no-constraint stage2`
-
-当前 formal 主线已经是仓库里的标准入口。
-
-### A1. No Pareto Extension
-
-直接复用已有 `stage1-only`。  
-不要重写。
-
-### A2. No Constraint
-
-建议 Codex这样做：
-
-新增配置项：
-
-- `stage2.extension_mode: constrained | unconstrained`
-
-然后在 `train_stage2.py` 中：
-
-- `unconstrained` 时仍保留：
-    - selection
-    - extension_rounds
-    - num_extension_policies
-    - objective-wise extension
-- 但关闭：
-    - IPO barrier bonus
-    - feasibility gate
-    - `constraint_tolerance` 判定
-
-也就是保留 Stage-2 的结构，但不施加约束。  
-这样才是真正“只去掉 constraints，别的都不动”的受控消融。  
-因为当前 `IPOTrainer` 里 barrier bonus 是明确存在的，`train_stage2.py` 里 feasibility gate 也是明确存在的。
+- `Planned` 为 `adaptive selection` 和 `dynamic beta` 各自增加“关闭开关后退化为原始版本”的明确实现与日志记录
+- `Planned` 对每个 run 保存：
+  - `selection_mode`
+  - `beta_mode`
+  - `score_weights`
+  - `beta_schedule_weights`
+  - `beta_min`
+  - `beta_max`
+- `Planned` 新增 sanity check：
+  - `adaptive selection` 关闭后，选择结果应与 `crowding` 一致
+  - `dynamic beta` 关闭后，调度结果应退化为固定 `beta`
+- `验收标准`
+  - 可以从日志和 summary 中复核“新机制已真正启用”
+  - 可以排除“只是换了别的默认参数”的质疑
 
 ---
 
-## B. Weighted-Sum
+### P0 最高优先级：把正式 CybORG 线变成 AdaCS / DCS 的主证据来源
 
-这个已经有，但我建议 Codex做两件小改动。
+#### A-201 正式 CybORG 主线重跑
 
-### B1. 别用默认 5 个权重，改成 paper 主表专用 preference 文件
+- `Planned` 将 AdaCS / DCS 的所有主结论迁移到 `cmorl_cyborg` 正式线验证
+- `Planned` 不再只依赖 `cmorl_minicage` 或探索性 `ablation_*` 目录作主证据
+- `Planned` 当前至少完成：
+  - `3-seed` 正式聚合
+  - 若资源允许，扩到 `5-seed`
+- `验收标准`
+  - AdaCS / DCS 的主表、主图、结论全部来自 `cmorl_cyborg`
+  - `cmorl_minicage` 只保留为历史探索和补充证据
 
-当前默认只有 5 个权重。
+#### A-202 tight / loose 双设定验证
 
-我建议增加：
+- `Planned` 对四组核心消融同时报告：
+  - `loose`
+  - `tight`
+- `Planned` 当前主文优先展示：
+  - `loose`：总体集合质量与 deployment utility
+  - `tight`：strict-constraint feasible set quality
+- `验收标准`
+  - 能清楚说明 AdaCS / DCS 在不同约束强度下的行为差异
+  - 如果 tight 下不是绝对最好，也能形成清晰 trade-off 解释
 
-- `configs/paper/preferences_main_table_a.yaml`
+#### A-203 多 seed 稳定性验证
 
-里面放 6 或 10 个显式偏好，比如：
-
-- [1.0, 0.0, 0.0]
-- [0.75, 0.25, 0.0]
-- [0.75, 0.0, 0.25]
-- [0.5, 0.5, 0.0]
-- [0.5, 0.25, 0.25]
-- [0.5, 0.0, 0.5]
-- [0.25, 0.75, 0.0]
-- [0.25, 0.5, 0.25]
-- [0.25, 0.25, 0.5]
-- [0.0, 0.5, 0.5]
-
-然后让 `baselines.py weighted-sum` 支持：
-
-- `--preferences-file`
-
-### B2. 预算要改成总预算 98304
-
-当前 `run_weighted_sum_baseline()` 本质是 `_run_learning_baseline()`，它复用 Stage-1 配置。
-
-所以让 Codex：
-
-- 根据权重数 `K`
-- 设置 `total_timesteps = 98304 / K`
-
-这样和 Ours 总预算一致。
+- `Planned` 如果 AdaCS / DCS 要抬成主贡献，则正式主结果不能只停留在 3-seed 观察
+- `Planned` 最少补以下方法到 5-seed：
+  - `AdaCS-DCS full`
+  - `crowding + fixed beta`
+  - `adaptive + fixed beta`
+  - `crowding + dynamic beta`
+- `验收标准`
+  - 可以在正文中写“trend remains stable across seeds”
+  - 如果某一子模块高度不稳定，则不能单独抬为核心 claim
 
 ---
 
-## C. Preference-Conditioned PPO
+### P0 最高优先级：补“机制真的起作用”的中间证据
 
-这是你最应该优先补的主基线。
+#### A-301 新增 selection-level diagnostics
 
-### C1. 新文件
+- `Planned` 对每轮 selection 输出：
+  - `selected_policy_ids`
+  - `selected_policy_scores`
+  - `selected_policy_components`
+  - `selection_rank`
+  - `extreme_kept`
+- `Planned` 比较 `crowding` 与 `adaptive` 时，重点看：
+  - 是否真的选出不同父策略
+  - `coverage_gain` / `low_risk` / `expansion_potential` 是否影响了最终入选顺序
+- `Planned` 新增图：
+  - `selection_score_breakdown.png`
+  - `selected_policy_components_by_round.png`
+- `验收标准`
+  - 可以回答“为什么 AdaCS 会比 crowding 更好”
+  - 不是只看到终点指标提升，却看不到选择机制本身的变化
 
-让 Codex新增：
+#### A-302 新增 beta-schedule diagnostics
 
-- `cmorl_minicage/models/preference_conditioned_actor_critic.py`
-- `cmorl_minicage/train_pref_conditioned_ppo.py`
-- `cmorl_minicage/configs/paper/pref_cond_ppo.yaml`
+- `Planned` 对每条扩展路径输出：
+  - `dynamic_beta`
+  - `beta_components`
+  - `base_reference_objectives`
+  - `candidate_margins`
+  - `constraint_gate_passed`
+- `Planned` 新增图：
+  - `dynamic_beta_by_round.png`
+  - `beta_vs_feasibility.png`
+  - `beta_vs_front_growth.png`
+- `验收标准`
+  - 可以回答“DCS 为什么比固定 beta 更合适”
+  - 能看到 beta 调度与 front growth / feasibility 的对应关系
 
-### C2. 模型最小设计
+#### A-303 新增 front-growth 过程证据
 
-最小可行版本：
-
-- 输入：`concat(obs, preference)`
-- actor：输出离散动作 logits
-- critic：输出**标量 value**（对当前 preference 的 scalarized utility）
-
-因为当前仓库是离散 actor，很适合直接扩展。当前 `ActorCritic` 结构也很简单，改成 conditional 版本不难。
-
-### C3. 训练规则
-
-最小稳妥实现：
-
-- 每个并行 env 在 reset 时采样一个训练 preference
-- 整个 episode 内该 preference 固定
-- 每步用 `r_scalar = w · r_vec`
-- 用 PPO 更新单个条件策略
-
-不要一开始就做“每步切换 preference”，太容易训崩。
-
-### C4. 评估规则
-
-不能走当前 `evaluate.py`。  
-要走新写的 `evaluate_conditioned.py`：
-
-- 用 evaluation simplex grid 跑全套 preference
-- 每个 preference 评估出一个 objective vector
-- 收集所有点
-- 对这些点评估：
-    - nondominated filter
-    - HV
-    - SP
-    - EU = 直接对每个 preference 的 utility 取平均
-
-这正是你上传的 C-MORL 论文对 single preference-conditioned 方法的评估方式。
-
----
-
-## D. PCN
-
-这是整个计划里**最难的一项**。我的建议是：  
-**让 Codex 最后实现。**
-
-### D1. 新文件
-
-- `cmorl_minicage/train_pcn.py`
-- `cmorl_minicage/models/pcn_policy.py`
-- `cmorl_minicage/datasets/trajectory_archive.py`
-- `cmorl_minicage/configs/paper/pcn.yaml`
-
-### D2. 最小可行版本
-
-不要上来就追完整论文细节。  
-先做一个 repo-compatible 的 **PCN-lite**：
-
-1. 收集 trajectory archive  
-    来源可以先用：
-    - weighted-sum run
-    - stage1-only run
-    - random-valid rollout
-2. 每条 transition 存：
-    - obs
-    - action
-    - return-to-go vector
-    - remaining horizon
-3. 模型输入：
-    - obs
-    - desired return vector
-    - desired horizon
-4. 输出：
-    - action logits
-5. 训练：
-    - 行为克隆 / 监督学习
-
-### D3. 评估
-
-和 Preference-Conditioned PPO 一样：
-
-- 对 evaluation preference grid 逐个跑
-- 得到 objective vectors
-- nondominated filter
-- 算 HV/EU/SP
-
-### D4. 我对 PCN 的建议
-
-如果 Codex第一轮做不稳，不要让它拖主实验进度。  
-先把：
-
-- Ours
-- Weighted-Sum
-- Preference-Conditioned PPO
-- Lagrangian-PPO
-- 两个补充实验
-
-全部跑通，再补 PCN。
+- `Planned` 对四组主消融记录：
+  - `pareto_size_after_round`
+  - `hv_after_round`
+  - `eu_after_round`
+  - `coverage_ratio_after_round`
+  - `tight_feasible_count_after_round`
+- `Planned` 新增图：
+  - `front_growth_by_round.png`
+  - `hv_eu_by_round.png`
+- `验收标准`
+  - 能证明 AdaCS / DCS 是“更快、更稳、更有方向地扩展 front”
+  - 而不是终点偶然更优
 
 ---
 
-## E. Lagrangian-PPO
+### P1 次高优先级：补参数鲁棒性与交互效应分析
 
-这是主表 B 的核心。
+#### A-401 AdaCS 权重鲁棒性实验
 
-### E1. 新文件
+- `Planned` 固定 DCS，系统比较 AdaCS score 权重组合：
+  - `coverage-heavy`
+  - `risk-heavy`
+  - `balanced`
+- `Planned` 目标不是穷举，而是证明 AdaCS 的有效性不依赖单点魔法权重
+- `验收标准`
+  - 至少 3 组权重配置下趋势一致
+  - 可以说明正式主配置不是偶然挑出来的
 
-- `cmorl_minicage/train_lagrangian_ppo.py`
-- `cmorl_minicage/configs/paper/lagrangian_ppo.yaml`
-- `cmorl_minicage/evaluate_constraints.py`
+#### A-402 DCS 范围与调度权重鲁棒性实验
 
-### E2. 推荐的 constrained problem
+- `Planned` 固定 AdaCS，系统比较：
+  - `beta_min / beta_max`
+  - `round-progress weight`
+  - `risk weight`
+  - `expansion weight`
+- `Planned` 目标是说明动态调度优于固定 beta 不是建立在脆弱的 schedule 上
+- `验收标准`
+  - 至少证明 1 个较宽区间内保持优于 fixed beta
+  - 若非常敏感，则主文只写“promising enhancement”，不写“robust new algorithm”
 
-我建议表 B 不做“偏好网格”，而是固定一个部署约束问题：
+#### A-403 与 Stage-1 density 的交互实验
 
-- **主目标**：maximize `security`
-- **约束**：
-    - `business >= d_business`
-    - `cost >= d_cost`
-
-### E3. 阈值怎么定
-
-最稳妥做法：
-
-- 用 `stage1-only` 的 Pareto front
-- 取其中 `business` 和 `cost` 的 **25% 分位点**作为阈值  
-    即：
-- `d_business = q25(stage1_pareto.business)`
-- `d_cost = q25(stage1_pareto.cost)`
-
-这样阈值不是拍脑袋定的，也不会直接看 stage2 最优结果，比较公平。
-
-### E4. Lagrangian 更新最小实现
-
-用你当前向量 critic 架构就能做：
-
-- actor objective:
-    
-    Asec+λbAbusiness+λcAcostA_{sec} + \lambda_b A_{business} + \lambda_c A_{cost}Asec​+λb​Abusiness​+λc​Acost​
-    
-    因为你的约束形式是“business/cost 越大越好，且要超过下界”
-    
-- dual update:
-    
-    λi←max⁡(0,λi+α(di−Gi))\lambda_i \leftarrow \max(0, \lambda_i + \alpha(d_i - G_i))λi​←max(0,λi​+α(di​−Gi​))
-
-也就是说，business/cost 低于阈值时，乘子增大。
-
-### E5. 表 B 的评估方式
-
-表 B 不看 HV。  
-看：
-
-- `security return`
-- `business return`
-- `cost return`
-- `mean constraint violation`
-- `feasible rate`
-- `critical_impact_count`
-- `high_disruption_action_rate`
-
-对于你的方法，不是重新训练单个 constrained policy，而是：
-
-**从最终 Pareto set 中选出满足约束且 security 最高的那个 policy**，然后和 Lagrangian-PPO 对比。
-
-这样是合理的，因为你的方法本来就是“先学 Pareto set，再 assignment / selection”。
+- `Planned` 比较：
+  - 稀疏 Stage-1 front
+  - dense / candidate-rich Stage-1 front
+- `Planned` 目标是回答：
+  - AdaCS / DCS 的收益是否依赖“足够厚”的初始 Pareto front
+- `验收标准`
+  - 正文可说明新算法适用前提
+  - 避免被审稿人质疑“只有在特殊 buffer 上才成立”
 
 ---
 
-## 七、我建议 Codex 新增的脚本与配置
+### P1 次高优先级：补主会级安全叙事需要的额外结果
 
-### 新增脚本
+#### A-501 增加 strict-constraint deployment 价值主图
 
-- `train_pref_conditioned_ppo.py`
-- `train_pcn.py`
-- `train_lagrangian_ppo.py`
-- `evaluate_conditioned.py`
-- `evaluate_constraints.py`
-- `compare_suite.py`
-- `export_tables.py`
+- `Planned` 若 AdaCS / DCS 升为主贡献，则主文必须展示其对“strict constraints 下可部署候选集”的提升
+- `Planned` 核心指标：
+  - `tight_feasible_candidate_count`
+  - `tight_feasible_ratio`
+  - `best_feasible_security_return`
+- `验收标准`
+  - 该图进入主文，而非只在 appendix
+  - 可以将 AdaCS / DCS 的改进与“安全部署价值”直接绑定
 
-### 新增配置目录
+#### A-502 增加 preference coverage 主图
 
-- `cmorl_minicage/configs/paper/`
+- `Planned` 当前主文应把 AdaCS / DCS 的一个主价值写成：
+  - 更好的 preference-conditioned assignment flexibility
+- `Planned` 必须导出：
+  - per-preference utility
+  - assigned policy diversity
+  - feasible preference ratio
+- `验收标准`
+  - 主文中有至少 1 张 preference coverage 图
+  - 这张图能说明 AdaCS / DCS 不只是提高终点 reward，而是提高集合可选性
 
-建议至少包括：
+#### A-503 增加运行代价 / 计算开销报告
 
-- `stage1_main.yaml`
-- `stage2_main.yaml`
-- `stage2_no_constraint.yaml`
-- `weighted_sum_main.yaml`
-- `pref_cond_ppo.yaml`
-- `pcn.yaml`
-- `lagrangian_ppo.yaml`
-- `evaluate_main_table_a.yaml`
-- `evaluate_main_table_b.yaml`
-- `preferences_main_table_a.yaml`
-
-### 新增输出目录
-
-- `outputs/paper_table_a/`
-- `outputs/paper_table_b/`
-- `outputs/paper_appendix/`
-
----
-
-## 八、建议的运行顺序
-
-### Step 1：先跑当前主方法与已有 baseline
-
-1. Ours Stage-1
-2. Ours Stage-2
-3. stage1-only
-4. weighted-sum
-5. single-objective
-
-这一步你仓库已经基本支持。
-
-### Step 2：补 evaluator
-
-1. `evaluate_conditioned.py`
-2. `compare_suite.py`
-3. `evaluate_constraints.py`
-
-### Step 3：补新的 baseline
-
-1. Preference-Conditioned PPO
-2. Lagrangian-PPO
-3. PCN
-
-### Step 4：跑 smoke
-
-每个新 baseline 先做 smoke：
-
-- 2 seeds 以内
-- 少量 timesteps
-- 检查输出 JSON 和 plot 是否兼容
-
-### Step 5：跑 formal
-
-主表 A：
-
-- 5 seeds，统一 reference point
-
-主表 B：
-
-- 5 seeds，统一 thresholds
-
-### Step 6：导出表与图
-
-至少输出：
-
-- `table_a_metrics.csv`
-- `table_b_constraints.csv`
-- `main_table_a_pairwise.png`
-- `main_table_b_bar.png`
-- `appendix_ablations.csv`
+- `Planned` 由于原始 C-MORL 本身已经强调 selection 和 extension 的效率与复杂度，本轮若提出 AdaCS / DCS，需报告新增计算开销
+- `Planned` 最少报告：
+  - wall-clock time
+  - per-round selection overhead
+  - per-run total extension overhead
+- `验收标准`
+  - 能说明 AdaCS / DCS 的增益不是以不可接受的额外代价换来的
+  - 若代价上升明显，也要给出 trade-off 说明
 
 ---
 
-## 九、结果怎么分析
+### P1 次高优先级：同步论文结构和贡献点
 
-## 表 A：Pareto / utility
+#### A-601 更新标题、摘要、贡献点（AdaCS / DCS 主贡献版）
 
-你最应该关注：
+- `Planned` 若主实验成立，论文标题改写为显式包含方法名或机制名的版本，例如：
+  - `AdaCS-DCS-CMORL for Deployment-Aware Autonomous Cyber Defense`
+  - 或保守一点：
+    - `Adaptive Candidate Selection and Dynamic Constraint Scheduling for Constrained Multi-Objective Autonomous Cyber Defense`
+- `Planned` 摘要中必须明确 3 件事：
+  - 原始 C-MORL 风格 Stage-2 的局限
+  - AdaCS / DCS 分别解决什么问题
+  - 在 CybORG 中带来什么集合级与部署级收益
+- `验收标准`
+  - 摘要、方法节、实验节的主张全部围绕 AdaCS / DCS 展开
+  - 不再把“迁移到 CybORG”写成第一创新点
 
-### 1. HV
+#### A-602 更新贡献点排序
 
-如果 Ours 最高，说明你在 MiniCAGE 上确实更会发现前沿。  
-这是你最核心的 claim。
-
-### 2. EU
-
-如果 Preference-Conditioned PPO 的 EU 不差，但 HV 明显低于 Ours，说明：
-
-- 单策略条件方法能“适应偏好”
-- 但不能很好覆盖 Pareto front
-
-### 3. SP
-
-如果 Ours HV 高，但 SP 不最好，也正常。  
-你上传的 C-MORL 论文里就明确提到：某些方法 SP 看起来低，可能只是因为它只找到一小块相似点，而不是 front 真更好。
-
-### 4. assignment summary
-
-你当前 `evaluate.py` 已经会输出：
-
-- `coverage_ratio`
-- `unique_assigned_policies`
-- `mean_assigned_utility`  
-    这些都应该进入表 A 的补充说明。
+- `Planned` 当 AdaCS / DCS 升格后，贡献点排序改为：
+  1. 提出 AdaCS-DCS-CMORL，作为原始两阶段 constrained MORL 的新算法变体
+  2. 将该算法落地到 autonomous cyber defense / CybORG
+  3. 提出 deployment-aware set-value + deployment-value 评估协议
+  4. 通过正式 CybORG 结果验证其在 preference coverage 与 strict-constraint feasible-set quality 上的收益
+- `验收标准`
+  - 贡献点不再以“迁移 / operationalize”为首
+  - 主文逻辑先算法，后场景，最后评估
 
 ---
 
-## 表 B：约束处理
+### 当前不做
 
-你最应该关注：
+- `Planned` 若 AdaCS / DCS 升格为主贡献，则不再把“只做迁移”作为主卖点
+- `Planned` 暂不再引入新的更大算法分支（如额外 CPO 完整重构），避免分散主贡献
+- `Planned` 暂不同时把论文扩成完整红蓝双学习体 / 对抗博弈主线
+- `原因`
+  - 本轮需要把 novelty 牢牢集中在 `Stage-2` 的算法升级上
+  - 过多新分支会削弱 AdaCS / DCS 的可解释性和可防守性
 
-### 1. feasible rate
+---
 
-Lagrangian-PPO 如果 feasible rate 高，但 security 很低，说明太保守。
+### 建议 Codex 的实现顺序（AdaCS / DCS 主贡献版）
 
-### 2. mean violation
+1. `A-001 ~ A-002`
+   - 统一命名与固化原始 Stage-2 对照版本
+2. `A-101 ~ A-103`
+   - 跑 2×2 核心消融并确保可复现
+3. `A-201 ~ A-203`
+   - 在正式 `cmorl_cyborg` 线完成 3-seed / 5-seed 验证
+4. `A-301 ~ A-303`
+   - 增加 selection / beta / front-growth 诊断输出
+5. `A-401 ~ A-403`
+   - 做最小参数鲁棒性与 Stage-1 density 交互验证
+6. `A-501 ~ A-503`
+   - 生成主文级 preference coverage / tight-feasible / runtime 图
+7. `A-601 ~ A-602`
+   - 同步改写标题、摘要、贡献点与方法节
+8. 再回到 `paper/main.tex`
+   - 以 AdaCS-DCS-CMORL 为主算法完成初稿
 
-如果 violation 低但 utility 全线差，说明约束压得太死。
+---
 
-### 3. security vs semantic metrics
+### 本轮完成标志（AdaCS / DCS 主贡献版）
 
-特别看：
-
-- `critical_impact_count`
-- `high_disruption_action_rate`
-- `final_critical_compromised_hosts`  
-    这些是你 cyber 论文最有说服力的结果层语义指标。当前仓库已经有这些指标。
+- `Done` AdaCS / DCS 在正式 `cmorl_cyborg` 线完成统一口径验证
+- `Done` 2×2 核心消融能清楚证明二者独立贡献
+- `Done` 多 seed 与 tight / loose 结果足以支撑主文 claim
+- `Done` 有 selection / beta / front-growth 的机制性证据
+- `Done` 主文标题、摘要、贡献点已切换到 AdaCS-DCS-CMORL 主算法版本
+- `Done` 可以合理使用：
+  - “we propose AdaCS-DCS-CMORL”
+  - “a new algorithmic variant”
+  - “an adaptive-selection and dynamic-constraint-scheduling framework”

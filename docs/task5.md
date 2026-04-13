@@ -945,3 +945,405 @@ smoke 最低继续条件固定为至少满足一条：
     当前更深层的问题仍然是：
     - conservative branch 没有在正式预算下稳定地产出可路由 child
     - `A_cons` 的恢复瓶颈不只是 risk definition，还包括 operator / route / deployment semantic 的联动失配
+
+## Task 5 v3-A 2×2 消融计划：Operator vs Failure Protocol Attribution
+
+### 一、目标
+
+把本轮目标从“继续单点调风险公式”改成“可归因定位 `A_cons` 的主瓶颈”。
+
+固定不变项：
+
+- 保留 `strict_aligned_cvar`
+- 保留 `ppo_cost_surrogate`
+- 保留 `cons_risk_penalty_coef = 0.5`
+- 保留现有 strict / near / tight 语义
+- 保留现有 route 逻辑
+
+本轮不把 parent-pool 重建混进主实验；先拆清：
+
+- 是 `A_cons operator` 太弱
+- 还是 `failure protocol` 太硬
+- 还是两者共同卡住
+
+### 二、2×2 主消融矩阵
+
+固定四个 variant：
+
+- `A0`
+  - `cons_operator_mode = original`
+  - `max_consecutive_constraint_failures = 1`
+- `A1`
+  - `cons_operator_mode = adacs_dcs`
+  - `max_consecutive_constraint_failures = 1`
+- `A2`
+  - `cons_operator_mode = original`
+  - `max_consecutive_constraint_failures = 2`
+- `A3`
+  - `cons_operator_mode = adacs_dcs`
+  - `max_consecutive_constraint_failures = 2`
+
+固定执行顺序：
+
+1. 先完成 `pre-save failure diagnostics` 补强
+2. 再跑 `A0-A3` smoke
+3. smoke 通过后，再跑 `A0-A3` fair-budget `seed_0007`
+
+配置入口固定为：
+
+- smoke:
+  - `CybORG_plus_plus/cmorl_cyborg/configs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a0.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a1.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a2.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a3.yaml`
+- fair:
+  - `CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare_dual/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a0_fair_seed_0007.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare_dual/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a1_fair_seed_0007.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare_dual/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a2_fair_seed_0007.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare_dual/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a3_fair_seed_0007.yaml`
+
+### 三、pre-save failure diagnostics
+
+v3-A 要求即使 `generated_policy_id = None`，也必须把 `A_cons` 的失败信息落到 diagnostics。
+
+`round_diagnostics` / `stage2_summary` 里新增并固定保留：
+
+- `failure_stage`
+- `termination_reason`
+- `parent_id`
+- `objective_idx`
+- `parent_objectives`
+- `constraint_thresholds`
+- `last_constraint_margins`
+- `best_margin_seen`
+- `best_risk_seen`
+- `best_seen_semantics`
+- `best_min_margin_delta_vs_parent`
+- `best_final_critical_delta_vs_parent`
+- `best_mean_violation_delta_vs_parent`
+
+其中 `failure_stage` 采用以下固定标签：
+
+- `rollout_risk_too_high`
+- `constraint_margin_fail`
+- `no_best_feasible_checkpoint`
+- `route_rejected_after_save`
+
+并新增三层聚合指标：
+
+- `cons_successful_children`
+- `best_near_feasible_children`
+- `strict_candidate_count`
+
+以及三类进展计数：
+
+- `cons_margin_improved_attempts`
+- `cons_final_critical_improved_attempts`
+- `cons_mean_violation_improved_attempts`
+
+额外说明：
+
+- v3-A 同步修正了 Stage-2 child 保存时的约束元数据绑定方式：
+  `last_constraint_margins` / `constraint_thresholds` 现在绑定到“实际保存的 best feasible checkpoint”，避免被后续失败尝试污染。
+
+### 四、三层成功标准与决策门
+
+v3-A 不再只看一个成功指标，而是分三层：
+
+#### 1. 生成层
+
+主门：
+
+- fair `seed_0007` 中 `cons_successful_children > 0`
+
+#### 2. 接近部署层
+
+中间门：
+
+- `best_near_feasible_children > 0`
+
+定义：
+
+- 即使 child 最终没有保存、也没有路由，只要某条尝试在 `best_seen` 状态下已经满足现有 `near_feasible` 语义，就记为一次关键进展
+
+#### 3. 部署层
+
+最终门：
+
+- `strict_candidate_count > 0`
+
+归因判读规则固定为：
+
+- `A1 > A0` 且 `A2 ≈ A0`
+  - 主瓶颈是 operator
+- `A2 > A0` 且 `A1 ≈ A0`
+  - 主瓶颈是 termination protocol
+- `A3` 明显优于 `A1 / A2`
+  - 两者共同卡住
+- `A0-A3` 都没有生成层改善，但 `best_margin_seen` 普遍改善
+  - child 接近成功，下一步优先继续协议保留策略
+- `A0-A3` 都没有生成层改善，且 `best_margin_seen / best_risk_seen` 也没有改善
+  - 下一步转入 parent-pool 重建
+
+### 五、Parent Pool 后续门
+
+parent-pool 重建不并入 v3-A 主矩阵；只在 2×2 结论出来后决定是否进入下一轮。
+
+若触发下一轮，采用两层 parent pool：
+
+- `Tier 1 deployment-near`
+  - 优先低 `final_critical`
+  - 优先低 `mean_violation`
+  - 优先低 `high_disruption_action_rate`
+  - 优先最接近 `near_feasible` 的点
+- `Tier 2 frontier-side cons`
+  - 保留少量 conservative frontier 点，防止只在局部收缩
+
+默认预算分配：
+
+- `Tier 1 = 70%`
+- `Tier 2 = 30%`
+
+### Step T5-9: v3-A 范围冻结与三层成功标准
+- Status: done
+- Files changed:
+  - `task5.md`
+- Result:
+  - 将 v3-A 从“单点改进”升级为可归因的 2×2 主消融。
+  - 固定三层成功标准：
+    - 生成层：`cons_successful_children > 0`
+    - 接近部署层：`best_near_feasible_children > 0`
+    - 部署层：`strict_candidate_count > 0`
+  - 明确本轮不提前引入 parent-pool 重建，不改 route / strict gate。
+- Verification:
+  - 与 v2 fair 失败事实对齐：
+    - `cons_successful_children = 0`
+    - 说明当前主瓶颈发生在 route 之前
+- Notes:
+  - v3-A 的目标不是直接追求最优最终结果，而是先定位 `A_cons` 的主卡点。
+
+### Step T5-10: pre-save failure diagnostics 补强
+- Status: done
+- Files changed:
+  - `CybORG_plus_plus/cmorl_minicage/train_stage2.py`
+  - `task5.md`
+- Result:
+  - 在 `_run_stage2_extension_for_parent(...)` 中补齐了 pre-save 失败诊断。
+  - 即使 `generated_policy_id = None`，现在也会在 `round_diagnostics` / `stage2_summary` 中保留：
+    - `failure_stage`
+    - `termination_reason`
+    - `parent_id`
+    - `objective_idx`
+    - `constraint_thresholds`
+    - `last_constraint_margins`
+    - `best_margin_seen`
+    - `best_risk_seen`
+    - `best_seen_semantics`
+  - 同时新增训练侧聚合：
+    - `best_near_feasible_children`
+    - `strict_candidate_count`
+    - `cons_margin_improved_attempts`
+    - `cons_final_critical_improved_attempts`
+    - `cons_mean_violation_improved_attempts`
+  - 额外修正：
+    - 保存 child 时的约束元数据现在与“实际保存的 best feasible checkpoint”对齐，不再被最后一次失败尝试覆盖。
+- Verification:
+  - `py_compile` 通过。
+  - 新增 A0-A3 配置可被 `load_stage2_config(...)` 读取。
+- Notes:
+  - 本步不改变 route 规则，只增强训练侧可观察性并修正 saved-child 元数据一致性。
+
+### Step T5-11: A0-A3 配置模板冻结
+- Status: done
+- Files changed:
+  - `CybORG_plus_plus/cmorl_cyborg/configs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a0.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a1.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a2.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a3.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare_dual/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a0_fair_seed_0007.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare_dual/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a1_fair_seed_0007.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare_dual/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a2_fair_seed_0007.yaml`
+  - `CybORG_plus_plus/cmorl_cyborg/configs/paper/fair_compare_dual/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a3_fair_seed_0007.yaml`
+  - `task5.md`
+- Result:
+  - 为 smoke 与 fair `seed_0007` 同步冻结了 A0-A3 四组配置。
+  - 仅允许两类开关变化：
+    - `cons_operator_mode: original / adacs_dcs`
+    - `max_consecutive_constraint_failures: 1 / 2`
+  - 其余关键变量保持与 v2 对齐：
+    - `strict_aligned_cvar`
+    - `ppo_cost_surrogate`
+    - `cons_risk_penalty_coef = 0.5`
+- Verification:
+  - 配置文件已完成静态检查，字段与当前 `Stage2Config` 对齐。
+- Notes:
+  - `A0` 是 v2 的可复现实验对照，不复用旧输出目录，避免结果污染。
+
+### Step T5-12: 2×2 Smoke 消融
+- Status: done
+- Files changed:
+  - `task5.md`
+- Result:
+  - 已完成 `A0-A3` 四组 smoke：
+    - `A0`:
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a0/run_f84f844b/solution_buffer.json`
+    - `A1`:
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a1/run_8e6c35f6/solution_buffer.json`
+    - `A2`:
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a2/run_89f0acfb/solution_buffer.json`
+    - `A3`:
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/ablation/stage2_dual_archive_strict_aligned_cvar_cons_v3a_a3/run_8e7276c0/solution_buffer.json`
+  - 四组 smoke 的三层主指标完全一致：
+    - `cons_attempted_children = 6`
+    - `cons_successful_children = 6`
+    - `cons_routed_children = 0`
+    - `best_near_feasible_children = 1`
+    - `strict_candidate_count = 6`
+    - `cons_margin_improved_attempts = 6`
+    - `cons_final_critical_improved_attempts = 3`
+    - `cons_mean_violation_improved_attempts = 0`
+    - `cons_cvar_estimate_tail = 0.6875`
+    - `cons_risk_penalty_mean = 0.34375`
+  - 因此，smoke 上暂时没有出现可归因分离：
+    - 只换 operator 的 `A1`
+    - 只放宽 failure protocol 的 `A2`
+    - 两者同时上的 `A3`
+    都没有在主聚合指标上拉开与 `A0` 的差距。
+- Verification:
+  - 四组 run 的 `method_diagnostics.json` 和 `stage2_summary.json` 都已生成并完成抽查。
+  - 新增 `pre-save` 诊断字段已真实落盘，包括：
+    - `cons_pre_save_attempts[*].failure_stage`
+    - `cons_pre_save_attempts[*].termination_reason`
+    - `cons_pre_save_attempts[*].best_margin_seen`
+    - `cons_pre_save_attempts[*].best_risk_seen`
+    - `cons_pre_save_attempts[*].best_seen_semantics`
+  - 配置切换也已确认真实生效：
+    - `A1` / `A3` 的 `cons` 分支在训练诊断中显示为 `selection_mode = adaptive`、`beta_schedule_mode = dynamic`
+    - `A2` 仍是 `selection_mode = crowding`、`beta_schedule_mode = fixed`
+- Notes:
+  - smoke 已经足够说明：
+    - v3-A 的配置矩阵和诊断补强都能稳定运行
+    - 但 smoke 本身没有给出 operator / protocol 的分离证据
+  - 下一步必须进入 fair-budget `seed_0007`，才能判断这些改动是否只是在 smoke 中“过于容易”，还是确实在正式预算下也没有效果。
+
+### Step T5-13: 2×2 Fair-budget `seed_0007` 消融
+- Status: done
+- Files changed:
+  - `task5.md`
+- Result:
+  - 已完成 `A0-A3` fair-budget `seed_0007` 四组正式训练：
+    - `A0`:
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_v3a_a0_stage2_fair/seed_0007/run_b0595197/solution_buffer.json`
+    - `A1`:
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_v3a_a1_stage2_fair/seed_0007/run_8129ee9b/solution_buffer.json`
+    - `A2`:
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_v3a_a2_stage2_fair/seed_0007/run_80988795/solution_buffer.json`
+    - `A3`:
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_v3a_a3_stage2_fair/seed_0007/run_de44c781/solution_buffer.json`
+  - 四组 fair 主指标如下：
+    - `A0`:
+      - `cons_attempted_children = 18`
+      - `cons_successful_children = 0`
+      - `cons_routed_children = 0`
+      - `best_near_feasible_children = 0`
+      - `strict_candidate_count = 0`
+      - `cons_margin_improved_attempts = 5`
+      - `failure_stage_counts = {constraint_margin_fail: 18}`
+    - `A1`:
+      - `cons_attempted_children = 18`
+      - `cons_successful_children = 5`
+      - `cons_routed_children = 0`
+      - `best_near_feasible_children = 0`
+      - `strict_candidate_count = 5`
+      - `cons_margin_improved_attempts = 1`
+      - `failure_stage_counts = {route_rejected_after_save: 5, constraint_margin_fail: 13}`
+    - `A2`:
+      - `cons_attempted_children = 18`
+      - `cons_successful_children = 0`
+      - `cons_routed_children = 0`
+      - `best_near_feasible_children = 0`
+      - `strict_candidate_count = 0`
+      - `cons_margin_improved_attempts = 8`
+      - `failure_stage_counts = {constraint_margin_fail: 18}`
+    - `A3`:
+      - `cons_attempted_children = 18`
+      - `cons_successful_children = 4`
+      - `cons_routed_children = 0`
+      - `best_near_feasible_children = 0`
+      - `strict_candidate_count = 4`
+      - `cons_margin_improved_attempts = 1`
+      - `failure_stage_counts = {route_rejected_after_save: 4, constraint_margin_fail: 14}`
+  - 关键现象是：
+    - `A1` 相比 `A0` 首次把 `cons_successful_children` 从 `0` 拉到了 `5`
+    - `A2` 相比 `A0` 没有把 `cons_successful_children` 拉出 `0`
+    - `A3` 也能把 `cons_successful_children` 拉到非零，但没有超过 `A1`
+  - 这说明 fair 下真正带来结构性变化的是 `operator` 切换，而不是单独放宽 `failure protocol`。
+- Verification:
+  - 四组 `method_diagnostics.json` / `stage2_summary.json` 已完成抽查。
+  - `A1` / `A3` 中 `cons` 分支确认真实运行在：
+    - `selection_mode = adaptive`
+    - `beta_schedule_mode = dynamic`
+  - `A2` 仍运行在：
+    - `selection_mode = crowding`
+    - `beta_schedule_mode = fixed`
+- Notes:
+  - `A1` / `A3` 虽然把 `cons_successful_children` 拉到非零，但这些成功 child 全部都在 route 后进入 `A_uc`，没有一个进入 `A_cons`。
+  - 因此，fair 中真正被打通的是“pre-save child generation”这一步，而不是“strict / near-feasible conservative route”。
+
+### Step T5-14: 归因判读与下一阶段触发门
+- Status: done
+- Files changed:
+  - `results.md`
+  - `task5.md`
+- Result:
+  - 按 v3-A 的归因规则：
+    - `A1 > A0`
+    - `A2 ≈ A0`
+    - `A3` 没有明显优于 `A1`
+  - 因此，**`A_cons` 的主瓶颈被定位为 operator，而不是 failure protocol。**
+  - 更具体地说：
+    - `original -> adacs_dcs` 让 fair 中的 `cons_successful_children` 从 `0` 提升到 `5`
+    - 只把 `max_consecutive_constraint_failures: 1 -> 2` 并不能单独恢复 successful child
+    - `A3` 只达到 `4` 个 successful child，没有超过 `A1`
+  - 所以 v3-A 的正式归因结论是：
+    - **operator 是第一主瓶颈**
+    - **failure protocol 不是第一主瓶颈，也没有显示出独立足够强的增益**
+  - 同时，v3-A 也定位出了新的后续瓶颈：
+    - `A1` / `A3` 已经能生成 successful child
+    - 但它们全部在 route 后变成 `accepted_uc`
+    - `best_near_feasible_children` 仍然是 `0`
+    - `cons_routed_children` 仍然是 `0`
+  - 这说明下一阶段的主问题已经从“生成不出 child”转移为：
+    - **生成出的 child 仍然不满足 near/tight conservative semantics，因此 route / strict gate 前的语义对齐仍未完成。**
+- Verification:
+  - 判定依据来自：
+    - `A0` fair run：
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_v3a_a0_stage2_fair/seed_0007/run_b0595197/method_diagnostics.json`
+    - `A1` fair run：
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_v3a_a1_stage2_fair/seed_0007/run_8129ee9b/method_diagnostics.json`
+    - `A2` fair run：
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_v3a_a2_stage2_fair/seed_0007/run_80988795/method_diagnostics.json`
+    - `A3` fair run：
+      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_v3a_a3_stage2_fair/seed_0007/run_de44c781/method_diagnostics.json`
+- Notes:
+  - 这里的 `strict_candidate_count` 是 v3-A 训练诊断里的 “pre-route strict-candidate-eligible saved child” 计数，不等价于真正的 strict deployment hit。
+  - 因为在 `A1` / `A3` 中同时仍然成立：
+    - `best_near_feasible_children = 0`
+    - `cons_routed_children = 0`
+  - 对 `A1` fair run 的 5 个 successful child 逐条下钻后，可以把“为什么看起来只差一步却还没进 `A_cons`”说得更精确：
+    - 这 5 个 child 都已经跨过了 `constraint_margin_fail`，因此在训练侧属于 successful / savable child。
+    - 但 `extension_results` 里的 `feasible_flag / near_feasible_flag` 是 margin-based 语义，不等价于 archive route 使用的 strict semantics。
+    - 在 archive strict semantics 下，5 个 child 全部都是 `best_near_feasible_flag = False`，所以都会被 `cons_reason = rejected_feasibility` 挡回去。
+    - 其中 4 个 child 仍同时失败于：
+      - `mean_violation <= 0.5`
+      - `final_critical_compromised_hosts <= 0.25`
+    - 只有 `stage2_ext_009_obj_1` 真正只差一条：
+      - `mean_violation = 0.0439`
+      - `relative_cost_ok = True`
+      - `high_disruption_action_rate = 0.8942`
+      - 但 `final_critical_compromised_hosts = 1.0`
+    - 同时这 5 个 child 的 `spread_gain` 都达到或超过 `uc` 接纳门槛，因此最终稳定表现为 `route_decision = accepted_uc`。
+  - 因此，下一步不应继续优先放宽 failure protocol，而应把 `A1` 作为新的最强基线，转向检查：
+    - successful child 为什么全部变成 `accepted_uc`
+    - near / tight feasibility 语义为什么仍然过不去
+    - 是否需要针对 `A_cons` 的 post-save semantics / route 设计做下一轮对齐
