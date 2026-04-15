@@ -6,6 +6,20 @@
 - 当前优先级是把已有结果讲清楚、写完整、整理成可提交的论文与附录材料。
 - 如果后续真的恢复方法实验，默认从 `Task 5 / mainline A` 接续，而不是回到旧主线 B 重复补试。
 
+## 如果恢复实验（最新顺序）
+
+- `A1 + route_near` 仍然是这条线最后一个清晰可解释的恢复基线，不要再回退到 `A0/A2/A3` 或旧主线 B。
+- `semantic checkpoint` 只保留为 side finding：
+  - 它改善了 hybrid fallback 的 `final_critical`
+  - 但没有恢复 strict pool
+- `final_critical` 单轴增强 (`route_near_fc_w2`) 也已经验证：
+  - strict 仍为 `0`
+  - 没有触发继续跑 `fc_w4` 的条件
+- 因此默认策略已经更新为：
+  - **不再继续 Dual-Archive + CVaR 这条局部 reweighting 线**
+  - 将其作为 limitation 写入正文与 appendix
+- 只有当后续出现新的机制性改动方向，而不是继续调权重/阈值时，才重新打开这条实验线。
+
 ## P0 文档与论文
 
 - 补齐 `paper/main.tex` 的实验节文字：
@@ -37,6 +51,10 @@
   - 主文证据
   - appendix 证据
   - limitation / stress test
+- 补充最新 `Task 5 v3-A` 后续结果的统一口径：
+  - `route_near` 修复了 route，但没有恢复 strict
+  - `semantic checkpoint` 改善了 hybrid fallback 的 `final_critical`，但仍未形成 strict-deployable pool
+  - 最终 strict 判断应以正式评估的 `archive_diagnostics` / `metrics_strict` 为准，而不是训练期 diagnostics
 
 ## P1 项目文档同步
 

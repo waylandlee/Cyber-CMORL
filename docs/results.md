@@ -737,3 +737,216 @@ v3-A 同时也告诉我们：
 - conservative operator 本身是否足够产生可部署 child
 - 当前 route / feasibility protocol 是否仍然把本可用 child 挡在 `A_cons` 之外
 - strict deployment semantics 与训练目标之间是否仍然存在结构性错位
+
+## 九、Task 5 v3-A `route_near` / `semantic checkpoint` 补充
+
+在完成 v3-A 归因之后，我继续只围绕 `A1 = adacs_dcs + fail=1` 做了两步最小改动：
+
+1. 保留最终 `strict` 标准不动，但新增 `cons_route_near` 作为 route-only 条件，先修复 “一有 `spread_gain` 就被 `A_uc` 吸走” 的问题。
+2. 在此基础上，再加入 `semantic-aware checkpoint selection`，保存 `cons` child 时按 `tight > near > cons_route_near`，然后优先更低的 `final_critical`、更低的 `mean_violation`、更高的 margin。
+
+### `A1 + route_near`
+
+fair `seed_0007` 上，这一步首先修复的是 route，而不是 strict：
+
+- 训练侧：
+  - `cons_successful_children: 5 -> 6`
+  - `cons_routed_children: 0 -> 4`
+- 但正式评估侧：
+  - `archive_diagnostics.strict_candidate_count = 0`
+  - `metrics_strict.strict_hit_rate = 0.0`
+  - `metrics_hybrid.hybrid_fallback_rate = 1.0`
+
+同时，deployment 指标没有变得更 strict：
+
+- `hybrid.mean_violation: 7.0979 -> 7.0536`
+- `hybrid.final_critical_compromised_hosts: 0.5398 -> 0.5518`
+
+因此，这一步的正式结论是：
+
+> `route_near` 成功修复了 conservative child 的路由暴露问题，  
+> 但没有恢复 strict-deployable pool，  
+> 而且 deployment 侧的 `final_critical` 还略有恶化。
+
+### `A1 + route_near + semantic checkpoint`
+
+第二步继续保留 `route_near`，只改 checkpoint 保存逻辑。
+
+fair `seed_0007` 上得到：
+
+- 训练侧：
+  - `cons_successful_children = 4`
+  - `cons_routed_children = 4`
+- 正式评估侧仍然：
+  - `archive_diagnostics.strict_candidate_count = 0`
+  - `metrics_strict.strict_hit_rate = 0.0`
+  - `metrics_hybrid.hybrid_fallback_rate = 1.0`
+
+但这一步带来了一点有限的 deployment 改善：
+
+- `hybrid.final_critical_compromised_hosts: 0.5518 -> 0.5076`
+- `hybrid.mean_violation: 7.0536 -> 7.0389`
+
+代价是：
+
+- `hybrid.security_return: -469.49 -> -473.45`
+- `hybrid.high_disruption_action_rate: 0.9173 -> 0.9234`
+
+更关键的是，这一步仍然没有形成 strict 候选池：
+
+- `cons` 记录里的 `final_critical_compromised_hosts` 仍主要停在 `0.875 ~ 1.0`
+- `saved_final_critical_value_summary.mean = 1.0`
+- 所有新增 `cons` child 仍然只是 `route_near`，不是 `near/tight`
+
+因此，这一步的正式结论是：
+
+> `semantic checkpoint` 可以改善 hybrid fallback 的保守性，  
+> 但它仍然不能把 `cons` child 推进成 strict-deployable 候选。
+
+### 训练诊断口径与正式 strict 口径的区别
+
+这里还需要补一个新的口径澄清：
+
+- `stage2_summary.json` / `method_diagnostics.json` 里的若干计数，属于训练期或保存期 diagnostics
+- 最终是否真的形成 strict pool，应以正式评估阶段的 `archive_diagnostics.strict_candidate_count` 与 `metrics_strict.strict_hit_rate` 为准
+
+在当前两轮补实验中：
+
+- route 已经从 `0` 提升到非零
+- hybrid fallback 也出现了有限改善
+- 但正式 strict pool 仍然始终为 `0`
+
+所以当前最稳妥的总判断是：
+
+> v3-A 后续补实验已经证明，  
+> 第一瓶颈不再是 route，  
+> 而是 conservative child 的 `final_critical` 始终压不到 strict 门槛以下。
+
+### 当前最合理的下一步
+
+如果后续只允许继续做一个最小实验，当前最值得做的不是再调 route，而是：
+
+- 固定 `A1 + route_near` 作为恢复路由后的基线
+- 只做一个 `final_critical` 定向增强版本
+
+更具体地说，优先级应是：
+
+1. 直接加强 `final_critical_compromised_hosts` 在 conservative 训练/保存中的权重，而不是继续扩 route 规则。
+2. 不再重跑 `A0/A2/A3`，也不再扩 failure protocol 网格。
+3. 成功标准改成：
+   - `archive_diagnostics.strict_candidate_count > 0`，或
+   - `metrics_strict.selected_count > 0`
+4. 如果一到两个 `final_critical` 定向变体之后，strict 仍然是 `0`，就应停止方法扩实验，把它作为 limitation 写进正文和 appendix。
+
+## 十、Task 5 v3-A `final_critical` 定向增强（`B1 = route_near_fc_w2`）
+
+按照上一节的最小计划，我固定 `A1 + route_near` 为基线，只做了 1 个单轴增强版本：
+
+- `B1 = A1 + route_near + final_critical weight 2.0`
+
+也就是仅把：
+
+- `cvar_metric_weights.final_critical_compromised_hosts: 1.0 -> 2.0`
+
+其余条件全部保持不变：
+
+- `cons_operator_mode = adacs_dcs`
+- `route_near` 阈值不变
+- 不启用 `semantic checkpoint`
+- fair `seed_0007`
+
+### `B1` 训练/保存侧结果
+
+`B1` 的训练诊断结果为：
+
+- `cons_successful_children = 5`
+- `cons_routed_children = 2`
+- `cons_child_failed_by_final_critical = 1`
+- `saved_final_critical_value_summary.min = 0.9583`
+- `saved_final_critical_value_summary.mean = 0.9917`
+
+对比当前两个参考点：
+
+- 相对 `A1 + route_near`
+  - `cons_successful_children: 6 -> 5`
+  - `cons_routed_children: 4 -> 2`
+- 相对 `A1 + route_near + semantic checkpoint`
+  - `cons_successful_children: 4 -> 5`
+  - `cons_routed_children: 4 -> 2`
+
+这说明：
+
+> 单纯提高 `final_critical` 的 CVaR 权重，并没有把更多 child 稳定推到 `A_cons`；  
+> 相反，route 暴露数还下降了。
+
+### `B1` 正式评估结果
+
+正式评估阶段，`B1` 仍然没有恢复 strict：
+
+- `archive_diagnostics.strict_candidate_count = 0`
+- `metrics_strict.selected_count = 0`
+- `metrics_strict.strict_hit_rate = 0.0`
+- `metrics_hybrid.hybrid_fallback_rate = 1.0`
+
+deployment 指标则表现为：
+
+- 相对 `A1 + route_near`
+  - `hybrid.final_critical_compromised_hosts: 0.5518 -> 0.5164`
+  - `hybrid.mean_violation: 7.0536 -> 7.0700`
+  - `hybrid.security_return: -469.49 -> -470.17`
+  - `hybrid.high_disruption_action_rate: 0.9173 -> 0.9187`
+- 相对 `A1 + route_near + semantic checkpoint`
+  - `hybrid.final_critical_compromised_hosts: 0.5076 -> 0.5164`
+
+也就是说：
+
+- `B1` 的 `hybrid.final_critical` 比纯 `route_near` 基线更好
+- 但仍然不如 `semantic checkpoint`
+- 而且 strict 结果仍然完全没有突破
+
+### 为什么不继续补 `B2`
+
+根据预先设定的继续条件，只有满足以下任一项才继续跑 `B2 = fc_w4`：
+
+- `archive_diagnostics.strict_candidate_count > 0`
+- `metrics_strict.selected_count > 0`
+- `saved_final_critical_value_summary.min < 0.8333`
+- `metrics_hybrid.final_critical_compromised_hosts < 0.50`
+
+而 `B1` 的实际结果是：
+
+- `strict_candidate_count = 0`
+- `selected_count = 0`
+- `saved_final_critical_value_summary.min = 0.9583`
+- `hybrid.final_critical_compromised_hosts = 0.5164`
+
+因此，`B1` **没有触发任何一个继续条件**，所以：
+
+> **不再继续 `B2`。**
+
+### 当前最终判断
+
+这一轮最小验证说明：
+
+> 对 `A1 + route_near` 仅做 `final_critical` 权重从 `1.0 -> 2.0` 的单轴增强，  
+> 仍然不足以让 Dual-Archive + CVaR 形成 strict-deployable pool。
+
+截至目前，三条最新后续线的相对位置已经比较清楚：
+
+- `route_near`：
+  - 修复了 route 暴露
+  - 但没有恢复 strict
+- `route_near + semantic checkpoint`：
+  - 让 hybrid fallback 更保守
+  - 但没有恢复 strict
+- `route_near + fc_w2`：
+  - 对 hybrid `final_critical` 有一点改善
+  - 但不如 semantic checkpoint
+  - 也没有恢复 strict
+
+所以当前最稳妥、也最诚实的正式结论应当更新为：
+
+> **Dual-Archive + CVaR 在当前问题设定下，已经完成了 operator / route / fallback 三层 failure analysis，  
+> 但经过 `route_near`、`semantic checkpoint`、`final_critical` 单轴增强之后，仍未能恢复 strict-deployable conservative pool。**
+
+因此，这条方法线到这里应停止扩实验，并作为 limitation 写入正文与 appendix，而不是继续做局部 reweighting 网格搜索。

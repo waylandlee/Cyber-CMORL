@@ -318,7 +318,7 @@ def _strict_failure_buckets(
             continue
         if result.get("generated_policy_id") is None:
             continue
-        if result.get("route_decision") == "accepted_cons":
+        if str(result.get("route_decision") or "").startswith("accepted_cons"):
             continue
         violation_fail = float(result.get("mean_violation") or 0.0) > float(
             cons_thresholds.get("violation", 0.5)
@@ -923,6 +923,31 @@ def _build_pre_save_cons_snapshot(
         <= float(cons_thresholds.get("final_critical_near", 0.25))
         and disruption_ok
     )
+    route_violation = float(
+        cons_thresholds.get(
+            "route_violation",
+            max(float(cons_thresholds.get("violation", 0.5)), 1.0),
+        )
+    )
+    route_final_critical = float(
+        cons_thresholds.get(
+            "route_final_critical",
+            max(float(cons_thresholds.get("final_critical_near", 0.25)), 1.0),
+        )
+    )
+    route_high_disruption = float(
+        cons_thresholds.get(
+            "route_high_disruption",
+            float(cons_thresholds.get("high_disruption", 1.0)),
+        )
+    )
+    best_cons_route_near_flag = bool(
+        eligible
+        and float(mean_violation) <= route_violation
+        and relative_cost_ok
+        and float(final_critical) <= route_final_critical
+        and float(high_disruption) <= route_high_disruption
+    )
 
     return {
         "best_margin_seen": best_margin_seen,
@@ -968,9 +993,11 @@ def _build_pre_save_cons_snapshot(
             "strict_candidate_eligible": bool(eligible),
             "near_feasible_flag": bool(best_near_feasible_flag),
             "tight_feasible_flag": bool(best_tight_feasible_flag),
+            "cons_route_near_flag": bool(best_cons_route_near_flag),
         },
         "best_near_feasible_flag": bool(best_near_feasible_flag),
         "best_tight_feasible_flag": bool(best_tight_feasible_flag),
+        "best_cons_route_near_flag": bool(best_cons_route_near_flag),
         "best_min_margin_delta_vs_parent": best_min_margin_delta_vs_parent,
         "best_final_critical_delta_vs_parent": best_final_critical_delta_vs_parent,
         "best_mean_violation_delta_vs_parent": best_mean_violation_delta_vs_parent,
@@ -988,32 +1015,33 @@ def _should_replace_best_snapshot(
 ) -> bool:
     if current_best is None:
         return True
-    candidate_tight = bool(candidate_snapshot.get("best_tight_feasible_flag"))
-    current_tight = bool(current_best.get("best_tight_feasible_flag"))
-    if candidate_tight != current_tight:
-        return candidate_tight
-    candidate_near = bool(candidate_snapshot.get("best_near_feasible_flag"))
-    current_near = bool(current_best.get("best_near_feasible_flag"))
-    if candidate_near != current_near:
-        return candidate_near
-    candidate_margin = candidate_snapshot.get("best_margin_seen")
-    current_margin = current_best.get("best_margin_seen")
-    if candidate_margin is not None and (
-        current_margin is None or float(candidate_margin) > float(current_margin) + 1e-6
-    ):
-        return True
-    if (
-        candidate_margin is not None
-        and current_margin is not None
-        and np.isclose(float(candidate_margin), float(current_margin), atol=1e-6)
-    ):
-        candidate_risk = candidate_snapshot.get("best_risk_seen")
-        current_risk = current_best.get("best_risk_seen")
-        if candidate_risk is not None and (
-            current_risk is None or float(candidate_risk) < float(current_risk) - 1e-6
-        ):
-            return True
-    return False
+    def _float_or(value: object, default: float) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return default
+
+    candidate_priority = (
+        1 if bool(candidate_snapshot.get("best_tight_feasible_flag")) else 0,
+        1 if bool(candidate_snapshot.get("best_near_feasible_flag")) else 0,
+        1 if bool(candidate_snapshot.get("best_cons_route_near_flag")) else 0,
+        1 if bool(candidate_snapshot.get("best_relative_cost_ok")) else 0,
+        -_float_or(candidate_snapshot.get("best_final_critical_compromised_hosts"), np.inf),
+        -_float_or(candidate_snapshot.get("best_mean_violation"), np.inf),
+        _float_or(candidate_snapshot.get("best_margin_seen"), -np.inf),
+        -_float_or(candidate_snapshot.get("best_risk_seen"), np.inf),
+    )
+    current_priority = (
+        1 if bool(current_best.get("best_tight_feasible_flag")) else 0,
+        1 if bool(current_best.get("best_near_feasible_flag")) else 0,
+        1 if bool(current_best.get("best_cons_route_near_flag")) else 0,
+        1 if bool(current_best.get("best_relative_cost_ok")) else 0,
+        -_float_or(current_best.get("best_final_critical_compromised_hosts"), np.inf),
+        -_float_or(current_best.get("best_mean_violation"), np.inf),
+        _float_or(current_best.get("best_margin_seen"), -np.inf),
+        -_float_or(current_best.get("best_risk_seen"), np.inf),
+    )
+    return candidate_priority > current_priority
 
 
 def _empty_route_fail_counts() -> dict[str, int]:
@@ -1489,6 +1517,7 @@ def _run_stage2_extension_for_parent(
     best_feasible_constraint_thresholds = None
     best_feasible_constraint_objective_indices: list[int] = []
     best_feasible_semantics: dict[str, float] | None = None
+    best_feasible_snapshot: dict[str, object] | None = None
     best_pre_save_snapshot: dict[str, object] | None = None
     successful_updates = 0
     terminated_due_to_constraints = False
@@ -1498,6 +1527,10 @@ def _run_stage2_extension_for_parent(
     last_constraint_objective_indices: list[int] = []
     last_trainer_stats: dict[str, float] = {}
     cons_risk_rollout_summaries: list[dict[str, float | int | str]] = []
+    semantic_checkpoint_enabled = bool(
+        archive_branch == "cons"
+        and float(config.cons_thresholds.get("semantic_checkpoint_selection", 0.0)) > 0.0
+    )
 
     if beta_mode == "dynamic":
         beta_value, beta_components = compute_dynamic_beta(
@@ -1583,6 +1616,7 @@ def _run_stage2_extension_for_parent(
                 device,
                 episodes=config.eval.eval_episodes,
             )
+        candidate_snapshot: dict[str, object] | None = None
         if config.extension_mode == "constrained":
             reference_before_eval = np.asarray(current_reference, dtype=np.float32).copy()
             candidate_margins = candidate_objectives - (beta_value * reference_before_eval)
@@ -1608,6 +1642,7 @@ def _run_stage2_extension_for_parent(
                     cvar_metric_weights=dict(config.cvar_metric_weights),
                     semantic_metrics=dict(candidate_semantics),
                 )
+                candidate_snapshot = dict(snapshot)
                 if _should_replace_best_snapshot(best_pre_save_snapshot, snapshot):
                     best_pre_save_snapshot = dict(snapshot)
             is_feasible = bool(np.all(constraint_margins > config.constraint_tolerance))
@@ -1625,21 +1660,35 @@ def _run_stage2_extension_for_parent(
 
         successful_updates += 1
         current_reference = candidate_objectives
-        best_feasible_objectives = candidate_objectives.copy()
-        best_feasible_state = copy.deepcopy(actor_critic.state_dict())
-        best_feasible_constraint_margins = (
-            None if last_constraint_margins is None else last_constraint_margins.copy()
-        )
-        best_feasible_constraint_thresholds = (
-            None
-            if last_constraint_thresholds is None
-            else np.asarray(last_constraint_thresholds, dtype=np.float32).copy()
-        )
-        best_feasible_constraint_objective_indices = list(
-            last_constraint_objective_indices
-        )
-        if archive_branch == "cons":
-            best_feasible_semantics = dict(candidate_semantics)
+        should_save_feasible = True
+        if (
+            archive_branch == "cons"
+            and semantic_checkpoint_enabled
+            and candidate_snapshot is not None
+        ):
+            should_save_feasible = _should_replace_best_snapshot(
+                best_feasible_snapshot,
+                candidate_snapshot,
+            )
+        if should_save_feasible:
+            best_feasible_objectives = candidate_objectives.copy()
+            best_feasible_state = copy.deepcopy(actor_critic.state_dict())
+            best_feasible_constraint_margins = (
+                None if last_constraint_margins is None else last_constraint_margins.copy()
+            )
+            best_feasible_constraint_thresholds = (
+                None
+                if last_constraint_thresholds is None
+                else np.asarray(last_constraint_thresholds, dtype=np.float32).copy()
+            )
+            best_feasible_constraint_objective_indices = list(
+                last_constraint_objective_indices
+            )
+            if archive_branch == "cons":
+                best_feasible_semantics = dict(candidate_semantics)
+                best_feasible_snapshot = (
+                    None if candidate_snapshot is None else dict(candidate_snapshot)
+                )
 
     cons_risk_summary = _summarize_cons_risk(
         [{"archive_branch": archive_branch, **summary} for summary in cons_risk_rollout_summaries],
@@ -1686,6 +1735,7 @@ def _run_stage2_extension_for_parent(
         "best_seen_semantics": None,
         "best_near_feasible_flag": False,
         "best_tight_feasible_flag": False,
+        "best_cons_route_near_flag": False,
         "best_min_margin_delta_vs_parent": None,
         "best_final_critical_delta_vs_parent": None,
         "best_mean_violation_delta_vs_parent": None,
@@ -1771,6 +1821,7 @@ def _run_stage2_extension_for_parent(
             "archive_branch": archive_branch,
             "operator_source": operator_source,
             "extension_mode": config.extension_mode,
+            "semantic_checkpoint_selection": semantic_checkpoint_enabled,
             "beta_components": beta_components,
             "successful_constrained_updates": successful_updates,
             "terminated_due_to_constraints": terminated_due_to_constraints,
@@ -2082,7 +2133,7 @@ def _train_stage2_dual(config: Stage2Config) -> Path:
                         if branch_name == "cons":
                             round_summary["cons_successful_children"] += 1
                             diagnostics["cons_successful_children"] += 1
-                            if route_result["route_decision"] == "accepted_cons":
+                            if str(route_result["route_decision"]).startswith("accepted_cons"):
                                 round_summary["cons_routed_children"] += 1
                                 diagnostics["cons_routed_children"] += 1
                             elif route_result["route_decision"] == "rejected_cost_gate":
@@ -2102,9 +2153,11 @@ def _train_stage2_dual(config: Stage2Config) -> Path:
                         result["cons_reason"] = route_result.get("cons_reason")
                         result["uc_reason"] = route_result.get("uc_reason")
                         if branch_name == "cons":
-                            if route_result["route_decision"] == "accepted_cons":
-                                result["failure_stage"] = "accepted_cons"
-                                result["termination_reason"] = "accepted_cons"
+                            if str(route_result["route_decision"]).startswith("accepted_cons"):
+                                result["failure_stage"] = str(route_result["route_decision"])
+                                result["termination_reason"] = str(
+                                    route_result["route_decision"]
+                                )
                             else:
                                 result["failure_stage"] = "route_rejected_after_save"
                                 result["termination_reason"] = route_result[

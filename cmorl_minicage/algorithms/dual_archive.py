@@ -342,6 +342,7 @@ class DualArchiveManager:
         annotated["feasible_flag"] = strict_state["tight_feasible_flag"]
         annotated["near_feasible_flag"] = strict_state["near_feasible_flag"]
         annotated["tight_feasible_flag"] = strict_state["tight_feasible_flag"]
+        annotated["cons_route_near_flag"] = strict_state["cons_route_near_flag"]
         notes["archive_rule_version"] = self.archive_rule_version
         if self.archive_seed_thresholds:
             notes["archive_seed_thresholds"] = dict(self.archive_seed_thresholds)
@@ -365,6 +366,8 @@ class DualArchiveManager:
             record.get("near_feasible_flag")
         ):
             return True, "accepted_cons"
+        if _as_bool(record.get("cons_route_near_flag")):
+            return True, "accepted_cons_route_near"
         return False, "rejected_feasibility"
 
     def uc_decision(self, record: dict) -> tuple[bool, str]:
@@ -569,6 +572,7 @@ class DualArchiveManager:
             "spread_gain": record.get("spread_gain"),
             "near_feasible_flag": record.get("near_feasible_flag"),
             "tight_feasible_flag": record.get("tight_feasible_flag"),
+            "cons_route_near_flag": record.get("cons_route_near_flag"),
             "high_disruption_rate": record.get("high_disruption_rate"),
             "high_disruption_action_rate": record.get("high_disruption_action_rate"),
             "mean_violation": record.get("mean_violation"),
@@ -598,6 +602,8 @@ class DualArchiveManager:
             feasible_score = 1.0
         elif _as_bool(record.get("near_feasible_flag")):
             feasible_score = 0.5
+        elif _as_bool(record.get("cons_route_near_flag")):
+            feasible_score = 0.35
         elif _as_bool(record.get("feasible_flag")):
             feasible_score = 0.25
         cost_margin = _as_float(record.get("relative_cost_margin"), 0.0) or 0.0
@@ -605,8 +611,24 @@ class DualArchiveManager:
         disruption = _metric(
             record, "high_disruption_action_rate", "high_disruption_rate", default=0.0
         ) or 0.0
+        final_critical = _metric(
+            record,
+            "final_critical_compromised_hosts",
+            "final_critical_compromised",
+            default=0.0,
+        ) or 0.0
+        final_critical_weight = float(
+            self.cons_thresholds.get("score_final_critical_weight", 1.0)
+        )
         crowding = self._crowding_by_id(self.cons_records).get(str(record["policy_id"]), 0.0)
-        return feasible_score + cost_margin - violation - disruption + crowding
+        return (
+            feasible_score
+            + cost_margin
+            - violation
+            - disruption
+            - final_critical_weight * final_critical
+            + crowding
+        )
 
     def _uc_score(self, record: dict) -> float:
         return float(
@@ -806,10 +828,30 @@ class DualArchiveManager:
 
         tight = False
         near = False
+        cons_route_near = False
         if eligible:
             disruption_ok = bool(
                 float(high_disruption)
                 <= float(self.cons_thresholds.get("high_disruption", 1.0))
+            )
+            route_high_disruption_thr = float(
+                self.cons_thresholds.get(
+                    "route_high_disruption",
+                    self.cons_thresholds.get("high_disruption", 1.0),
+                )
+            )
+            route_disruption_ok = bool(float(high_disruption) <= route_high_disruption_thr)
+            route_violation_thr = float(
+                self.cons_thresholds.get(
+                    "route_violation",
+                    max(float(self.cons_thresholds.get("violation", 0.5)), 1.0),
+                )
+            )
+            route_final_critical_thr = float(
+                self.cons_thresholds.get(
+                    "route_final_critical",
+                    max(float(self.cons_thresholds.get("final_critical_near", 0.25)), 1.0),
+                )
             )
             tight = bool(
                 float(violation) <= 0.0
@@ -824,6 +866,12 @@ class DualArchiveManager:
                 <= float(self.cons_thresholds.get("final_critical_near", 0.25))
                 and disruption_ok
             )
+            cons_route_near = bool(
+                float(violation) <= route_violation_thr
+                and relative_cost_ok
+                and float(final_critical) <= route_final_critical_thr
+                and route_disruption_ok
+            )
 
         return {
             "eligible": bool(eligible),
@@ -833,6 +881,7 @@ class DualArchiveManager:
             "relative_cost_margin": float(relative_cost_margin),
             "tight_feasible_flag": bool(tight),
             "near_feasible_flag": bool(near),
+            "cons_route_near_flag": bool(cons_route_near),
         }
 
 
