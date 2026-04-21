@@ -564,9 +564,9 @@ Task 5 必须继续沿用，不允许回退到单一 `metrics.json` + plain SMP 
   - `task5.md`
 - Result:
   - 完成了 `Task5 Dual-Archive + CVaR Cons` 的 fair-budget `seed_0007` 运行：
-    - `/home/waylandlee/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_cvar_cons_stage2_fair/seed_0007/run_8f913fb9/solution_buffer.json`
+    - `/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_cvar_cons_stage2_fair/seed_0007/run_8f913fb9/solution_buffer.json`
   - 并与现有 B-fix fair 基线同口径评估对照：
-    - B-fix: `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/b_fix_dual_archive_stage2_fair/seed_0007/run_0810320f/solution_buffer.json`
+    - B-fix: `/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_dual/b_fix_dual_archive_stage2_fair/seed_0007/run_0810320f/solution_buffer.json`
     - B-fix eval: `/tmp/t5_bfix_fair_eval/metrics.json`
     - CVaR eval: `/tmp/t5_cvar_fair_eval/metrics.json`
   - fair-budget 对照结果如下：
@@ -852,7 +852,7 @@ smoke 最低继续条件固定为至少满足一条：
   - `task5.md`
 - Result:
   - 完成了 v2 smoke 训练：
-    - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/ablation/stage2_dual_archive_strict_aligned_cvar_cons/run_e84bdddc/solution_buffer.json`
+    - `/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/ablation/stage2_dual_archive_strict_aligned_cvar_cons/run_e84bdddc/solution_buffer.json`
   - 完成了 fresh smoke 评估：
     - `/tmp/t5_v2_smoke_eval_fresh/archive_diagnostics.json`
   - 与现有 B-fix smoke 基线对照：
@@ -888,7 +888,7 @@ smoke 最低继续条件固定为至少满足一条：
   - `task5.md`
 - Result:
   - 完成了 v2 fair-budget `seed_0007` 训练：
-    - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_stage2_fair/seed_0007/run_fcd1d299/solution_buffer.json`
+    - `/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_stage2_fair/seed_0007/run_fcd1d299/solution_buffer.json`
   - 训练侧 diagnostics 显示：
     - `cons_attempted_children = 18`
     - `cons_successful_children = 0`
@@ -935,8 +935,8 @@ smoke 最低继续条件固定为至少满足一条：
     - smoke fresh 评估：
       - `/tmp/t5_v2_smoke_eval_fresh/archive_diagnostics.json`
     - fair run 训练诊断：
-      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_stage2_fair/seed_0007/run_fcd1d299/method_diagnostics.json`
-      - `/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_stage2_fair/seed_0007/run_fcd1d299/stage2_summary.json`
+      - `/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_stage2_fair/seed_0007/run_fcd1d299/method_diagnostics.json`
+      - `/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_dual/dual_archive_strict_aligned_cvar_cons_stage2_fair/seed_0007/run_fcd1d299/stage2_summary.json`
 - Notes:
   - v2 的失败比 v1 更有信息量：
     - smoke 确实短暂出现了 `strict_candidate_count = 1`

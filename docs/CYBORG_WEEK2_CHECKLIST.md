@@ -12,7 +12,7 @@
 
 ## 目的
 
-本清单承接 [CYBORG_EXECUTION_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_EXECUTION_CHECKLIST.md)。
+本清单承接 [CYBORG_EXECUTION_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_EXECUTION_CHECKLIST.md)。
 
 第二周的目标不是继续搭基础设施，而是把已经稳定的 `cmorl_cyborg` 链路推进到：
 
@@ -39,8 +39,8 @@
 到第二周结束时，应满足以下五项：
 
 1. `Ours` 与主要 baseline 都已在正式 `CybORG` 上完成至少 `3-seed` 小规模运行。
-2. [cmorl_cyborg/compare_suite.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/compare_suite.py) 已基于正式环境结果生成稳定的 shared reference point。
-3. [cmorl_cyborg/evaluate_constraints.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/evaluate_constraints.py) 已基于正式环境 `stage1-only` 结果生成稳定的 shared thresholds。
+2. [cmorl_cyborg/compare_suite.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/compare_suite.py) 已基于正式环境结果生成稳定的 shared reference point。
+3. [cmorl_cyborg/evaluate_constraints.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/evaluate_constraints.py) 已基于正式环境 `stage1-only` 结果生成稳定的 shared thresholds。
 4. 主表 A / 主表 B 的 CSV / JSON / TEX 都能从正式环境产物导出。
 5. 已能明确判断：是否进入 `5-seed formal`，还是需要再做一轮小调参。
 
@@ -55,10 +55,10 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/configs/paper/compare_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
-- [cmorl_cyborg/configs/paper/export_tables_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/export_tables_main.yaml)
-- [cmorl_cyborg/configs/paper/stage1_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/stage1_main.yaml)
-- [cmorl_cyborg/configs/paper/stage2_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/stage2_main.yaml)
+- [cmorl_cyborg/configs/paper/compare_suite_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
+- [cmorl_cyborg/configs/paper/export_tables_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/export_tables_main.yaml)
+- [cmorl_cyborg/configs/paper/stage1_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/stage1_main.yaml)
+- [cmorl_cyborg/configs/paper/stage2_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/stage2_main.yaml)
 
 ### 要做的事
 
@@ -101,14 +101,14 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/baselines.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/baselines.py)
-- [cmorl_cyborg/train_pref_conditioned_ppo.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/train_pref_conditioned_ppo.py)
-- [cmorl_cyborg/train_lagrangian_ppo.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/train_lagrangian_ppo.py)
-- [cmorl_cyborg/train_pcn.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/train_pcn.py)
-- [cmorl_cyborg/configs/paper/weighted_sum_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/weighted_sum_main.yaml)
-- [cmorl_cyborg/configs/paper/pref_cond_ppo.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/pref_cond_ppo.yaml)
-- [cmorl_cyborg/configs/paper/lagrangian_ppo.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/lagrangian_ppo.yaml)
-- [cmorl_cyborg/configs/paper/pcn.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/pcn.yaml)
+- [cmorl_cyborg/baselines.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/baselines.py)
+- [cmorl_cyborg/train_pref_conditioned_ppo.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/train_pref_conditioned_ppo.py)
+- [cmorl_cyborg/train_lagrangian_ppo.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/train_lagrangian_ppo.py)
+- [cmorl_cyborg/train_pcn.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/train_pcn.py)
+- [cmorl_cyborg/configs/paper/weighted_sum_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/weighted_sum_main.yaml)
+- [cmorl_cyborg/configs/paper/pref_cond_ppo.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/pref_cond_ppo.yaml)
+- [cmorl_cyborg/configs/paper/lagrangian_ppo.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/lagrangian_ppo.yaml)
+- [cmorl_cyborg/configs/paper/pcn.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/pcn.yaml)
 
 ### 要做的事
 
@@ -151,9 +151,9 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/evaluate.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/evaluate.py)
-- [cmorl_cyborg/evaluate_conditioned.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/evaluate_conditioned.py)
-- [cmorl_cyborg/compare_suite.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/compare_suite.py)
+- [cmorl_cyborg/evaluate.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/evaluate.py)
+- [cmorl_cyborg/evaluate_conditioned.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/evaluate_conditioned.py)
+- [cmorl_cyborg/compare_suite.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/compare_suite.py)
 
 ### 要做的事
 
@@ -178,8 +178,8 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/evaluate_constraints.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/evaluate_constraints.py)
-- [cmorl_cyborg/configs/paper/evaluate_main_table_b.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/evaluate_main_table_b.yaml)
+- [cmorl_cyborg/evaluate_constraints.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/evaluate_constraints.py)
+- [cmorl_cyborg/configs/paper/evaluate_main_table_b.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/evaluate_main_table_b.yaml)
 
 ### 要做的事
 
@@ -212,8 +212,8 @@
 
 ### 要改的文件
 
-- [docs/EXPERIMENT_LOG.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/EXPERIMENT_LOG.md)
-- 可选补充到 [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md)
+- [docs/EXPERIMENT_LOG.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/EXPERIMENT_LOG.md)
+- 可选补充到 [README.md](/home/waylandlee/CMORL2/Cyber-CMORL/README.md)
 
 ### 要做的事
 
@@ -257,7 +257,7 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/configs/paper](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper)
+- [cmorl_cyborg/configs/paper](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper)
 
 ### 要做的事
 

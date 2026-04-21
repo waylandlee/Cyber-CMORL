@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import argparse
 
+import cmorl_minicage.evaluate_constraints as constraint_base
 import cmorl_minicage.train_stage2 as base
 
 from .config import DEFAULT_STAGE2_CONFIG, load_stage2_config
 from .env import CybORGMORLEnv
 
 base.MiniCageMORLEnv = CybORGMORLEnv
+constraint_base.MiniCageMORLEnv = CybORGMORLEnv
 
 train_stage2 = base.train_stage2
 

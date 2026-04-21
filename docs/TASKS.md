@@ -7,6 +7,115 @@
 - `Blocked`
 - `Done`
 
+## 2026-04-20 V2.4 Snapshot
+
+- `Done` `V2.4 = ours_stage2_fair_critical_safe_v2_4_4obj` 的 `3-seed` 扩展已完成：
+  - `seed_0007`
+  - `seed_0011`
+  - `seed_0019`
+- `Done` `3/3 seeds pilot_passed = true`
+- `Done` `seed_0011` 的 verifier 回填已完成：
+  - `containment_hypothesis_status = evaluable`
+  - `containment_hypothesis_triggered_vs_v2_3 = true`
+- `Done` `V2.4` 独立 `table_a / table_b` 导表支线已打通：
+  - `cmorl_cyborg/outputs/paper_table_v2_4/table_a`
+  - `cmorl_cyborg/outputs/paper_table_v2_4/table_b`
+  - `cmorl_cyborg/outputs/paper_table_v2_4/tables`
+- `In Progress` 当前需要做的不是继续设计 `V2.5`，而是决定：
+  - `V2.4 table_b` 是否作为主表 `Table B` 的新增方法行或替换候选
+  - `V2.4 table_a` 是否先作为补充表，因为它当前是 `4-objective` 独立口径
+- `Planned` 若论文仍保留旧 `3-objective Table A`，则明确把 `V2.4 set-quality row` 视为补充表，不与当前主表 A 直接横向比较
+
+## 2026-04-20 4-Objective Upgrade Execution Plan
+
+### Upgrade Goal
+
+- `In Progress` 将论文主线从旧 `3-objective` 升级为 `4-objective semantic safety`：
+  - `security`
+  - `business`
+  - `cost`
+  - `critical_host_safety`
+- `In Progress` 主方法固定为 `V2.4 pre-critical containment`，即：
+  - `ours_stage2_fair_critical_safe_v2_4_4obj`
+- `Planned` 当前默认 paper seed 协议先锁定为 `3-seed = 0007 / 0011 / 0019`，除非后续明确决定扩到 `5-seed`
+
+### Paper-Level Locks Needed First
+
+- `In Progress` 锁定 `4-objective` 论文最终方法名与主方法描述
+- `In Progress` 锁定 `Table A` 和 `Table B` 在升级后的主方法集合
+- `In Progress` 决定 `Table A` 是否整体升级到 `4-objective`
+- `In Progress` 决定 `Table B` 是否直接纳入 `V2.4` 新方法行
+- `Planned` 在 paper-level 决策没有锁定前，不再启动 `V2.5`
+
+### Must Rerun Vs Reuse
+
+| 项目 | 论文位置 | 必须重训 | 必须重评估/导表 | 可复用现有产物 | 当前判断 |
+|---|---|---:|---:|---|---|
+| `ours_stage2_v2_4` set-quality | `Table A` | 否 | 是 | `cmorl_cyborg/outputs/paper_table_v2_4/table_a/` 与 3 个 V2.4 stage2 buffer | 现有 row 只能作 sanity check，最终要在共享 `4D reference point` 下重算 |
+| `ours_stage2_v2_4` deployment | `Table B` | 否 | 是 | `seed_*_selected_constraint_metrics.json` 与 `paper_table_v2_4/table_b/aggregated/ours_stage2_v2_4.json` | 当前最接近可直接入论文主表的产物 |
+| `stage1_only_4obj` set-quality | `Table A` | 否 | 是 | V2.4 三颗 seed 已完成的 Stage1 buffer | 可直接复用当前 V2.4 Stage1 产物 |
+| `stage1_only_4obj` deployment | `Table B` | 否 | 是 | 同上 | 需要重新跑 constraint evaluate 和 aggregation |
+| `weighted_sum_4obj` set-quality | `Table A` | 是 | 是 | 无 | 旧 `weighted_sum` 是 `3-objective`，不能直接沿用 |
+| `weighted_sum_4obj` deployment | `Table B` | 是 | 是 | 无 | 与上面同一套训练产物顺带导出 |
+| `preference_conditioned_ppo_4obj` | `Table A` | 是 | 是 | 无 | 若保留在主表 A，就必须补齐 `4-objective` 版本 |
+| `pcn_4obj` | `Table A` | 是 | 是 | 无 | 若保留在主表 A，就必须补齐 `4-objective` 版本 |
+| `no_constraint_stage2_4obj` | `Table B / Ablation` | 是 | 是 | 无 | 若主文继续保留 matched ablation，则需要重训 |
+| `lagrangian_ppo_4obj` | `Table B` | 是 | 是 | 无 | 若保留在升级后的主表 B，就必须补齐 `4-objective` 版本 |
+| `single_objective_4obj` | `Table B` | 是 | 是 | 无 | 需要先定义“单目标”在 `4-objective` 下的 paper 语义 |
+| `3-seed semantic risk summary` | 正文结果 / Appendix | 否 | 是 | 三颗 seed 的 final summaries 与 selected risk summaries | 这是 `4-objective` 论文里最关键的正式证据 |
+| `V2.3 -> V2.4` 机制对照 | Ablation / Appendix | 否 | 是 | `seed_0011` verifier/backfill 已完成 | `seed_0011` 版已足够，不必强制扩成 `3-seed` |
+| `case study / trace appendix` | 正文图 / Appendix | 否 | 是 | 现有 `critical_casebook.md`、semantic audit trace | 不需要重训，只需整理与导出 |
+
+### Minimum Recommended Method Set
+
+- `In Progress` 最小 `4-objective Table A` 方法组建议固定为：
+  - `ours_stage2_v2_4`
+  - `stage1_only_4obj`
+  - `weighted_sum_4obj`
+- `Planned` `preference_conditioned_ppo_4obj` 与 `pcn_4obj` 默认先降到 appendix，除非后续确认时间预算充足
+- `In Progress` 最小 `4-objective Table B` 方法组建议固定为：
+  - `ours_stage2_v2_4`
+  - `stage1_only_4obj`
+  - `weighted_sum_4obj`
+  - `no_constraint_stage2_4obj`
+- `Planned` `lagrangian_ppo_4obj` 与 `single_objective_4obj` 只有在 paper-level 决定保留旧 deployment baseline 角色时才补齐
+
+### Concrete Execution Order
+
+- `P0` 锁定升级后的 paper-level 方法组：
+  - `Table A` 保留哪些方法
+  - `Table B` 保留哪些方法
+- `P0` 先产出 `3-seed semantic risk summary`
+- `P0` 复用现有 V2.4 和 Stage1-only 产物，补齐无需重训的方法行
+- `P0` 重训 `weighted_sum_4obj`
+- `P0` 在共享 `4D reference point` 下重建正式 `Table A`
+- `P0` 重建 matched `4-objective Table B`
+- `P1` 补 `V2.3 -> V2.4` 机制性 ablation
+- `P1` 补 case study / trace appendix
+- `P2` 再决定是否补：
+  - `pcn_4obj`
+  - `preference_conditioned_ppo_4obj`
+  - `lagrangian_ppo_4obj`
+  - `single_objective_4obj`
+
+### Immediate Next Experiments
+
+- `In Progress` 先做 `3-seed semantic risk summary`，不再等待新的训练
+- `In Progress` 复用现有产物补一版 `stage1_only_4obj` 的 set-quality 与 deployment 结果
+- `Planned` 启动 `weighted_sum_4obj` 的 `3-seed` 训练与导表
+- `Planned` 在 `weighted_sum_4obj` 完成后，统一重建 `4-objective Table A`
+- `Planned` 在 `Table A` 锁定后，再统一重建 matched `4-objective Table B`
+
+### What Not To Do
+
+- `Planned` 在 `4-objective Table A` 没有重建前，不把当前 `paper_table_v2_4/table_a` 直接当成论文主表 A
+- `Planned` 在 `paper-level` 方法组没有锁定前，不同时开启：
+  - `pcn_4obj`
+  - `preference_conditioned_ppo_4obj`
+  - `lagrangian_ppo_4obj`
+  - `single_objective_4obj`
+- `Planned` 在 `4-objective` 升级完成前，不继续设计 `V2.5`
+
 ## CybORG Paper Lock
 
 ### 当前主叙事
@@ -28,6 +137,7 @@
   - `weighted_sum`
   - `preference_conditioned_ppo`
   - `pcn`
+- `In Progress` `V2.4` 当前不直接写入主表 `Table A` 固定方法组，因为它属于 `4-objective semantic safety` 线，和现有 `3-objective` 主表 A 口径不一致。
 - `Planned` `Table B = Deployment Table` 固定方法组：
   - `ours_stage2`
   - `lagrangian_ppo`
@@ -35,6 +145,9 @@
   - `stage1_only`
   - `no_constraint_stage2`
   - `single_objective`
+- `In Progress` `V2.4` 已具备进入 `Table B` 候选行的条件，正在决定是：
+  - 作为新增方法行
+  - 还是替换当前 `ours_stage2` 主结果行
 - `Planned` 主文核心消融默认只保留：
   - `ours_stage2`
   - `stage1_only`
@@ -65,7 +178,7 @@
 ### P1 次高优先级
 
 - `Planned` 用更多 seed 验证当前 `formal_c2` 主线胜出结论的稳定性。
-- `Done` 增加 [cmorl_minicage/multiseed.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/multiseed.py)，支持按 seed 批跑 `Stage-1 -> Stage-2` 并汇总共享参考点下的稳定性指标。
+- `Done` 增加 [cmorl_minicage/multiseed.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/multiseed.py)，支持按 seed 批跑 `Stage-1 -> Stage-2` 并汇总共享参考点下的稳定性指标。
 - `Planned` 系统比较 Stage-2 的 `beta`、`constraint_tolerance`、`constrained_updates` 和 `total_timesteps_per_update`。
 - `Planned` 为 Stage-1 增加独立 reseed / 独立 env 模式，降低串行随机耦合。
 - `Planned` 为 `visualize.py` 增加可选 policy id 标注与更统一的 figure export 命名。
@@ -78,10 +191,10 @@
 
 ## 当前待办
 
-- `In Progress` 整理 formal `Stage-1 / Stage-2 / baseline suite` 的正式对比说明。
-- `In Progress` 把 pairwise / 3D / compact objective 图进一步统一成论文展示风格。
-- `Planned` 增加 `business` 与 `cost` 的更结果化语义指标。
-- `Planned` 为 `select_policy.py` 增加默认最新 buffer 选择模式，减少命令行参数输入。
+- `In Progress` 把 `V2.4 3-seed` 结果整理成论文可直接复用的实验结论与 case-study。
+- `In Progress` 决定 `V2.4 table_b` 是主表替换项、补充方法行，还是 appendix 先行。
+- `Planned` 若需要把 `V2.4` 推入主表 A，先定义新的 `4-objective` set-quality 表达方式，而不是直接覆盖旧 `3-objective Table A`。
+- `Planned` 更新 `paper/main.tex` 中的方法与实验叙事，使其与 `V2.4` 当前主线一致。
 
 ## 进行中
 
@@ -89,10 +202,13 @@
 - `In Progress` 文档、配置、输出格式持续对齐，避免代码和记录体系脱节。
 - `In Progress` Stage-2 数值行为与论文差异梳理。
 - `In Progress` 图像、实验记录与论文展示材料同步更新。
+- `In Progress` `V2.4` 结果与主表口径收束：
+  - `table_b` 可直接比较
+  - `table_a` 当前仅作独立 semantic-safety row
 
 ## 已完成
 
-- `Done` 建立独立的 [cmorl_minicage](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage) 工作区。
+- `Done` 建立独立的 [cmorl_minicage](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage) 工作区。
 - `Done` 完成 Stage-1 / Stage-2 / evaluation 首版可运行链路。
 - `Done` 完成 YAML 配置驱动入口。
 - `Done` 完成 IPO surrogate + Stage-2 feasibility gate 工程实现。
@@ -128,7 +244,7 @@
   - `formal_c2_suite_metrics.png`
   - `formal_c2_suite_3d.png`
   - `formal_c2_suite_pairwise.png`
-- `Done` 完成 [select_policy.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/select_policy.py)，支持按 preference 选当前最优策略。
+- `Done` 完成 [select_policy.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/select_policy.py)，支持按 preference 选当前最优策略。
 
 ## 关键观察驱动的任务
 

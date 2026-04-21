@@ -145,13 +145,16 @@ def select_top_n_adaptive(
     *,
     coverage_mode: str = "static",
     keep_extremes: bool = True,
+    pareto_only: bool = True,
     component_overrides: dict[str, dict[str, float | list[float] | dict[str, float]]] | None = None,
 ) -> tuple[list[dict], dict[str, float], dict[str, dict[str, float | list[float]]]]:
-    pareto = nondominated_filter(records)
-    if top_n <= 0 or not pareto:
+    candidates = (
+        nondominated_filter(records) if pareto_only else [dict(record) for record in records]
+    )
+    if top_n <= 0 or not candidates:
         return [], {}, {}
 
-    components = compute_selection_components(pareto, preferences, tolerance)
+    components = compute_selection_components(candidates, preferences, tolerance)
     component_overrides = component_overrides or {}
     for policy_id, override in component_overrides.items():
         if policy_id not in components:
@@ -159,20 +162,20 @@ def select_top_n_adaptive(
         components[policy_id].update(dict(override))
     scores = {
         record["policy_id"]: compute_selection_score(components[record["policy_id"]], weights)
-        for record in pareto
+        for record in candidates
     }
 
     selected_indices: list[int] = []
-    points = _objective_array(pareto)
-    if keep_extremes and len(pareto) > 0:
+    points = _objective_array(candidates)
+    if keep_extremes and len(candidates) > 0:
         for objective_idx in range(points.shape[1]):
             extreme = int(np.argmax(points[:, objective_idx]))
             if extreme not in selected_indices:
                 selected_indices.append(extreme)
 
-    selected_ids = {pareto[index]["policy_id"] for index in selected_indices}
+    selected_ids = {candidates[index]["policy_id"] for index in selected_indices}
     if coverage_mode != "marginal":
-        remaining = [record for record in pareto if record["policy_id"] not in selected_ids]
+        remaining = [record for record in candidates if record["policy_id"] not in selected_ids]
         remaining.sort(
             key=lambda record: (
                 -scores[record["policy_id"]],
@@ -188,18 +191,18 @@ def select_top_n_adaptive(
             selected_indices.append(
                 next(
                     i
-                    for i, candidate in enumerate(pareto)
+                    for i, candidate in enumerate(candidates)
                     if candidate["policy_id"] == record["policy_id"]
                 )
             )
     else:
-        utilities = _utility_matrix(pareto, preferences)
-        while len(selected_indices) < min(top_n, len(pareto)):
+        utilities = _utility_matrix(candidates, preferences)
+        while len(selected_indices) < min(top_n, len(candidates)):
             covered_preferences = _covered_preferences_mask(
                 utilities, tolerance, selected_indices
             )
             remaining_indices = [
-                index for index in range(len(pareto)) if index not in selected_indices
+                index for index in range(len(candidates)) if index not in selected_indices
             ]
             if not remaining_indices:
                 break
@@ -213,15 +216,15 @@ def select_top_n_adaptive(
                 marginal_gain = float(
                     np.mean(candidate_covered & (~covered_preferences))
                 )
-                components[pareto[index]["policy_id"]]["utility_coverage_gain"] = marginal_gain
-                scores[pareto[index]["policy_id"]] = compute_selection_score(
-                    components[pareto[index]["policy_id"]], weights
+                components[candidates[index]["policy_id"]]["utility_coverage_gain"] = marginal_gain
+                scores[candidates[index]["policy_id"]] = compute_selection_score(
+                    components[candidates[index]["policy_id"]], weights
                 )
                 key = (
-                    -scores[pareto[index]["policy_id"]],
+                    -scores[candidates[index]["policy_id"]],
                     -marginal_gain,
-                    -float(components[pareto[index]["policy_id"]]["crowding_score"]),
-                    pareto[index]["policy_id"],
+                    -float(components[candidates[index]["policy_id"]]["crowding_score"]),
+                    candidates[index]["policy_id"],
                 )
                 if best_key is None or key < best_key:
                     best_key = key
@@ -230,7 +233,7 @@ def select_top_n_adaptive(
                 break
             selected_indices.append(best_index)
 
-    selected = [dict(pareto[index]) for index in selected_indices[:top_n]]
+    selected = [dict(candidates[index]) for index in selected_indices[:top_n]]
     selected_scores = {record["policy_id"]: scores[record["policy_id"]] for record in selected}
     selected_components = {
         record["policy_id"]: dict(components[record["policy_id"]]) for record in selected

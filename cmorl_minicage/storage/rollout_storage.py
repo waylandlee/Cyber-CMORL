@@ -9,6 +9,7 @@ import torch
 class RolloutBatch:
     obs: torch.Tensor
     actions: torch.Tensor
+    action_masks: torch.Tensor
     old_log_probs: torch.Tensor
     returns: torch.Tensor
     value_preds: torch.Tensor
@@ -23,12 +24,14 @@ class VectorRolloutStorage:
         num_envs: int,
         obs_dim: int,
         obj_dim: int,
+        action_dim: int,
         device: torch.device,
     ) -> None:
         self.num_steps = num_steps
         self.num_envs = num_envs
         self.obs_dim = obs_dim
         self.obj_dim = obj_dim
+        self.action_dim = action_dim
         self.device = device
         self.reset()
 
@@ -39,6 +42,13 @@ class VectorRolloutStorage:
         )
         self.actions = torch.zeros(
             self.num_steps, self.num_envs, dtype=torch.long, device=self.device
+        )
+        self.action_masks = torch.ones(
+            self.num_steps,
+            self.num_envs,
+            self.action_dim,
+            dtype=torch.bool,
+            device=self.device,
         )
         self.log_probs = torch.zeros(
             self.num_steps, self.num_envs, device=self.device
@@ -58,6 +68,7 @@ class VectorRolloutStorage:
         self,
         obs: torch.Tensor,
         actions: torch.Tensor,
+        action_masks: torch.Tensor,
         log_probs: torch.Tensor,
         values: torch.Tensor,
         rewards: torch.Tensor,
@@ -65,6 +76,7 @@ class VectorRolloutStorage:
     ) -> None:
         self.obs[self.step + 1].copy_(obs)
         self.actions[self.step].copy_(actions)
+        self.action_masks[self.step].copy_(action_masks)
         self.log_probs[self.step].copy_(log_probs)
         self.value_preds[self.step].copy_(values)
         self.rewards[self.step].copy_(rewards)
@@ -105,6 +117,7 @@ class VectorRolloutStorage:
 
         obs = self.obs[:-1].reshape(batch_size, self.obs_dim)
         actions = self.actions.reshape(batch_size)
+        action_masks = self.action_masks.reshape(batch_size, self.action_dim)
         old_log_probs = self.log_probs.reshape(batch_size)
         returns = self.returns[:-1].reshape(batch_size, self.obj_dim)
         value_preds = self.value_preds[:-1].reshape(batch_size, self.obj_dim)
@@ -121,6 +134,7 @@ class VectorRolloutStorage:
                 RolloutBatch(
                     obs=obs[indices],
                     actions=actions[indices],
+                    action_masks=action_masks[indices],
                     old_log_probs=old_log_probs[indices],
                     returns=returns[indices],
                     value_preds=value_preds[indices],

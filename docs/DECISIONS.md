@@ -9,7 +9,7 @@
 
 ## D-001 保持 `cmorl_minicage` 与仓库其他主线隔离
 
-- 决策：论文复现和 MiniCAGE 迁移实现继续集中在 [cmorl_minicage](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage)，不与仓库其他训练主线混写。
+- 决策：论文复现和 MiniCAGE 迁移实现继续集中在 [cmorl_minicage](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage)，不与仓库其他训练主线混写。
 - 原因：
   - 更容易判断当前结果是“论文方法迁移版”还是“现有工程变体”。
   - 降低对仓库其他研究路径的干扰。
@@ -31,7 +31,7 @@
 
 ## D-003 采用 `security / business / cost` 三目标，并选择方案 A 保留双口径
 
-- 决策：通过 [env.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/env.py) 将环境目标明确重构为：
+- 决策：通过 [env.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/env.py) 将环境目标明确重构为：
   - `security`
   - `business`
   - `cost`
@@ -58,7 +58,7 @@
 
 ## D-004 保持默认配置入口稳定，新增分层模板目录
 
-- 决策：保留 [stage1.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/stage1.yaml)、[stage2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/stage2.yaml)、[evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/evaluate.yaml) 作为稳定默认入口；新增 `smoke / formal / ablation` 模板目录。
+- 决策：保留 [stage1.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/stage1.yaml)、[stage2.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/stage2.yaml)、[evaluate.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/evaluate.yaml) 作为稳定默认入口；新增 `smoke / formal / ablation` 模板目录。
 - 原因：
   - 既能提供更清晰的实验模板分层，又不会破坏现有命令和脚本习惯。
   - 便于区分链路验证、正式实验和消融实验。
@@ -157,7 +157,7 @@
 
 ## D-010 实验记录分成“结构化输出 + 文档日志”两层
 
-- 决策：结构化事实保留在 `solution_buffer.json`、`stage1_summary.json`、`stage2_summary.json`、`metrics.json`；结论、异常和比较写入 [EXPERIMENT_LOG.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/EXPERIMENT_LOG.md)。
+- 决策：结构化事实保留在 `solution_buffer.json`、`stage1_summary.json`、`stage2_summary.json`、`metrics.json`；结论、异常和比较写入 [EXPERIMENT_LOG.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/EXPERIMENT_LOG.md)。
 - 原因：
   - 既便于程序化分析，也方便后续写作时回看结论。
   - 文本日志能记录“为什么这个结果值得关注”，JSON 本身做不到。
@@ -166,7 +166,7 @@
 
 ## D-011 把可视化纳入正式实验产物
 
-- 决策：通过 [visualize.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/visualize.py) 自动生成：
+- 决策：通过 [visualize.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/visualize.py) 自动生成：
   - Pareto 2D projections
   - 3D Pareto scatter
   - Stage-1 vs Stage-2 overlay
@@ -199,7 +199,7 @@
 
 ## D-014 把 8 个网络安全语义指标纳入正式评估
 
-- 决策：在 [evaluate.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/evaluate.py) 中固定输出以下语义指标：
+- 决策：在 [evaluate.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/evaluate.py) 中固定输出以下语义指标：
   - `final_compromised_hosts`
   - `final_critical_compromised_hosts`
   - `critical_impact_count`
@@ -334,7 +334,7 @@
 
 ## D-012 README 只提供高层入口，细节下沉到 `docs/`
 
-- 决策：仓库根 [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md) 提供高层入口；更细的项目边界、架构、决策、任务和实验记录放在 `docs/`。
+- 决策：仓库根 [README.md](/home/waylandlee/CMORL2/Cyber-CMORL/README.md) 提供高层入口；更细的项目边界、架构、决策、任务和实验记录放在 `docs/`。
 - 原因：
   - 保持根 README 可读。
   - 方便新协作者快速定位不同层级的信息。

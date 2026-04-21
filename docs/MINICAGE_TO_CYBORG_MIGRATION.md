@@ -6,16 +6,16 @@
 
 当前项目分工已经比较明确：
 
-- [cmorl_minicage](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage)
+- [cmorl_minicage](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage)
   负责方法迁移验证、ablation、机制解释和 supplementary 素材
-- [cmorl_cyborg](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg)
+- [cmorl_cyborg](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg)
   负责正式环境 `3-seed` 结果、主表 B、公平比较与当前论文主结论
 
 因此，后续写作不应把这份文档理解成“还要不要迁移”，而应理解成“这次迁移为什么这样做、哪些资产从 MiniCAGE 继承而来、哪些结论必须在 CybORG 中重新验证”。
 
 ## 目标
 
-本清单用于把当前 [cmorl_minicage](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage) 中已经稳定的两阶段 C-MORL 实验链路迁移到正式 `CybORG` 环境。
+本清单用于把当前 [cmorl_minicage](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage) 中已经稳定的两阶段 C-MORL 实验链路迁移到正式 `CybORG` 环境。
 
 迁移目标不是“直接复用 MiniCAGE 的数值结果”，而是：
 
@@ -60,22 +60,22 @@
 
 以下文件原则上应直接复用，除非 CybORG 状态维度或动作接口逼迫改动：
 
-- [cmorl_minicage/train_stage1.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/train_stage1.py)
-- [cmorl_minicage/train_stage2.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/train_stage2.py)
-- [cmorl_minicage/algorithms/ppo_vector.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/ppo_vector.py)
-- [cmorl_minicage/algorithms/ipo.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/ipo.py)
-- [cmorl_minicage/algorithms/adaptive_selection.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/adaptive_selection.py)
-- [cmorl_minicage/algorithms/dynamic_beta.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/dynamic_beta.py)
-- [cmorl_minicage/algorithms/selection.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/selection.py)
-- [cmorl_minicage/algorithms/assignment.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/assignment.py)
-- [cmorl_minicage/buffer.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/buffer.py)
-- [cmorl_minicage/evaluate_conditioned.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/evaluate_conditioned.py)
-- [cmorl_minicage/evaluate_constraints.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/evaluate_constraints.py)
-- [cmorl_minicage/compare_suite.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/compare_suite.py)
-- [cmorl_minicage/export_tables.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/export_tables.py)
-- [cmorl_minicage/train_pref_conditioned_ppo.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/train_pref_conditioned_ppo.py)
-- [cmorl_minicage/train_lagrangian_ppo.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/train_lagrangian_ppo.py)
-- [cmorl_minicage/train_pcn.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/train_pcn.py)
+- [cmorl_minicage/train_stage1.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/train_stage1.py)
+- [cmorl_minicage/train_stage2.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/train_stage2.py)
+- [cmorl_minicage/algorithms/ppo_vector.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/ppo_vector.py)
+- [cmorl_minicage/algorithms/ipo.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/ipo.py)
+- [cmorl_minicage/algorithms/adaptive_selection.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/adaptive_selection.py)
+- [cmorl_minicage/algorithms/dynamic_beta.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/dynamic_beta.py)
+- [cmorl_minicage/algorithms/selection.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/selection.py)
+- [cmorl_minicage/algorithms/assignment.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/assignment.py)
+- [cmorl_minicage/buffer.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/buffer.py)
+- [cmorl_minicage/evaluate_conditioned.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/evaluate_conditioned.py)
+- [cmorl_minicage/evaluate_constraints.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/evaluate_constraints.py)
+- [cmorl_minicage/compare_suite.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/compare_suite.py)
+- [cmorl_minicage/export_tables.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/export_tables.py)
+- [cmorl_minicage/train_pref_conditioned_ppo.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/train_pref_conditioned_ppo.py)
+- [cmorl_minicage/train_lagrangian_ppo.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/train_lagrangian_ppo.py)
+- [cmorl_minicage/train_pcn.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/train_pcn.py)
 
 ## 必须新建或重写的文件
 
@@ -141,7 +141,7 @@
 `reward.py` / `semantics.py` 中，而是优先从 `env.scenario_profile` 或
 `env.scenario_name` 解析 YAML profile。内置 profile 目录为：
 
-- [cmorl_cyborg/profiles](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/profiles)
+- [cmorl_cyborg/profiles](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/profiles)
 
 目前仓库内置的是 `Scenario2.yaml`，因此当前正式实验口径仍以 `Scenario2` 为主，但
 后续新增 scenario 时原则上只需新增 profile 文件，而不再需要改核心奖励与语义代码。

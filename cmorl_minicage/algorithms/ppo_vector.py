@@ -52,7 +52,7 @@ class VectorPPO:
                 ) / (scalar_advantages.std() + 1e-8)
 
                 values, log_probs, entropy = self.actor_critic.evaluate_actions(
-                    batch.obs, batch.actions
+                    batch.obs, batch.actions, action_mask=batch.action_masks
                 )
                 ratio = torch.exp(log_probs - batch.old_log_probs)
                 surr1 = ratio * batch_scalar_advantages

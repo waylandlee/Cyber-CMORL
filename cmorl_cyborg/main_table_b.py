@@ -148,17 +148,22 @@ def generate_main_table_b(config_path: str | Path) -> Path:
         method_name = str(entry["method_name"])
         seed = int(entry["seed"])
         input_path = _resolve_source_path(config_path, entry, "input_path")
-        result = evaluate_constraints(
-            method_name=method_name,
-            input_kind=str(entry.get("input_kind", "buffer")),
-            input_path=input_path,
-            selection_source=str(entry.get("selection_source", "pareto")),
-            selection_policy=str(
-                entry.get("selection_policy", config.get("selection_policy", "objective"))
-            ),
-            thresholds_path=shared_thresholds_path,
-            eval_episodes=int(entry.get("eval_episodes", config.get("eval_episodes", 5))),
-        )
+        input_kind = str(entry.get("input_kind", "buffer"))
+        if input_kind == "precomputed_metrics":
+            result = load_json(input_path)
+            result.setdefault("method_name", method_name)
+        else:
+            result = evaluate_constraints(
+                method_name=method_name,
+                input_kind=input_kind,
+                input_path=input_path,
+                selection_source=str(entry.get("selection_source", "pareto")),
+                selection_policy=str(
+                    entry.get("selection_policy", config.get("selection_policy", "objective"))
+                ),
+                thresholds_path=shared_thresholds_path,
+                eval_episodes=int(entry.get("eval_episodes", config.get("eval_episodes", 5))),
+            )
         output_path = output_dir / method_name / f"seed_{seed:04d}" / "constraint_metrics.json"
         save_json(output_path, result)
         per_run_paths.append(str(output_path.resolve()))
@@ -167,6 +172,7 @@ def generate_main_table_b(config_path: str | Path) -> Path:
             {
                 "method_name": method_name,
                 "seed": seed,
+                "input_kind": input_kind,
                 "input_path": str(input_path),
                 "output_path": str(output_path.resolve()),
             }

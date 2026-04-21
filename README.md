@@ -47,6 +47,23 @@
   - [coverage_combo_fair_loose.json](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
   - [coverage_more_parents_fair_loose.json](./cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_loose.json)
 
+## 实验整理入口
+
+如果你当前的重点是整理仓库，而不是继续跑新实验，建议从下面四个入口开始：
+
+- [docs/OUTPUT_RETENTION.md](./docs/OUTPUT_RETENTION.md)
+- [cmorl_cyborg/outputs/README.md](./cmorl_cyborg/outputs/README.md)
+- [cmorl_cyborg/outputs/manifests/official_artifacts.yaml](./cmorl_cyborg/outputs/manifests/official_artifacts.yaml)
+- [cmorl_minicage/outputs/README.md](./cmorl_minicage/outputs/README.md)
+
+这一轮整理是“非破坏式”的：
+
+- 先固定哪些产物算正式结果
+- 再固定哪些只是复现实验输入
+- 最后才处理大体积 `run_*`、`policy_*.pt`、`trace/` 这类临时运行产物
+
+这样可以先把秩序立起来，而不打断当前 `3-objective` 主文线和 `4-objective` 升级线。
+
 ## 当前复现主线在做什么
 
 当前 `cmorl_minicage` 主要实现了以下能力：

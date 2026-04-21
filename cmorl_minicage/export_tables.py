@@ -78,10 +78,20 @@ def _table_b_rows(paths: list[str]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for path in paths:
         payload = load_json(path)
+        selected_policy_id = payload.get("selected_policy_id", "")
+        if not selected_policy_id:
+            selected_policy_ids = payload.get("selected_policy_ids", [])
+            if isinstance(selected_policy_ids, list):
+                unique_ids: list[str] = []
+                for raw_policy_id in selected_policy_ids:
+                    policy_id = str(raw_policy_id).strip()
+                    if policy_id and policy_id not in unique_ids:
+                        unique_ids.append(policy_id)
+                selected_policy_id = "; ".join(unique_ids)
         rows.append(
             {
                 "method_name": payload.get("method_name", Path(path).stem),
-                "selected_policy_id": payload.get("selected_policy_id", ""),
+                "selected_policy_id": selected_policy_id,
                 "security_return": f"{float(payload.get('security_return', 0.0)):.4f}",
                 "business_return": f"{float(payload.get('business_return', 0.0)):.4f}",
                 "cost_return": f"{float(payload.get('cost_return', 0.0)):.4f}",

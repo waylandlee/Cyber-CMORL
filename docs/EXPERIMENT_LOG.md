@@ -25,6 +25,11 @@
 
 本文件负责记录“如何理解这些结果”，而不是替代这些产物。
 
+说明：
+
+- 历史 MiniCAGE 实验的部分原始 `run_*` 目录与派生图片已在后续清理中移出当前工作区。
+- 对于这类不再保留本地实体的历史产物，本文件只保留 run id、文件名和结论描述，不再保留失效点击链接。
+
 ## 口径变更说明
 
 从 2026-03-31 开始，`cmorl_minicage` 的环境奖励口径切换为：
@@ -68,8 +73,8 @@
 - 实验 ID：`run_29deaae7`
 - 阶段：Stage-1
 - 目标：验证新的 preference 初始化策略、summary 产物和 buffer schema 是否能正常写出
-- 配置文件：[cmorl_minicage/configs/stage1.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/stage1.yaml)
-- 输出目录：[run_29deaae7](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/p1_stage1_check/run_29deaae7)
+- 配置文件：[cmorl_minicage/configs/stage1.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/stage1.yaml)
+- 输出目录：`run_29deaae7`
 - 关键指标：
   - `schema_version = 0.3.0`
   - `preferences count = 6`
@@ -93,10 +98,10 @@
 - 阶段：Stage-2 + Evaluation
 - 目标：验证 round summary、泛化 HV 和 assignment summary 是否正常写出
 - 配置文件：
-  - [cmorl_minicage/configs/stage2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/stage2.yaml)
-  - [cmorl_minicage/configs/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/evaluate.yaml)
-- 输入 buffer：[solution_buffer.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/p1_stage1_check/run_29deaae7/solution_buffer.json)
-- 输出目录：[run_81cbc3c2](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/p1_stage2_check/run_81cbc3c2)
+  - [cmorl_minicage/configs/stage2.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/stage2.yaml)
+  - [cmorl_minicage/configs/evaluate.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/evaluate.yaml)
+- 输入 buffer：`solution_buffer.json`
+- 输出目录：`run_81cbc3c2`
 - 关键指标：
   - `hypervolume_method = exact_inclusion_exclusion`
   - `unique_assigned_policies = 4`
@@ -125,26 +130,26 @@
 - 阶段：Stage-2 + Evaluation
 - 目标：围绕 Stage-2 约束强度与局部搜索步长，找到能产生有效 Pareto front extension 的超参数区间
 - 配置文件：
-  - [cmorl_minicage/configs/ablation/stage2_conservative.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_conservative.yaml)
-  - [cmorl_minicage/configs/ablation/stage2_balanced.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_balanced.yaml)
-  - [cmorl_minicage/configs/ablation/stage2_relaxed.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_relaxed.yaml)
-  - [cmorl_minicage/configs/ablation/local_search/stage2_beta_1005.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/local_search/stage2_beta_1005.yaml)
-  - [cmorl_minicage/configs/ablation/local_search/stage2_beta_1020.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/local_search/stage2_beta_1020.yaml)
-  - [cmorl_minicage/configs/ablation/local_search/stage2_steps_1024.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/local_search/stage2_steps_1024.yaml)
-  - [cmorl_minicage/configs/ablation/local_search/stage2_steps_1536.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/local_search/stage2_steps_1536.yaml)
-  - [cmorl_minicage/configs/ablation/local_search/stage2_tol_025.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/local_search/stage2_tol_025.yaml)
-  - [cmorl_minicage/configs/ablation/local_search/stage2_tol_075.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/local_search/stage2_tol_075.yaml)
-- 输入 buffer：[solution_buffer.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/p1_stage1_check/run_29deaae7/solution_buffer.json)
+  - [cmorl_minicage/configs/ablation/stage2_conservative.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/stage2_conservative.yaml)
+  - [cmorl_minicage/configs/ablation/stage2_balanced.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/stage2_balanced.yaml)
+  - [cmorl_minicage/configs/ablation/stage2_relaxed.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/stage2_relaxed.yaml)
+  - [cmorl_minicage/configs/ablation/local_search/stage2_beta_1005.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/local_search/stage2_beta_1005.yaml)
+  - [cmorl_minicage/configs/ablation/local_search/stage2_beta_1020.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/local_search/stage2_beta_1020.yaml)
+  - [cmorl_minicage/configs/ablation/local_search/stage2_steps_1024.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/local_search/stage2_steps_1024.yaml)
+  - [cmorl_minicage/configs/ablation/local_search/stage2_steps_1536.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/local_search/stage2_steps_1536.yaml)
+  - [cmorl_minicage/configs/ablation/local_search/stage2_tol_025.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/local_search/stage2_tol_025.yaml)
+  - [cmorl_minicage/configs/ablation/local_search/stage2_tol_075.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/local_search/stage2_tol_075.yaml)
+- 输入 buffer：`solution_buffer.json`
 - 输出目录：
-  - [stage2_conservative/run_a29b1cf0](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/stage2_conservative/run_a29b1cf0)
-  - [stage2_balanced/run_3e8fb3a0](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/stage2_balanced/run_3e8fb3a0)
-  - [stage2_relaxed/run_5c3e7177](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/stage2_relaxed/run_5c3e7177)
-  - [stage2_beta_1005/run_89adf296](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_beta_1005/run_89adf296)
-  - [stage2_beta_1020/run_ec04a030](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_beta_1020/run_ec04a030)
-  - [stage2_steps_1024/run_68b8a4b2](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_steps_1024/run_68b8a4b2)
-  - [stage2_steps_1536/run_28007b1b](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_steps_1536/run_28007b1b)
-  - [stage2_tol_025/run_2e112668](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_tol_025/run_2e112668)
-  - [stage2_tol_075/run_8e69e7c1](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_tol_075/run_8e69e7c1)
+  - `stage2_conservative/run_a29b1cf0`
+  - `stage2_balanced/run_3e8fb3a0`
+  - `stage2_relaxed/run_5c3e7177`
+  - `stage2_beta_1005/run_89adf296`
+  - `stage2_beta_1020/run_ec04a030`
+  - `stage2_steps_1024/run_68b8a4b2`
+  - `stage2_steps_1536/run_28007b1b`
+  - `stage2_tol_025/run_2e112668`
+  - `stage2_tol_075/run_8e69e7c1`
 - 关键指标摘要：
 
 | 配置 | HV | EU | SP | Pareto Count | Coverage | Unique Assigned |
@@ -177,11 +182,11 @@
 - 实验 ID：`run_4a7029b6` 可视化补充
 - 阶段：Visualization / Legacy Run Interpretation
 - 目标：为旧版 `config_stage2` run 生成 Pareto 图，作为机制验证和文档解释样例
-- 输入目录：[run_4a7029b6](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/config_stage2/run_4a7029b6)
+- 输入目录：`run_4a7029b6`
 - 输出图：
-  - [pareto_projections.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/config_stage2/run_4a7029b6/plots/pareto_projections.png)
-  - [pareto_3d_scatter.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/config_stage2/run_4a7029b6/plots/pareto_3d_scatter.png)
-  - [stage1_vs_stage2_overlay.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/config_stage2/run_4a7029b6/plots/stage1_vs_stage2_overlay.png)
+  - `pareto_projections.png`
+  - `pareto_3d_scatter.png`
+  - `stage1_vs_stage2_overlay.png`
 - 现象：
   - 该 run 最终只有 3 个 Pareto 点。
   - 第二目标恒为 `0.0`，说明这条 run 主要只在两个目标间发生 trade-off。
@@ -197,16 +202,16 @@
 - 阶段：Visualization / Result Interpretation
 - 目标：把当前最重要的一组 Stage-2 结果转成可直接解释的图形产物
 - 输入目录：
-  - [stage2_beta_1005/run_89adf296](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_beta_1005/run_89adf296)
-  - [cmorl_minicage/outputs](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs)
+  - `stage2_beta_1005/run_89adf296`
+  - [cmorl_minicage/outputs](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs)
 - 输出图：
-  - [beta_1005/pareto_projections.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_beta_1005/run_89adf296/plots/pareto_projections.png)
-  - [beta_1005/pareto_3d_scatter.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_beta_1005/run_89adf296/plots/pareto_3d_scatter.png)
-  - [beta_1005/stage1_vs_stage2_overlay.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_beta_1005/run_89adf296/plots/stage1_vs_stage2_overlay.png)
-  - [beta_1005/assignment_counts.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_beta_1005/run_89adf296/plots/assignment_counts.png)
-  - [beta_1005/stage2_rounds.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation/local_search/stage2_beta_1005/run_89adf296/plots/stage2_rounds.png)
-  - [ablation_triplet.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/ablation_triplet.png)
-  - [paper_style_ablation_summary.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/paper_style_ablation_summary.png)
+  - `beta_1005/pareto_projections.png`
+  - `beta_1005/pareto_3d_scatter.png`
+  - `beta_1005/stage1_vs_stage2_overlay.png`
+  - `beta_1005/assignment_counts.png`
+  - `beta_1005/stage2_rounds.png`
+  - `ablation_triplet.png`
+  - `paper_style_ablation_summary.png`
 - 关键指标：
   - `beta_1005`：
     - `HV = 2873.94`
@@ -237,9 +242,9 @@
 - 阶段：Stage-1 + Evaluation
 - 目标：在新的 `security / business / cost` 定义下重新建立 Stage-1 baseline，并验证 8 个语义指标能稳定输出
 - 配置文件：
-  - [cmorl_minicage/configs/stage1.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/stage1.yaml)
-  - [cmorl_minicage/configs/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/evaluate.yaml)
-- 输出目录：[run_b01c7843](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/p2_stage1_semantic_check/run_b01c7843)
+  - [cmorl_minicage/configs/stage1.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/stage1.yaml)
+  - [cmorl_minicage/configs/evaluate.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/evaluate.yaml)
+- 输出目录：`run_b01c7843`
 - 关键指标：
   - `HV = 320.98`
   - `EU = -53.89`
@@ -262,8 +267,8 @@
 - 实验 ID：`run_ec06fdce`
 - 阶段：Stage-2 + Evaluation
 - 目标：在新的 `security / business / cost` 定义下验证 Stage-2 `beta_1005` 是否仍能带来有效扩展
-- 输入 buffer：[solution_buffer.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/p2_stage1_semantic_check/run_b01c7843/solution_buffer.json)
-- 输出目录：[run_ec06fdce](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/p2_stage2_semantic_beta1005/run_ec06fdce)
+- 输入 buffer：`solution_buffer.json`
+- 输出目录：`run_ec06fdce`
 - 关键指标：
   - `HV = 87.18`
   - `EU = -53.67`
@@ -292,14 +297,14 @@
 - 阶段：Formal Baselines + Evaluation
 - 目标：在新三目标定义下建立一套可直接对照主方法的正式 baseline 套餐
 - 配置文件：
-  - [cmorl_minicage/configs/formal/stage1.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1.yaml)
-  - [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/evaluate.yaml)
+  - [cmorl_minicage/configs/formal/stage1.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/stage1.yaml)
+  - [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/evaluate.yaml)
 - 输出目录：
-  - [sleep/run_bdc3cfa1](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/sleep/run_bdc3cfa1)
-  - [random_valid/run_8a580b0d](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/random_valid/run_8a580b0d)
-  - [stage1_only/run_771cd77c](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/stage1_only/run_771cd77c)
-  - [single_objective/run_6219e73a](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/single_objective/run_6219e73a)
-  - [weighted_sum/run_62da19e2](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/weighted_sum/run_62da19e2)
+  - `sleep/run_bdc3cfa1`
+  - `random_valid/run_8a580b0d`
+  - `stage1_only/run_771cd77c`
+  - `single_objective/run_6219e73a`
+  - `weighted_sum/run_62da19e2`
 - 关键结果：
   - `Weighted-Sum`
     - `EU = -28.22`
@@ -332,11 +337,11 @@
 - 统一参考点：
   - `[-806.4847, -74.4281, -66.7700]`
 - 输出文件：
-  - [sleep metrics_fixed_ref.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/sleep/run_bdc3cfa1/metrics_fixed_ref.json)
-  - [random_valid metrics_fixed_ref.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/random_valid/run_8a580b0d/metrics_fixed_ref.json)
-  - [stage1_only metrics_fixed_ref.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/stage1_only/run_771cd77c/metrics_fixed_ref.json)
-  - [single_objective metrics_fixed_ref.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/single_objective/run_6219e73a/metrics_fixed_ref.json)
-  - [weighted_sum metrics_fixed_ref.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/weighted_sum/run_62da19e2/metrics_fixed_ref.json)
+  - `sleep metrics_fixed_ref.json`
+  - `random_valid metrics_fixed_ref.json`
+  - `stage1_only metrics_fixed_ref.json`
+  - `single_objective metrics_fixed_ref.json`
+  - `weighted_sum metrics_fixed_ref.json`
 - 关键指标：
   - `sleep = 3959276.75`
   - `stage1_only = 2668390.50`
@@ -359,10 +364,10 @@
 - 统一参考点：
   - `[-557.1790, -53.3703, -46.2695]`
 - 输出文件：
-  - [weighted_sum metrics_compare_main.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal/weighted_sum/run_62da19e2/metrics_compare_main.json)
-  - [stage2 metrics_compare_main.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/p2_stage2_semantic_beta1005/run_ec06fdce/metrics_compare_main.json)
-  - [main_vs_weighted_sum_metrics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/main_vs_weighted_sum_metrics.png)
-  - [main_vs_weighted_sum_semantics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/main_vs_weighted_sum_semantics.png)
+  - `weighted_sum metrics_compare_main.json`
+  - `stage2 metrics_compare_main.json`
+  - `main_vs_weighted_sum_metrics.png`
+  - `main_vs_weighted_sum_semantics.png`
 - 关键指标：
   - `Weighted-Sum`
     - `HV = 441929.16`
@@ -400,17 +405,17 @@
     - `security` 中加入 no-op under compromise 的显式安全惩罚
     - no-op 在 `business / cost` 上不再接近免费
 - 配置文件：
-  - [cmorl_minicage/configs/formal/stage1_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2.yaml)
-  - [cmorl_minicage/configs/formal/stage2_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2.yaml)
-  - [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/evaluate.yaml)
+  - [cmorl_minicage/configs/formal/stage1_c2.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/stage1_c2.yaml)
+  - [cmorl_minicage/configs/formal/stage2_c2.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/stage2_c2.yaml)
+  - [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/evaluate.yaml)
 - 输出目录：
-  - [stage1/run_446acb6c](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage1/run_446acb6c)
-  - [stage2/run_46e57616](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616)
-  - [weighted_sum/run_bc553e0f](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2/cand_g/weighted_sum/run_bc553e0f)
+  - [stage1/run_446acb6c](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2/stage1/run_446acb6c)
+  - [stage2/run_46e57616](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616)
+  - [weighted_sum/run_bc553e0f](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2/cand_g/weighted_sum/run_bc553e0f)
   - 统一参考点评估：
-    - [stage1 metrics_compare_c2main.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage1/run_446acb6c/metrics_compare_c2main.json)
-    - [stage2 metrics_compare_c2main.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616/metrics_compare_c2main.json)
-    - [weighted_sum metrics_compare_c2main.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2/cand_g/weighted_sum/run_bc553e0f/metrics_compare_c2main.json)
+    - [stage1 metrics_compare_c2main.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2/stage1/run_446acb6c/metrics_compare_c2main.json)
+    - [stage2 metrics_compare_c2main.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616/metrics_compare_c2main.json)
+    - [weighted_sum metrics_compare_c2main.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2/cand_g/weighted_sum/run_bc553e0f/metrics_compare_c2main.json)
 - 统一参考点：
   - `[-746.9993, -55.7503, -45.4993]`
 - 关键指标：
@@ -446,12 +451,12 @@
   - 经过 reward 校准后，formal `Stage-2` 已成为当前项目里表现最强的主方法结果。
 - 下一步：
   - 为这轮 formal `Stage-2` 生成新的可视化主图与 `Stage-1 / Weighted-Sum` 对比图。
-  - 把 [PROJECT_BRIEF.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/PROJECT_BRIEF.md) 和 [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md) 的“当前主结果判断”同步更新到这轮结论。
+  - 把 [PROJECT_BRIEF.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/PROJECT_BRIEF.md) 和 [README.md](/home/waylandlee/CMORL2/Cyber-CMORL/README.md) 的“当前主结果判断”同步更新到这轮结论。
 
 #### 图 1：常规指标解释与结果分析
 
 - 图文件：
-  - [formal_c2_mainline_metrics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_mainline_metrics.png)
+  - [formal_c2_mainline_metrics.png](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/plots/formal_c2_mainline_metrics.png)
 - 比较对象：
   - `Stage-1`
   - `Stage-2`
@@ -473,7 +478,7 @@
 #### 图 2：网络安全语义指标解释与结果分析
 
 - 图文件：
-  - [formal_c2_mainline_semantics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_mainline_semantics.png)
+  - [formal_c2_mainline_semantics.png](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/plots/formal_c2_mainline_semantics.png)
 - 比较对象：
   - `Stage-1`
   - `Stage-2`
@@ -509,15 +514,15 @@
   - 在当前默认 `C2 / cand_g` reward 口径下，把 5 个 baseline 与正式 `Stage-2` 放到同一评估协议中统一比较。
   - 一次性生成 suite 级 metrics 图、3D 图和三图 pairwise 图。
 - 输出目录：
-  - [sleep/run_162d138e](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/sleep/run_162d138e)
-  - [random_valid/run_c52c29c6](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/random_valid/run_c52c29c6)
-  - [stage1_only](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/stage1_only)
-  - [single_objective/run_cc1669d6](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/single_objective/run_cc1669d6)
-  - [weighted_sum/run_19ca174c](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c)
-  - [formal Stage-2 run_46e57616](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616)
+  - [sleep/run_162d138e](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/sleep/run_162d138e)
+  - [random_valid/run_c52c29c6](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/random_valid/run_c52c29c6)
+  - [stage1_only](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/stage1_only)
+  - [single_objective/run_cc1669d6](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/single_objective/run_cc1669d6)
+  - [weighted_sum/run_19ca174c](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c)
+  - [formal Stage-2 run_46e57616](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616)
   - 统一评估结果：
-    - [sleep metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/sleep/run_162d138e/metrics_compare_suite.json)
-  - [random_valid metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/random_valid/run_c52c29c6/metrics_compare_suite.json)
+    - [sleep metrics_compare_suite.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/sleep/run_162d138e/metrics_compare_suite.json)
+  - [random_valid metrics_compare_suite.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/random_valid/run_c52c29c6/metrics_compare_suite.json)
 
 ### 2026-04-01 / P6-Formal-C2-Independent-Protocol
 
@@ -530,28 +535,28 @@
   - 验证去除串行随机耦合后，`Stage-1 -> Stage-2 -> evaluate` 是否仍然成立。
   - 在统一参考点下，把这条新协议主线与当前 formal `Weighted-Sum` 做公平比较。
 - 配置文件：
-  - [cmorl_minicage/configs/formal/stage1_c2_independent.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
-  - [cmorl_minicage/configs/formal/stage2_c2.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2.yaml)
-  - [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/evaluate.yaml)
+  - [cmorl_minicage/configs/formal/stage1_c2_independent.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
+  - [cmorl_minicage/configs/formal/stage2_c2.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/stage2_c2.yaml)
+  - [cmorl_minicage/configs/formal/evaluate.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/evaluate.yaml)
 - 输入与输出：
   - `Stage-1` 输出：
-    - [run_39a19d00](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00)
-    - [solution_buffer.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/solution_buffer.json)
-    - [metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/metrics_compare_independent.json)
+    - [run_39a19d00](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00)
+    - [solution_buffer.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/solution_buffer.json)
+    - [metrics_compare_independent.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/metrics_compare_independent.json)
   - `Stage-2` 输出：
-    - [run_0a44c361](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361)
-    - [solution_buffer.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/solution_buffer.json)
-    - [stage2_summary.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/stage2_summary.json)
-    - [metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/metrics_compare_independent.json)
+    - [run_0a44c361](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361)
+    - [solution_buffer.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/solution_buffer.json)
+    - [stage2_summary.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/stage2_summary.json)
+    - [metrics_compare_independent.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/metrics_compare_independent.json)
   - 统一参考点 baseline：
-    - [weighted_sum metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/metrics_compare_independent.json)
+    - [weighted_sum metrics_compare_independent.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/metrics_compare_independent.json)
   - 可视化：
-    - [formal_c2_independent_mainline_metrics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_mainline_metrics.png)
-    - [formal_c2_independent_mainline_semantics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_mainline_semantics.png)
-    - [formal_c2_independent_core_security.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_core_security.png)
-    - [formal_c2_independent_compact_objective_map.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_compact_objective_map.png)
-    - [formal_c2_independent_objective_3d_comparison.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_objective_3d_comparison.png)
-    - [formal_c2_independent_pairwise_objectives.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_pairwise_objectives.png)
+    - `formal_c2_independent_mainline_metrics.png`
+    - `formal_c2_independent_mainline_semantics.png`
+    - `formal_c2_independent_core_security.png`
+    - `formal_c2_independent_compact_objective_map.png`
+    - `formal_c2_independent_objective_3d_comparison.png`
+    - `formal_c2_independent_pairwise_objectives.png`
 - 协议说明：
   - `stage1_protocol_name = independent`
   - `reseed_mode = per_preference`
@@ -588,9 +593,9 @@
   - 但与 `legacy formal_c2` 不同，新协议下 `Stage-2` 的语义指标没有同步优于 `Stage-1`：其 `final_compromised_hosts`、`final_critical_compromised_hosts`、`critical_impact_count` 和 `high_disruption_action_rate` 都更高。
 - 机制解释：
   - `Stage-1` 最终只保留了 3 个互补角色：
-    - [stage1_pref_003_ckpt_008](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/pareto_front_stage1.json) 更偏安全端；
-    - [stage1_pref_002_ckpt_015](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/pareto_front_stage1.json) 更偏 `cost` / 折中；
-    - [stage1_pref_005_ckpt_015](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/pareto_front_stage1.json) 更偏业务友好端。
+    - [stage1_pref_003_ckpt_008](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/pareto_front_stage1.json) 更偏安全端；
+    - [stage1_pref_002_ckpt_015](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/pareto_front_stage1.json) 更偏 `cost` / 折中；
+    - [stage1_pref_005_ckpt_015](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/pareto_front_stage1.json) 更偏业务友好端。
   - `Stage-2` 第 0 轮直接选中了这 3 个点作为父策略；第 1 轮继续围绕扩展后的 `4` 点局部修复前沿。
   - 最终 front 中真正被 assignment 使用的 3 个点是：
     - `stage2_ext_000_obj_1`
@@ -624,10 +629,10 @@
     - Stage-2 的候选选择逻辑
     - 约束强度的动态调度
     - 使前沿扩展更多落向低风险、低扰动且仍具 utility 的区域
-    - [stage1_only metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/stage1_only/metrics_compare_suite.json)
-    - [single_objective metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/single_objective/run_cc1669d6/metrics_compare_suite.json)
-    - [weighted_sum metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/metrics_compare_suite.json)
-    - [stage2 metrics_compare_suite.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616/metrics_compare_suite.json)
+    - [stage1_only metrics_compare_suite.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/stage1_only/metrics_compare_suite.json)
+    - [single_objective metrics_compare_suite.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/single_objective/run_cc1669d6/metrics_compare_suite.json)
+    - [weighted_sum metrics_compare_suite.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/metrics_compare_suite.json)
+    - [stage2 metrics_compare_suite.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2/stage2/run_46e57616/metrics_compare_suite.json)
 - 统一参考点：
   - `[-1523.38696, -55.75031, -45.49925]`
 - 关键指标：
@@ -656,9 +661,9 @@
     - `EU = -454.18`
     - `Pareto Count = 1`
 - 图文件：
-  - [formal_c2_suite_metrics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_suite_metrics.png)
-  - [formal_c2_suite_3d.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_suite_3d.png)
-  - [formal_c2_suite_pairwise.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_suite_pairwise.png)
+  - [formal_c2_suite_metrics.png](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/plots/formal_c2_suite_metrics.png)
+  - [formal_c2_suite_3d.png](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/plots/formal_c2_suite_3d.png)
+  - [formal_c2_suite_pairwise.png](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/plots/formal_c2_suite_pairwise.png)
 - 现象：
   - `Stage-2` 在 6 方法统一比较中保持最强，说明它当前不是只赢过 `Weighted-Sum`，而是同时赢过 `Stage-1 Only` 与 `Single-Objective`。
   - `Stage-1 Only` 与 `Single-Objective` 的 HV 都明显高于 `Weighted-Sum`，说明这两条线在当前 reward 口径下也是强基线，不能被视为弱对照。
@@ -676,16 +681,16 @@
   - `run_19ca174c` `weighted-sum` fair compare reuse
 - 阶段：Formal C2 Independent Mainline + Fair Evaluation Refresh
 - 目标：
-  - 用 [stage1_c2_independent.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2_independent.yaml) 重跑新的正式 `Stage-1`。
+  - 用 [stage1_c2_independent.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/stage1_c2_independent.yaml) 重跑新的正式 `Stage-1`。
   - 把新的 `Stage-1` buffer 接到 `Stage-2`，生成新的 independent 主线结果。
   - 以 `Stage-1 / Stage-2 / Weighted-Sum` 的联合前沿重新计算统一参考点，刷新 independent 主线公平评估与图像。
 - 输出目录：
-  - [formal_c2_independent/stage1/run_39a19d00](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00)
-  - [formal_c2_independent/stage2/run_0a44c361](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361)
+  - [formal_c2_independent/stage1/run_39a19d00](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00)
+  - [formal_c2_independent/stage2/run_0a44c361](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361)
   - 公平评估结果：
-    - [stage1 metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/metrics_compare_independent.json)
-    - [stage2 metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/metrics_compare_independent.json)
-    - [weighted_sum metrics_compare_independent.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/metrics_compare_independent.json)
+    - [stage1 metrics_compare_independent.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_39a19d00/metrics_compare_independent.json)
+    - [stage2 metrics_compare_independent.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage2/run_0a44c361/metrics_compare_independent.json)
+    - [weighted_sum metrics_compare_independent.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/baselines_formal_c2_suite/weighted_sum/run_19ca174c/metrics_compare_independent.json)
 - 训练摘要：
   - `Stage-1` 共完成 `6` 个 preference，写出 `30` 条 records，最终 Pareto Count 为 `3`。
   - `Stage-2` 在 `2` 个 extension rounds 中共生成 `7` 条新 policy，最终 records 数为 `37`，Pareto Count 提升到 `4`。
@@ -705,12 +710,12 @@
     - `EU = -189.66`
     - `Pareto Count = 3`
 - 图文件：
-  - [formal_c2_independent_mainline_metrics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_mainline_metrics.png)
-  - [formal_c2_independent_mainline_semantics.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_mainline_semantics.png)
-  - [formal_c2_independent_core_security.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_core_security.png)
-  - [formal_c2_independent_compact_objective_map.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_compact_objective_map.png)
-  - [formal_c2_independent_objective_3d_comparison.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_objective_3d_comparison.png)
-  - [formal_c2_independent_pairwise_objectives.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/plots/formal_c2_independent_pairwise_objectives.png)
+  - `formal_c2_independent_mainline_metrics.png`
+  - `formal_c2_independent_mainline_semantics.png`
+  - `formal_c2_independent_core_security.png`
+  - `formal_c2_independent_compact_objective_map.png`
+  - `formal_c2_independent_objective_3d_comparison.png`
+  - `formal_c2_independent_pairwise_objectives.png`
 - 现象：
   - 新的 independent `Stage-2` 仍然稳定优于同轮 `Stage-1`，在 `HV / EU / Pareto Count` 三项核心指标上都继续领先。
   - 在这轮 unified reference point 下，`Weighted-Sum` 明显落后于 independent `Stage-1 / Stage-2`，说明新的独立协议主线仍保留了明显的几何与 utility 优势。
@@ -729,9 +734,9 @@
   - 把 independent 协议下的 `Stage-1` 默认基线从 `6-policy dirichlet_extremes` 切到 `E3` explicit preference 设计。
   - 验证更密的中间 preference 是否能在不增加前沿点数的情况下提升 front 质量。
 - 配置文件：
-  - [stage1_c2_independent.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
+  - [stage1_c2_independent.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/stage1_c2_independent.yaml)
 - 输出目录：
-  - [run_ea5423c5](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_ea5423c5)
+  - [run_ea5423c5](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_ea5423c5)
 - 关键指标：
   - `HV = 333840.66`
   - `EU = -128.39`
@@ -751,11 +756,11 @@
 - 目标：
   - 在新的 `E3 Stage-1` 基线上直接跑一版正式 `AdaCS-DCS Stage-2`。
 - 配置文件：
-  - [stage2_c2_adacs_dcs.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
+  - [stage2_c2_adacs_dcs.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
 - 输入 buffer：
-  - [run_ea5423c5/solution_buffer.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent/stage1/run_ea5423c5/solution_buffer.json)
+  - [run_ea5423c5/solution_buffer.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent/stage1/run_ea5423c5/solution_buffer.json)
 - 输出目录：
-  - [run_df327d5c](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent_adacs_dcs/stage2/run_df327d5c)
+  - [run_df327d5c](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent_adacs_dcs/stage2/run_df327d5c)
 - 关键指标：
   - 与 `Stage-1 E3` 完全相同：
     - `HV = 333840.66`
@@ -782,10 +787,10 @@
   - 仅调 `dynamic beta` 区间，验证 DCS 是否能从“完全卡死”恢复为可行扩展。
   - 在统一参考点下，与 `Stage-1 E3`、`fixed beta`、`Weighted-Sum` 公平比较。
 - 配置文件：
-  - [stage2_crowding_dcs_gentle.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_crowding_dcs_gentle.yaml)
-  - [stage2_adacs_dcs_gentle.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_adacs_dcs_gentle.yaml)
-  - [stage2_crowding_dcs_verygentle.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_crowding_dcs_verygentle.yaml)
-  - [stage2_adacs_dcs_verygentle.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/ablation/stage2_adacs_dcs_verygentle.yaml)
+  - [stage2_crowding_dcs_gentle.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/stage2_crowding_dcs_gentle.yaml)
+  - [stage2_adacs_dcs_gentle.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/stage2_adacs_dcs_gentle.yaml)
+  - [stage2_crowding_dcs_verygentle.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/stage2_crowding_dcs_verygentle.yaml)
+  - [stage2_adacs_dcs_verygentle.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/ablation/stage2_adacs_dcs_verygentle.yaml)
 - 关键机制结果：
   - `crowding_dcs_gentle`: `generated = 7`, `pareto_after = 5`
   - `adacs_dcs_gentle`: `generated = 7`, `pareto_after = 5`
@@ -846,7 +851,7 @@
   - 验证当前 independent 协议下，`Stage-1` 的 `3` 点前沿是否只是 preference 太稀导致。
   - 为 AdaCS 提供 candidate-rich 的 Stage-1 front。
 - 输出目录：
-  - [e3_dense_ckpt/run_011d7162](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/formal_c2_independent_stage1_density/e3_dense_ckpt/run_011d7162)
+  - [e3_dense_ckpt/run_011d7162](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/formal_c2_independent_stage1_density/e3_dense_ckpt/run_011d7162)
 - 关键结果：
   - `E3 baseline`
     - `Pareto Count = 3`
@@ -879,10 +884,10 @@
     - 提高 `num_extension_policies / extension_rounds`
   - 验证 AdaCS-DCS 能否在 dense-front 上同时超过 `crowding + dcs_gentle` 的 `HV / EU`。
 - 配置文件：
-  - [stage2_c2_adacs_dcs.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
+  - [stage2_c2_adacs_dcs.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/configs/formal/stage2_c2_adacs_dcs.yaml)
 - 输出目录：
-  - [chase/run_57a6c14a](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation_adacs_dcs_marginal/chase/run_57a6c14a)
-  - [crowding_dcs_gentle/run_0fc59441](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/outputs/ablation_adacs_dcs_dense/crowding_dcs_gentle/run_0fc59441)
+  - [chase/run_57a6c14a](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/ablation_adacs_dcs_marginal/chase/run_57a6c14a)
+  - [crowding_dcs_gentle/run_0fc59441](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/outputs/ablation_adacs_dcs_dense/crowding_dcs_gentle/run_0fc59441)
 - 公平结果：
   - `crowding + dcs_gentle`
     - `HV = 6370030.75`
@@ -916,12 +921,12 @@
   - 固定主表 A / 主表 B / 总导表入口
   - 给出进入 `5-seed formal` 前的最终命令模板与准入判断口径
 - 关键改动：
-  - 新增 [cmorl_cyborg/main_table_a.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/main_table_a.py)
-  - 新增 [cmorl_cyborg/main_table_b.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/main_table_b.py)
-  - [cmorl_cyborg/evaluate_constraints.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/evaluate_constraints.py) 补齐 `build-thresholds` 与 `aggregate`
-  - [compare_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/compare_suite_main.yaml) 改为第二周正式 `3-seed` 协议入口
-  - 新增 [table_b_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/table_b_suite_main.yaml)
-  - 新增 [CYBORG_WEEK2_CLOSEOUT.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_WEEK2_CLOSEOUT.md)
+  - 新增 [cmorl_cyborg/main_table_a.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/main_table_a.py)
+  - 新增 [cmorl_cyborg/main_table_b.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/main_table_b.py)
+  - [cmorl_cyborg/evaluate_constraints.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/evaluate_constraints.py) 补齐 `build-thresholds` 与 `aggregate`
+  - [compare_suite_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/compare_suite_main.yaml) 改为第二周正式 `3-seed` 协议入口
+  - 新增 [table_b_suite_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/table_b_suite_main.yaml)
+  - 新增 [CYBORG_WEEK2_CLOSEOUT.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_WEEK2_CLOSEOUT.md)
 - 当前状态：
   - 第二周的代码链、配置链、导表链已经固定在 `Scenario2` 协议上
   - `shared reference` 与 `shared thresholds` 的正式生成入口已经固定
@@ -937,9 +942,9 @@
 - 目标：
   - 判断 `coverage_combo_fair` 的 `3-seed` 效果是否优于原始 `paper_table_b` 中的 `ours_stage2`
 - 输入文件：
-  - [ours_stage2.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_b/aggregated/ours_stage2.json)
-  - [coverage_combo_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
-  - [main_table_b_bar.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/paper_table_b/main_table_b_bar.png)
+  - [ours_stage2.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/paper_table_b/aggregated/ours_stage2.json)
+  - [coverage_combo_fair_loose.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
+  - [main_table_b_bar.png](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/paper_table_b/main_table_b_bar.png)
 - 关键指标：
   - 原始 `ours_stage2`
     - `security_return = -518.70 ± 17.16`
@@ -968,11 +973,11 @@
 - 目标：
   - 判断新增 `coverage_combo_fair` 与 `coverage_more_parents_fair` 是否在 `Loose` 情况下形成稳定优势
 - 输入文件：
-  - [coverage_combo_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
-  - [coverage_more_parents_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_loose.json)
-  - [ours_stage2_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/ours_stage2_fair_loose.json)
-  - [no_constraint_stage2_fair_loose.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/no_constraint_stage2_fair_loose.json)
-  - [fair_compare_table_b_loose_with_coverage.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_loose_with_coverage.png)
+  - [coverage_combo_fair_loose.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_loose.json)
+  - [coverage_more_parents_fair_loose.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_loose.json)
+  - [ours_stage2_fair_loose.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/ours_stage2_fair_loose.json)
+  - [no_constraint_stage2_fair_loose.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/no_constraint_stage2_fair_loose.json)
+  - [fair_compare_table_b_loose_with_coverage.png](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_loose_with_coverage.png)
 - 关键指标：
   - `coverage_combo_fair`
     - `feasible_rate = 0.633 ± 0.116`
@@ -1012,11 +1017,11 @@
 - 目标：
   - 判断 coverage 变体在更严格阈值下是否显示出更强的约束处理优势
 - 输入文件：
-  - [coverage_combo_fair_tight.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_tight.json)
-  - [coverage_more_parents_fair_tight.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_tight.json)
-  - [ours_stage2_fair_tight.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/ours_stage2_fair_tight.json)
-  - [no_constraint_stage2_fair_tight.json](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/no_constraint_stage2_fair_tight.json)
-  - [fair_compare_table_b_tight_with_coverage.png](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_tight_with_coverage.png)
+  - [coverage_combo_fair_tight.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_combo_fair_tight.json)
+  - [coverage_more_parents_fair_tight.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/coverage_more_parents_fair_tight.json)
+  - [ours_stage2_fair_tight.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/ours_stage2_fair_tight.json)
+  - [no_constraint_stage2_fair_tight.json](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/no_constraint_stage2_fair_tight.json)
+  - [fair_compare_table_b_tight_with_coverage.png](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/fair_compare_eval/aggregated/fair_compare_table_b_tight_with_coverage.png)
 - 关键指标：
   - `coverage_combo_fair`
     - `feasible_rate = 0.300 ± 0.134`

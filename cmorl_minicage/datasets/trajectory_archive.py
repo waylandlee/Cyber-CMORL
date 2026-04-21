@@ -9,6 +9,7 @@ import torch
 from cmorl_minicage.buffer import load_policy_buffer
 from cmorl_minicage.env import MiniCageMORLEnv
 from cmorl_minicage.models import ActorCritic
+from cmorl_minicage.shield import default_policy_action_mask, record_policy_mask_stats
 from cmorl_minicage.utils import save_json
 
 
@@ -28,7 +29,7 @@ def _resolve_path(anchor: str | Path, raw_path: str | Path) -> Path:
 
 
 def _random_valid_actions(env: MiniCageMORLEnv) -> np.ndarray:
-    blue_mask = env.sim.get_mask(env.sim.state, env.sim.current_decoys)["Blue"]
+    blue_mask = default_policy_action_mask(env)
     actions = np.zeros(env.num_envs, dtype=np.int32)
     for idx in range(env.num_envs):
         valid_actions = np.flatnonzero(blue_mask[idx] > 0)
@@ -72,9 +73,17 @@ def _record_trajectories(
             while not np.all(done):
                 if actor_critic is not None:
                     obs_tensor = torch.as_tensor(obs, dtype=torch.float32, device=device)
-                    actions = (
-                        actor_critic.act(obs_tensor).actions.cpu().numpy().reshape(env.num_envs)
+                    action_mask = torch.as_tensor(
+                        default_policy_action_mask(env),
+                        dtype=torch.bool,
+                        device=device,
                     )
+                    policy_output = actor_critic.act(
+                        obs_tensor,
+                        action_mask=action_mask,
+                    )
+                    record_policy_mask_stats(env, policy_output.blocked_probability_mass)
+                    actions = policy_output.actions.cpu().numpy().reshape(env.num_envs)
                 elif baseline_kind == "random_valid":
                     actions = _random_valid_actions(env)
                 else:
@@ -131,6 +140,11 @@ def build_trajectory_archive(
             remove_bugs=bool(metadata.get("env", {}).get("remove_bugs", True)),
             max_steps=int(metadata.get("env", {}).get("max_episode_steps", 100)),
             seed=int(metadata.get("env", {}).get("seed", 7)),
+            obj_dim=int(metadata.get("model", {}).get("obj_dim", 3)),
+            critical_host_safety_mode=str(
+                metadata.get("model", {}).get("critical_host_safety_mode", "v2_legacy")
+            ),
+            shield_mode=str(metadata.get("shield", {}).get("mode", "disabled")),
         )
         hidden_size = int(metadata.get("model", {}).get("hidden_size", 128))
         records = payload.get("pareto_front") or payload.get("records", [])

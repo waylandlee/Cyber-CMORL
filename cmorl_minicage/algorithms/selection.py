@@ -50,13 +50,18 @@ def crowding_distance(records: Sequence[dict]) -> np.ndarray:
     return distances
 
 
-def select_top_n_by_crowding(records: Sequence[dict], top_n: int) -> list[dict]:
-    pareto = nondominated_filter(records)
-    if top_n <= 0 or not pareto:
+def select_top_n_by_crowding(
+    records: Sequence[dict],
+    top_n: int,
+    *,
+    pareto_only: bool = True,
+) -> list[dict]:
+    candidates = nondominated_filter(records) if pareto_only else [dict(record) for record in records]
+    if top_n <= 0 or not candidates:
         return []
 
-    distances = crowding_distance(pareto)
-    points = _objective_array(pareto)
+    distances = crowding_distance(candidates)
+    points = _objective_array(candidates)
     selected_indices: list[int] = []
 
     for objective_idx in range(points.shape[1]):
@@ -64,11 +69,11 @@ def select_top_n_by_crowding(records: Sequence[dict], top_n: int) -> list[dict]:
         if extreme not in selected_indices:
             selected_indices.append(extreme)
 
-    remaining = [index for index in range(len(pareto)) if index not in selected_indices]
+    remaining = [index for index in range(len(candidates)) if index not in selected_indices]
     remaining.sort(key=lambda index: distances[index], reverse=True)
     for index in remaining:
         if len(selected_indices) >= top_n:
             break
         selected_indices.append(index)
 
-    return [dict(pareto[index]) for index in selected_indices[:top_n]]
+    return [dict(candidates[index]) for index in selected_indices[:top_n]]

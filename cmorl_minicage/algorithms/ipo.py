@@ -58,7 +58,7 @@ class IPOTrainer:
         for _ in range(self.config.ppo_epochs):
             for batch in storage.feed_forward_generator(self.config.num_mini_batch):
                 values, log_probs, entropy = self.actor_critic.evaluate_actions(
-                    batch.obs, batch.actions
+                    batch.obs, batch.actions, action_mask=batch.action_masks
                 )
                 ratio = torch.exp(log_probs - batch.old_log_probs)
                 clipped_ratio = torch.clamp(

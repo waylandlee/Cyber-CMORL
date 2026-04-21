@@ -14,7 +14,7 @@
 
 ## 目的
 
-本清单承接 [CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_WEEK2_CHECKLIST.md)。
+本清单承接 [CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_WEEK2_CHECKLIST.md)。
 
 第三周的目标是把已经稳定的 `cmorl_cyborg` 协议推进到最终论文交付阶段，也就是：
 
@@ -58,8 +58,8 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/configs/paper](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper)
-- [docs/CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_WEEK2_CHECKLIST.md)
+- [cmorl_cyborg/configs/paper](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper)
+- [docs/CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_WEEK2_CHECKLIST.md)
 
 ### 要做的事
 
@@ -145,10 +145,10 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/compare_suite.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/compare_suite.py)
-- [cmorl_cyborg/evaluate_constraints.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/evaluate_constraints.py)
-- [cmorl_cyborg/configs/paper/compare_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
-- [cmorl_cyborg/configs/paper/evaluate_main_table_b.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/evaluate_main_table_b.yaml)
+- [cmorl_cyborg/compare_suite.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/compare_suite.py)
+- [cmorl_cyborg/evaluate_constraints.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/evaluate_constraints.py)
+- [cmorl_cyborg/configs/paper/compare_suite_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
+- [cmorl_cyborg/configs/paper/evaluate_main_table_b.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/evaluate_main_table_b.yaml)
 
 ### 要做的事
 
@@ -174,8 +174,8 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/export_tables.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/export_tables.py)
-- [cmorl_cyborg/configs/paper/export_tables_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/export_tables_main.yaml)
+- [cmorl_cyborg/export_tables.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/export_tables.py)
+- [cmorl_cyborg/configs/paper/export_tables_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/export_tables_main.yaml)
 
 ### 要做的事
 
@@ -211,9 +211,9 @@
 
 ### 要改的文件
 
-- [docs/EXPERIMENT_LOG.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/EXPERIMENT_LOG.md)
-- [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md)
-- 可选补充到 [docs/METHOD_ADACS_DCS_CMORL.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/METHOD_ADACS_DCS_CMORL.md)
+- [docs/EXPERIMENT_LOG.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/EXPERIMENT_LOG.md)
+- [README.md](/home/waylandlee/CMORL2/Cyber-CMORL/README.md)
+- 可选补充到 [docs/METHOD_ADACS_DCS_CMORL.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/METHOD_ADACS_DCS_CMORL.md)
 
 ### 要做的事
 
@@ -253,11 +253,11 @@
 
 ### 要改的文件
 
-- [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md)
-- [docs/EXPERIMENT_LOG.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/EXPERIMENT_LOG.md)
-- [docs/MINICAGE_TO_CYBORG_MIGRATION.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/MINICAGE_TO_CYBORG_MIGRATION.md)
-- [docs/CYBORG_EXECUTION_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_EXECUTION_CHECKLIST.md)
-- [docs/CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_WEEK2_CHECKLIST.md)
+- [README.md](/home/waylandlee/CMORL2/Cyber-CMORL/README.md)
+- [docs/EXPERIMENT_LOG.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/EXPERIMENT_LOG.md)
+- [docs/MINICAGE_TO_CYBORG_MIGRATION.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/MINICAGE_TO_CYBORG_MIGRATION.md)
+- [docs/CYBORG_EXECUTION_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_EXECUTION_CHECKLIST.md)
+- [docs/CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_WEEK2_CHECKLIST.md)
 
 ### 要做的事
 

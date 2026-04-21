@@ -15,6 +15,7 @@ from cmorl_minicage.buffer import buffer_metadata, policy_record, save_policy_bu
 from cmorl_minicage.config import DEFAULT_STAGE1_CONFIG, Stage1Config, load_stage1_config
 from cmorl_minicage.env import MiniCageMORLEnv
 from cmorl_minicage.models import ActorCritic
+from cmorl_minicage.shield import default_policy_action_mask, record_policy_mask_stats
 from cmorl_minicage.storage import VectorRolloutStorage
 from cmorl_minicage.utils import ensure_dir, sample_preferences, save_json, set_seed
 
@@ -29,7 +30,14 @@ def evaluate_policy(
             done = np.zeros(env.num_envs, dtype=bool)
             while not np.all(done):
                 obs_tensor = torch.as_tensor(obs, dtype=torch.float32, device=device)
-                actions = actor_critic.act(obs_tensor).actions.cpu().numpy().reshape(env.num_envs, 1)
+                action_mask = torch.as_tensor(
+                    default_policy_action_mask(env),
+                    dtype=torch.bool,
+                    device=device,
+                )
+                policy_output = actor_critic.act(obs_tensor, action_mask=action_mask)
+                record_policy_mask_stats(env, policy_output.blocked_probability_mass)
+                actions = policy_output.actions.cpu().numpy().reshape(env.num_envs, 1)
                 obs, reward_vec, done, _, _ = env.step(actions)
                 returns += reward_vec.mean(axis=0)
     returns /= episodes
@@ -50,7 +58,13 @@ def collect_rollout(
 
     for step in range(storage.num_steps):
         with torch.no_grad():
-            policy_output = actor_critic.act(obs_tensor)
+            action_mask = torch.as_tensor(
+                default_policy_action_mask(env),
+                dtype=torch.bool,
+                device=device,
+            )
+            policy_output = actor_critic.act(obs_tensor, action_mask=action_mask)
+            record_policy_mask_stats(env, policy_output.blocked_probability_mass)
         actions = policy_output.actions.cpu().numpy().reshape(env.num_envs, 1)
         next_obs, reward_vec, done, _, _ = env.step(actions)
         next_obs_tensor = torch.as_tensor(next_obs, dtype=torch.float32, device=device)
@@ -59,6 +73,7 @@ def collect_rollout(
         storage.insert(
             obs=next_obs_tensor,
             actions=policy_output.actions,
+            action_masks=action_mask,
             log_probs=policy_output.log_probs,
             values=policy_output.values,
             rewards=reward_tensor,
@@ -85,6 +100,8 @@ def _validate_stage1_config(config: Stage1Config) -> None:
         raise ValueError("preference_seed_stride must be positive")
     if config.env_seed_stride <= 0:
         raise ValueError("env_seed_stride must be positive")
+    if int(config.model.obj_dim) not in (3, 4):
+        raise ValueError("model.obj_dim must be 3 or 4")
 
 
 def _resolve_preference_seed(config: Stage1Config, pref_idx: int) -> int:
@@ -106,6 +123,9 @@ def _build_env(config: Stage1Config, env_seed: int) -> MiniCageMORLEnv:
         remove_bugs=config.env.remove_bugs,
         max_steps=config.env.max_episode_steps,
         seed=env_seed,
+        obj_dim=int(config.model.obj_dim),
+        critical_host_safety_mode=str(config.model.critical_host_safety_mode),
+        shield_mode=str(config.shield.mode),
     )
 
 
@@ -160,6 +180,7 @@ def train_single_preference(
         num_envs=config.env.num_envs,
         obs_dim=env.obs_dim,
         obj_dim=env.obj_dim,
+        action_dim=env.action_dim,
         device=device,
     )
 
@@ -353,6 +374,7 @@ def train_stage1(config: Stage1Config) -> Path:
             optimizer_config=PPOConfig(),
             eval_config=config.eval,
             extra={
+                "shield": vars(config.shield),
                 "seed": config.seed,
                 "num_policies": num_policies,
                 "preference_strategy": config.preference_strategy,

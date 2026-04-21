@@ -2,7 +2,7 @@
 
 日期：`2026-04-03`
 
-本文件用于承接 [CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_WEEK2_CHECKLIST.md)，给出第二周在正式 `CybORG` 线上的收尾状态、最终运行命令与 `5-seed formal` 准入判断口径。
+本文件用于承接 [CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_WEEK2_CHECKLIST.md)，给出第二周在正式 `CybORG` 线上的收尾状态、最终运行命令与 `5-seed formal` 准入判断口径。
 
 ## 2026-04-08 补充状态
 
@@ -27,15 +27,15 @@
 当前 `cmorl_cyborg` 已补齐以下正式导表入口：
 
 - 主表 A：
-  - [compare_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
-  - [main_table_a.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/main_table_a.py)
+  - [compare_suite_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
+  - [main_table_a.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/main_table_a.py)
 - 主表 B：
-  - [table_b_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/table_b_suite_main.yaml)
-  - [main_table_b.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/main_table_b.py)
-  - [evaluate_constraints.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/evaluate_constraints.py)
+  - [table_b_suite_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/table_b_suite_main.yaml)
+  - [main_table_b.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/main_table_b.py)
+  - [evaluate_constraints.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/evaluate_constraints.py)
 - 总导表：
-  - [export_tables_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/export_tables_main.yaml)
-  - [export_tables.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/export_tables.py)
+  - [export_tables_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/export_tables_main.yaml)
+  - [export_tables.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/export_tables.py)
 
 这些入口现在都只面向第二周正式 `Scenario2` 协议，不再指向 `week1` 的草稿产物。
 

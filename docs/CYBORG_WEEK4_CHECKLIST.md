@@ -12,7 +12,7 @@
 
 ## 目的
 
-本清单承接 [CYBORG_WEEK3_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_WEEK3_CHECKLIST.md)。
+本清单承接 [CYBORG_WEEK3_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_WEEK3_CHECKLIST.md)。
 
 第四周的目标不再是“把实验跑出来”，而是把已经完成的正式环境结果整理成可交付的论文与仓库成果，也就是：
 
@@ -52,8 +52,8 @@
 ### 要改的文件
 
 - 论文正文草稿文件
-- [docs/EXPERIMENT_LOG.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/EXPERIMENT_LOG.md)
-- [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md)
+- [docs/EXPERIMENT_LOG.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/EXPERIMENT_LOG.md)
+- [README.md](/home/waylandlee/CMORL2/Cyber-CMORL/README.md)
 
 ### 要做的事
 
@@ -98,7 +98,7 @@
 ### 要改的文件
 
 - 图表生成脚本或 notebook
-- [cmorl_cyborg/export_tables.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/export_tables.py)
+- [cmorl_cyborg/export_tables.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/export_tables.py)
 - 最终图片输出目录
 
 ### 要做的事
@@ -139,9 +139,9 @@
 ### 要改的文件
 
 - 论文 supplementary / appendix 草稿
-- [docs/METHOD_ADACS_DCS_CMORL.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/METHOD_ADACS_DCS_CMORL.md)
-- [docs/ARCHITECTURE.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/ARCHITECTURE.md)
-- [docs/DECISIONS.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/DECISIONS.md)
+- [docs/METHOD_ADACS_DCS_CMORL.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/METHOD_ADACS_DCS_CMORL.md)
+- [docs/ARCHITECTURE.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/ARCHITECTURE.md)
+- [docs/DECISIONS.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/DECISIONS.md)
 
 ### 要做的事
 
@@ -175,12 +175,12 @@
 
 ### 要改的文件
 
-- [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md)
-- [cmorl_cyborg/README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/README.md)
-- [docs/MINICAGE_TO_CYBORG_MIGRATION.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/MINICAGE_TO_CYBORG_MIGRATION.md)
-- [docs/CYBORG_EXECUTION_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_EXECUTION_CHECKLIST.md)
-- [docs/CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_WEEK2_CHECKLIST.md)
-- [docs/CYBORG_WEEK3_CHECKLIST.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/CYBORG_WEEK3_CHECKLIST.md)
+- [README.md](/home/waylandlee/CMORL2/Cyber-CMORL/README.md)
+- [cmorl_cyborg/README.md](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/README.md)
+- [docs/MINICAGE_TO_CYBORG_MIGRATION.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/MINICAGE_TO_CYBORG_MIGRATION.md)
+- [docs/CYBORG_EXECUTION_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_EXECUTION_CHECKLIST.md)
+- [docs/CYBORG_WEEK2_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_WEEK2_CHECKLIST.md)
+- [docs/CYBORG_WEEK3_CHECKLIST.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/CYBORG_WEEK3_CHECKLIST.md)
 
 ### 要做的事
 
@@ -248,7 +248,7 @@
 
 ### 要改的文件
 
-- [README.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/README.md)
+- [README.md](/home/waylandlee/CMORL2/Cyber-CMORL/README.md)
 - 提交说明或发布说明文档
 
 ### 要做的事

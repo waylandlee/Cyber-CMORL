@@ -19,6 +19,8 @@ _AGGREGATE_FIELDS = (
     "security_return",
     "business_return",
     "cost_return",
+    "critical_host_safety_return",
+    "critical_host_safety_cvar_alpha",
     "feasible_rate",
     "mean_violation",
     "final_compromised_hosts",
@@ -56,10 +58,16 @@ def aggregate_constraint_metrics(
         "thresholds": thresholds,
     }
     for field_name in _AGGREGATE_FIELDS:
-        values = np.asarray(
-            [float(payload.get(field_name, 0.0)) for payload in payloads],
-            dtype=np.float64,
-        )
+        raw_values = [
+            payload.get(field_name)
+            for payload in payloads
+            if payload.get(field_name) is not None
+        ]
+        if not raw_values:
+            aggregated[field_name] = None
+            aggregated[f"{field_name}_std"] = None
+            continue
+        values = np.asarray([float(value) for value in raw_values], dtype=np.float64)
         aggregated[field_name] = float(np.mean(values))
         aggregated[f"{field_name}_std"] = float(np.std(values))
     return aggregated
@@ -95,7 +103,16 @@ def main() -> None:
     parser.add_argument("--input-kind", choices=("buffer", "single_policy"), default=None)
     parser.add_argument("--input-path", default=None)
     parser.add_argument("--selection-source", choices=("pareto", "records"), default=None)
-    parser.add_argument("--selection-policy", choices=("objective", "semantic_aware", "semantic_balanced"), default=None)
+    parser.add_argument(
+        "--selection-policy",
+        choices=(
+            "objective",
+            "semantic_aware",
+            "semantic_balanced",
+            "critical_safe_balanced",
+        ),
+        default=None,
+    )
     parser.add_argument("--thresholds-path", default=None)
     parser.add_argument("--output-path", default=None)
     args = parser.parse_args()

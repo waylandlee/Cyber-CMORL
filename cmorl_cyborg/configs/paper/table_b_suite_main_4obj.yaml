@@ -1,0 +1,69 @@
+output_dir: cmorl_cyborg/outputs/paper_4obj/table_b
+table_output_dir: cmorl_cyborg/outputs/paper_4obj/tables
+shared_thresholds_path: cmorl_cyborg/outputs/paper_4obj/table_b/shared_thresholds.json
+eval_episodes: 5
+threshold_buffer_sources:
+  - path: cmorl_cyborg/outputs/fair_compare_semantic/ours_stage2_fair_critical_safe_v2_4_4obj/stage1/seed_0007/run_e96621b7/solution_buffer.json
+  - path: cmorl_cyborg/outputs/fair_compare_semantic/ours_stage2_fair_critical_safe_v2_4_4obj/stage1/seed_0011/run_4d7c193f/solution_buffer.json
+  - path: cmorl_cyborg/outputs/fair_compare_semantic/ours_stage2_fair_critical_safe_v2_4_4obj/stage1/seed_0019/run_68a6b88d/solution_buffer.json
+entries:
+  - method_name: ours_stage2_v2_4
+    seed: 7
+    input_kind: single_policy
+    input_path: cmorl_cyborg/outputs/paper_4obj/table_b/ours_stage2_v2_4_selected/seed_0007/run_metadata.json
+  - method_name: ours_stage2_v2_4
+    seed: 11
+    input_kind: single_policy
+    input_path: cmorl_cyborg/outputs/paper_4obj/table_b/ours_stage2_v2_4_selected/seed_0011/run_metadata.json
+  - method_name: ours_stage2_v2_4
+    seed: 19
+    input_kind: single_policy
+    input_path: cmorl_cyborg/outputs/paper_4obj/table_b/ours_stage2_v2_4_selected/seed_0019/run_metadata.json
+
+  - method_name: stage1_only_4obj
+    seed: 7
+    input_kind: buffer
+    input_path: cmorl_cyborg/outputs/fair_compare_semantic/ours_stage2_fair_critical_safe_v2_4_4obj/stage1/seed_0007/run_e96621b7/solution_buffer.json
+    selection_source: pareto
+  - method_name: stage1_only_4obj
+    seed: 11
+    input_kind: buffer
+    input_path: cmorl_cyborg/outputs/fair_compare_semantic/ours_stage2_fair_critical_safe_v2_4_4obj/stage1/seed_0011/run_4d7c193f/solution_buffer.json
+    selection_source: pareto
+  - method_name: stage1_only_4obj
+    seed: 19
+    input_kind: buffer
+    input_path: cmorl_cyborg/outputs/fair_compare_semantic/ours_stage2_fair_critical_safe_v2_4_4obj/stage1/seed_0019/run_68a6b88d/solution_buffer.json
+    selection_source: pareto
+
+  - method_name: weighted_sum_4obj
+    seed: 7
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_4obj/weighted_sum_4obj/seed_0007/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: weighted_sum_4obj
+    seed: 11
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_4obj/weighted_sum_4obj/seed_0011/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: weighted_sum_4obj
+    seed: 19
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_4obj/weighted_sum_4obj/seed_0019/run_*/solution_buffer.json
+    selection_source: pareto
+
+  - method_name: no_constraint_stage2_4obj
+    seed: 7
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_4obj/no_constraint_stage2_4obj/seed_0007/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: no_constraint_stage2_4obj
+    seed: 11
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_4obj/no_constraint_stage2_4obj/seed_0011/run_*/solution_buffer.json
+    selection_source: pareto
+  - method_name: no_constraint_stage2_4obj
+    seed: 19
+    input_kind: buffer
+    input_path_glob: cmorl_cyborg/outputs/paper_4obj/no_constraint_stage2_4obj/seed_0019/run_*/solution_buffer.json
+    selection_source: pareto

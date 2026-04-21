@@ -12,9 +12,9 @@
 
 ## 目的
 
-本清单是 [MINICAGE_TO_CYBORG_MIGRATION.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/MINICAGE_TO_CYBORG_MIGRATION.md) 的执行版补充。
+本清单是 [MINICAGE_TO_CYBORG_MIGRATION.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/MINICAGE_TO_CYBORG_MIGRATION.md) 的执行版补充。
 
-目标不是继续扩展想法，而是把当前 [cmorl_cyborg](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg) 从“已跑通迁移骨架”推进到“可支撑正式环境调参与后续论文 formal”的状态。
+目标不是继续扩展想法，而是把当前 [cmorl_cyborg](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg) 从“已跑通迁移骨架”推进到“可支撑正式环境调参与后续论文 formal”的状态。
 
 本周重点：
 
@@ -33,8 +33,8 @@
 
 到本周结束时，应满足以下四项：
 
-1. [cmorl_cyborg/reward.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/reward.py) 与 [cmorl_cyborg/semantics.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/semantics.py) 具有明确、文档化的正式定义。
-2. [cmorl_cyborg/env.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/env.py) 在多 seed、多步 rollout 下稳定，且 `reward_terms` / `semantic_info` 字段完整。
+1. [cmorl_cyborg/reward.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/reward.py) 与 [cmorl_cyborg/semantics.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/semantics.py) 具有明确、文档化的正式定义。
+2. [cmorl_cyborg/env.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/env.py) 在多 seed、多步 rollout 下稳定，且 `reward_terms` / `semantic_info` 字段完整。
 3. `Stage-1 -> Stage-2 -> evaluate -> evaluate_constraints -> compare_suite -> export_tables` 在 `cmorl_cyborg` 线上都可跑通。
 4. 已经形成一组可用于下周正式调参的 `dev` 配置，并完成 `dev + holdout` 两个 seed 的小预算验证。
 
@@ -44,9 +44,9 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/reward.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/reward.py)
-- [cmorl_cyborg/semantics.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/semantics.py)
-- [docs/MINICAGE_TO_CYBORG_MIGRATION.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/MINICAGE_TO_CYBORG_MIGRATION.md)
+- [cmorl_cyborg/reward.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/reward.py)
+- [cmorl_cyborg/semantics.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/semantics.py)
+- [docs/MINICAGE_TO_CYBORG_MIGRATION.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/MINICAGE_TO_CYBORG_MIGRATION.md)
 
 ### 要做的事
 
@@ -74,7 +74,7 @@
 ### 如果失败，优先检查
 
 - 当前 `ChallengeWrapper` 暴露的信息是否不足以支撑正式定义
-- 是否需要在 [cmorl_cyborg/env.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/env.py) 中补 true-state diff 或 helper 提取
+- 是否需要在 [cmorl_cyborg/env.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/env.py) 中补 true-state diff 或 helper 提取
 
 ---
 
@@ -82,8 +82,8 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/env.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/env.py)
-- [cmorl_cyborg/rollout_smoke.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/rollout_smoke.py)
+- [cmorl_cyborg/env.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/env.py)
+- [cmorl_cyborg/rollout_smoke.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/rollout_smoke.py)
 
 ### 要做的事
 
@@ -116,10 +116,10 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/configs/smoke/stage1_smoke.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/smoke/stage1_smoke.yaml)
-- [cmorl_cyborg/configs/smoke/stage2_smoke.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/smoke/stage2_smoke.yaml)
-- [cmorl_cyborg/configs/paper/stage1_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/stage1_main.yaml)
-- [cmorl_cyborg/configs/paper/stage2_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/stage2_main.yaml)
+- [cmorl_cyborg/configs/smoke/stage1_smoke.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/smoke/stage1_smoke.yaml)
+- [cmorl_cyborg/configs/smoke/stage2_smoke.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/smoke/stage2_smoke.yaml)
+- [cmorl_cyborg/configs/paper/stage1_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/stage1_main.yaml)
+- [cmorl_cyborg/configs/paper/stage2_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/stage2_main.yaml)
 
 ### 要做的事
 
@@ -159,8 +159,8 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/configs/paper/stage1_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/stage1_main.yaml)
-- [cmorl_cyborg/configs/paper/stage2_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/stage2_main.yaml)
+- [cmorl_cyborg/configs/paper/stage1_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/stage1_main.yaml)
+- [cmorl_cyborg/configs/paper/stage2_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/stage2_main.yaml)
 
 ### 优先调的超参
 
@@ -222,10 +222,10 @@
 
 ### 要改的文件
 
-- [cmorl_cyborg/compare_suite.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/compare_suite.py)
-- [cmorl_cyborg/export_tables.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/export_tables.py)
-- [cmorl_cyborg/configs/paper/compare_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
-- [cmorl_cyborg/configs/paper/export_tables_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/export_tables_main.yaml)
+- [cmorl_cyborg/compare_suite.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/compare_suite.py)
+- [cmorl_cyborg/export_tables.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/export_tables.py)
+- [cmorl_cyborg/configs/paper/compare_suite_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
+- [cmorl_cyborg/configs/paper/export_tables_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/export_tables_main.yaml)
 
 ### 要做的事
 

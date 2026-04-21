@@ -16,7 +16,7 @@
 
 ## 冻结范围
 
-- 不再改 [cmorl_cyborg/reward.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/reward.py) 与 [cmorl_cyborg/semantics.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/semantics.py) 的工作定义。
+- 不再改 [cmorl_cyborg/reward.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/reward.py) 与 [cmorl_cyborg/semantics.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/semantics.py) 的工作定义。
 - 不再改第二周 seed 协议。
 - 不再混用 `preformal` 与 `dev_tuning` 输出路径作为正式横评输入。
 
@@ -54,41 +54,41 @@
 ## 方法到配置与输出根目录映射
 
 - `ours_stage2`
-  - 配置：[stage2_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/stage2_main.yaml)
+  - 配置：[stage2_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/stage2_main.yaml)
   - 输出根目录：`cmorl_cyborg/outputs/paper_table_a/ours_stage2`
 - `stage1_only`
-  - 配置：[stage1_only_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/stage1_only_main.yaml)
+  - 配置：[stage1_only_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/stage1_only_main.yaml)
   - 输出根目录：`cmorl_cyborg/outputs/paper_appendix/stage1_only`
 - `no_constraint_stage2`
-  - 配置：[stage2_no_constraint_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/stage2_no_constraint_main.yaml)
+  - 配置：[stage2_no_constraint_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/stage2_no_constraint_main.yaml)
   - 输出根目录：`cmorl_cyborg/outputs/paper_appendix/no_constraint_stage2`
 - `weighted_sum`
-  - 配置：[weighted_sum_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/weighted_sum_main.yaml)
+  - 配置：[weighted_sum_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/weighted_sum_main.yaml)
   - 输出根目录：`cmorl_cyborg/outputs/paper_table_a/weighted_sum`
 - `single_objective`
-  - 配置：[single_objective_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/single_objective_main.yaml)
+  - 配置：[single_objective_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/single_objective_main.yaml)
   - 输出根目录：`cmorl_cyborg/outputs/paper_table_b/single_objective`
 - `lagrangian_ppo`
-  - 配置：[lagrangian_ppo.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/lagrangian_ppo.yaml)
+  - 配置：[lagrangian_ppo.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/lagrangian_ppo.yaml)
   - 输出根目录：`cmorl_cyborg/outputs/paper_table_b/lagrangian_ppo`
 - `preference_conditioned_ppo`
-  - 配置：[pref_cond_ppo.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/pref_cond_ppo.yaml)
+  - 配置：[pref_cond_ppo.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/pref_cond_ppo.yaml)
   - 输出根目录：`cmorl_cyborg/outputs/paper_table_a/preference_conditioned_ppo`
 - `pcn`
-  - 配置：[pcn.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/pcn.yaml)
+  - 配置：[pcn.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/pcn.yaml)
   - 输出根目录：`cmorl_cyborg/outputs/paper_appendix/pcn`
 
 ## 第二周 Compare / Export 协议
 
 - 主表 A 协议配置：
-  [compare_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
+  [compare_suite_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/compare_suite_main.yaml)
 - 主表 A 导表入口：
-  [main_table_a.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/main_table_a.py)
+  [main_table_a.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/main_table_a.py)
 - 主表 B 协议配置：
-  [table_b_suite_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/table_b_suite_main.yaml)
+  [table_b_suite_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/table_b_suite_main.yaml)
 - 主表 B 导表入口：
-  [main_table_b.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/main_table_b.py)
+  [main_table_b.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/main_table_b.py)
 - 导表协议配置：
-  [export_tables_main.yaml](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_cyborg/configs/paper/export_tables_main.yaml)
+  [export_tables_main.yaml](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/configs/paper/export_tables_main.yaml)
 
 这两个文件从现在开始只表达第二周正式环境协议，不再继续指向 week1 的 `preformal` 或 `dev_tuning` 具体产物。

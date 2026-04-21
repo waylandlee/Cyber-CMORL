@@ -138,12 +138,18 @@ def _load_model_and_env_from_metadata(
 
 def _build_env(metadata: dict[str, Any]) -> MiniCageMORLEnv:
     env_config = metadata.get("env", {})
+    model_config = metadata.get("model", {})
     return MiniCageMORLEnv(
         num_envs=int(env_config.get("num_envs", 8)),
         red_policy=env_config.get("red_policy", "bline"),
         remove_bugs=bool(env_config.get("remove_bugs", True)),
         max_steps=int(env_config.get("max_episode_steps", 100)),
         seed=int(env_config.get("seed", 7)),
+        obj_dim=int(model_config.get("obj_dim", 3)),
+        critical_host_safety_mode=str(
+            model_config.get("critical_host_safety_mode", "v2_legacy")
+        ),
+        shield_mode=str(metadata.get("shield", {}).get("mode", "disabled")),
     )
 
 

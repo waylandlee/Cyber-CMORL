@@ -8,7 +8,16 @@ from typing import Any
 import numpy as np
 
 from mini_CAGE import B_line_minimal, Meander_minimal, SimplifiedCAGE
-from mini_CAGE.minimal import EXPLOITS
+from mini_CAGE.minimal import EXPLOITS, HOSTS
+from cmorl_minicage.shield import (
+    SHIELD_MODE_DISABLED,
+    action_family_from_name,
+    build_shielded_action_mask,
+    shield_enabled,
+)
+
+CRITICAL_HOST_SAFETY_MODE_LEGACY = "v2_legacy"
+CRITICAL_HOST_SAFETY_MODE_DENSE_PERSISTENT = "v2_1_dense_persistent"
 
 
 def _env_float(name: str, default: float) -> float:
@@ -40,6 +49,8 @@ NOOP_OPERATION_COMPROMISE_COST = _env_float("CMORL_NOOP_OPERATION_COMPROMISE_COS
 NOOP_OPERATION_CRITICAL_COMPROMISE_COST = _env_float(
     "CMORL_NOOP_OPERATION_CRITICAL_COMPROMISE_COST", 0.25
 )
+HOST_NAMES = np.asarray(HOSTS)
+CRITICAL_PATH_HOSTS = frozenset({"ent0", "ent1", "ent2", "opserv"})
 
 
 @dataclass
@@ -47,16 +58,55 @@ class RewardTerms:
     security: np.ndarray
     business: np.ndarray
     cost: np.ndarray
+    critical_host_safety: np.ndarray | None = None
 
     def as_array(self) -> np.ndarray:
-        return np.stack(
-            [
-                self.security,
-                self.business,
-                self.cost,
-            ],
-            axis=-1,
-        ).astype(np.float32)
+        components = [self.security, self.business, self.cost]
+        if self.critical_host_safety is not None:
+            components.append(self.critical_host_safety)
+        return np.stack(components, axis=-1).astype(np.float32)
+
+    def with_critical_host_safety(self, value: np.ndarray | None) -> "RewardTerms":
+        return RewardTerms(
+            security=np.asarray(self.security, dtype=np.float32),
+            business=np.asarray(self.business, dtype=np.float32),
+            cost=np.asarray(self.cost, dtype=np.float32),
+            critical_host_safety=(
+                None if value is None else np.asarray(value, dtype=np.float32)
+            ),
+        )
+
+
+def _critical_host_safety_step_reward(
+    *,
+    critical_hit_event: np.ndarray,
+    critical_present: np.ndarray,
+    done: np.ndarray,
+    step_idx: int,
+    max_episode_steps: int,
+    mode: str = CRITICAL_HOST_SAFETY_MODE_LEGACY,
+) -> np.ndarray:
+    normalized_mode = str(mode).lower()
+    reward = np.zeros_like(np.asarray(critical_hit_event, dtype=np.float32))
+    hit_mask = np.asarray(critical_hit_event, dtype=np.float32) > 0.0
+    if np.any(hit_mask):
+        latency_score = float(step_idx) / float(max(int(max_episode_steps), 0) + 1)
+        if normalized_mode == CRITICAL_HOST_SAFETY_MODE_DENSE_PERSISTENT:
+            reward[hit_mask] = -(0.35 + 0.15 * (1.0 - float(latency_score)))
+        else:
+            reward[hit_mask] = -(0.5 + 0.2 * (1.0 - float(latency_score)))
+    if normalized_mode == CRITICAL_HOST_SAFETY_MODE_DENSE_PERSISTENT:
+        reward -= (
+            0.30 / float(max(int(max_episode_steps), 1))
+        ) * np.asarray(critical_present, dtype=np.float32)
+    persistent_mask = np.logical_and(
+        np.asarray(done, dtype=bool),
+        np.asarray(critical_present, dtype=np.float32) > 0.0,
+    )
+    reward[persistent_mask] -= (
+        0.20 if normalized_mode == CRITICAL_HOST_SAFETY_MODE_DENSE_PERSISTENT else 0.3
+    )
+    return reward.astype(np.float32)
 
 
 def make_red_agent(name: str):
@@ -78,6 +128,9 @@ class MiniCageMORLEnv:
         remove_bugs: bool = True,
         max_steps: int = 100,
         seed: int | None = None,
+        obj_dim: int = 3,
+        critical_host_safety_mode: str = CRITICAL_HOST_SAFETY_MODE_LEGACY,
+        shield_mode: str = SHIELD_MODE_DISABLED,
     ) -> None:
         self.num_envs = num_envs
         self.red_policy_name = red_policy
@@ -88,8 +141,14 @@ class MiniCageMORLEnv:
         self.red_agent = make_red_agent(red_policy)
         self.action_map = self.sim.action_mapping["Blue"]
         self.action_dim = len(self.action_map)
-        self.obj_dim = 3
+        self.obj_dim = int(obj_dim)
+        if self.obj_dim not in (3, 4):
+            raise ValueError(f"MiniCageMORLEnv only supports obj_dim 3 or 4, got {self.obj_dim}")
         self.obs_dim = 6 * self.sim.num_nodes
+        self.critical_host_safety_mode = str(critical_host_safety_mode)
+        self.shield_mode = str(shield_mode)
+        self._shield_action_catalog = self._build_shield_action_catalog()
+        self._last_shield_diagnostics = self._default_shield_diagnostics()
 
         self._red_obs: np.ndarray | None = None
         self._step_count = 0
@@ -110,6 +169,7 @@ class MiniCageMORLEnv:
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict[str, Any]]:
         action_array = np.asarray(blue_action, dtype=np.int32).reshape(self.num_envs, 1)
         red_action = self.red_agent.get_action(self._red_obs).astype(np.int32)
+        step_idx = int(self._step_count)
         reward_terms, semantic_info = self._project_reward_terms(red_action, action_array)
         obs_dict, reward_dict, terminated, info = self.sim.step(
             red_action=red_action,
@@ -119,11 +179,27 @@ class MiniCageMORLEnv:
 
         self._step_count += 1
         self._red_obs = obs_dict["Red"].copy()
+        done = np.full((self.num_envs,), bool(self._step_count >= self.max_steps)) | terminated.reshape(-1).astype(bool)
+        if self.obj_dim >= 4:
+            reward_terms = reward_terms.with_critical_host_safety(
+                _critical_host_safety_step_reward(
+                    critical_hit_event=np.asarray(
+                        semantic_info.get("critical_hit_event", np.zeros(self.num_envs)),
+                        dtype=np.float32,
+                    ),
+                    critical_present=np.asarray(
+                        semantic_info.get("critical_present", np.zeros(self.num_envs)),
+                        dtype=np.float32,
+                    ),
+                    done=done,
+                    step_idx=step_idx,
+                    max_episode_steps=self.max_steps,
+                    mode=self.critical_host_safety_mode,
+                )
+            )
         reward_vec = reward_terms.as_array()
         mini_cage_scalar_reward = reward_dict["Blue"].reshape(self.num_envs).astype(np.float32)
         morl_scalar_reward = reward_vec.sum(axis=-1).astype(np.float32)
-
-        done = np.full((self.num_envs,), bool(self._step_count >= self.max_steps)) | terminated.reshape(-1).astype(bool)
         truncated = np.zeros_like(done, dtype=bool)
 
         decorated = self._decorate_info(info)
@@ -131,6 +207,11 @@ class MiniCageMORLEnv:
             "security": reward_terms.security.tolist(),
             "business": reward_terms.business.tolist(),
             "cost": reward_terms.cost.tolist(),
+            "critical_host_safety": (
+                np.zeros(self.num_envs, dtype=np.float32).tolist()
+                if reward_terms.critical_host_safety is None
+                else reward_terms.critical_host_safety.tolist()
+            ),
             "morl_scalar_reward": morl_scalar_reward.tolist(),
             "mini_cage_scalar_reward": mini_cage_scalar_reward.tolist(),
         }
@@ -148,7 +229,167 @@ class MiniCageMORLEnv:
         decorated["impacted"] = np.asarray(self.sim.impacted).copy()
         decorated["current_processes"] = np.asarray(self.sim.current_processes).copy()
         decorated["current_decoys"] = np.asarray(self.sim.current_decoys).copy()
+        decorated.update(self._last_shield_diagnostics)
         return decorated
+
+    def _default_shield_diagnostics(self) -> dict[str, Any]:
+        allowed_count = int(self.action_dim)
+        return {
+            "shield_active_flag": np.zeros(self.num_envs, dtype=np.int32).tolist(),
+            "shield_level": ["none" for _ in range(self.num_envs)],
+            "shield_response_tier": ["none" for _ in range(self.num_envs)],
+            "shield_fallback_flag": np.zeros(self.num_envs, dtype=np.int32).tolist(),
+            "shield_blocked_probability_mass": np.zeros(
+                self.num_envs, dtype=np.float32
+            ).tolist(),
+            "shield_allowed_action_count": np.full(
+                self.num_envs,
+                allowed_count,
+                dtype=np.int32,
+            ).tolist(),
+        }
+
+    def _host_subnet(self, hostname: str | None) -> str | None:
+        if hostname is None:
+            return None
+        key = str(hostname).lower()
+        if key.startswith("ent"):
+            return "Enterprise"
+        if key.startswith("op"):
+            return "Operational"
+        if key.startswith("user"):
+            return "User"
+        if key.startswith("def"):
+            return "Defender"
+        return None
+
+    def _build_shield_action_catalog(self) -> list[dict[str, Any]]:
+        catalog: list[dict[str, Any]] = []
+        for action_idx in range(self.action_dim):
+            if action_idx == 0:
+                target_hostname = None
+                target_subnet = None
+                is_non_sleep = False
+            else:
+                host_idx = int((action_idx - 1) % self.sim.num_nodes)
+                target_hostname = str(HOST_NAMES[host_idx])
+                target_subnet = self._host_subnet(target_hostname)
+                is_non_sleep = True
+            target_hostname_key = None if target_hostname is None else str(target_hostname).lower()
+            target_subnet_key = None if target_subnet is None else str(target_subnet).lower()
+            catalog.append(
+                {
+                    "index": int(action_idx),
+                    "name": "Sleep" if action_idx == 0 else "Action",
+                    "target_hostname": target_hostname,
+                    "target_subnet": target_subnet,
+                    "_shield_action_family": action_family_from_name(
+                        "Sleep" if action_idx == 0 else "Action"
+                    ),
+                    "_shield_is_critical_path_target": target_hostname_key
+                    in {"ent0", "ent1", "ent2", "opserv"},
+                    "_shield_is_non_user_non_sleep": bool(
+                        is_non_sleep and target_subnet_key != "user"
+                    ),
+                    "_shield_is_enterprise_operational_non_sleep": bool(
+                        is_non_sleep
+                        and target_subnet_key in {"enterprise", "operational"}
+                    ),
+                }
+            )
+        return catalog
+
+    def native_action_mask(self) -> np.ndarray:
+        blue_mask = self.sim.get_mask(self.sim.state, self.sim.current_decoys)["Blue"]
+        return np.asarray(blue_mask, dtype=np.float32).reshape(
+            self.num_envs,
+            self.action_dim,
+        )
+
+    def _current_target_mask(self, compromised_mask: np.ndarray, *, allowed_hosts: set[str]) -> np.ndarray:
+        target_mask = np.zeros((self.num_envs, self.action_dim), dtype=bool)
+        for action_idx, entry in enumerate(self._shield_action_catalog):
+            target_hostname = entry.get("target_hostname")
+            if target_hostname is None:
+                continue
+            normalized_target = str(target_hostname).lower()
+            if normalized_target not in allowed_hosts:
+                continue
+            host_matches = HOST_NAMES == normalized_target
+            if not np.any(host_matches):
+                continue
+            target_mask[:, action_idx] = np.logical_and(
+                compromised_mask,
+                host_matches.reshape(1, -1),
+            ).any(axis=1)
+        return target_mask
+
+    def _current_shield_state(
+        self,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        compromised_mask = self._compromised_host_mask(self.sim, self.sim.state)
+        critical_present = np.logical_and(
+            compromised_mask,
+            self.sim.host_priority == 3,
+        ).any(axis=1)
+        enterprise_mask = np.isin(
+            HOST_NAMES.reshape(1, -1),
+            np.asarray(["ent0", "ent1", "ent2"]),
+        )
+        enterprise_foothold_present = np.logical_and(
+            compromised_mask,
+            enterprise_mask,
+        ).any(axis=1)
+        critical_compromised_target_mask = self._current_target_mask(
+            compromised_mask,
+            allowed_hosts={"opserv"},
+        )
+        enterprise_operational_compromised_target_mask = self._current_target_mask(
+            compromised_mask,
+            allowed_hosts={"ent0", "ent1", "ent2", "op0", "op1", "op2", "opserv"},
+        )
+        return (
+            critical_present.astype(bool),
+            enterprise_foothold_present.astype(bool),
+            critical_compromised_target_mask,
+            enterprise_operational_compromised_target_mask,
+        )
+
+    def current_action_mask(self) -> np.ndarray:
+        native_mask = self.native_action_mask()
+        if not shield_enabled(self.shield_mode):
+            diagnostics = self._default_shield_diagnostics()
+            diagnostics["shield_allowed_action_count"] = (
+                (native_mask > 0.0).sum(axis=1).astype(np.int32).tolist()
+            )
+            self._last_shield_diagnostics = diagnostics
+            return native_mask
+
+        (
+            critical_present,
+            enterprise_foothold_present,
+            critical_compromised_target_mask,
+            enterprise_operational_compromised_target_mask,
+        ) = self._current_shield_state()
+        shield_mask, diagnostics = build_shielded_action_mask(
+            native_mask=native_mask,
+            action_catalog=self._shield_action_catalog,
+            critical_present=critical_present,
+            enterprise_foothold_present=enterprise_foothold_present,
+            mode=self.shield_mode,
+            critical_compromised_target_mask=critical_compromised_target_mask,
+            enterprise_operational_compromised_target_mask=enterprise_operational_compromised_target_mask,
+        )
+        self._last_shield_diagnostics = diagnostics
+        return shield_mask
+
+    def set_last_policy_mask_stats(self, *, blocked_probability_mass: np.ndarray) -> None:
+        values = np.asarray(blocked_probability_mass, dtype=np.float32).reshape(
+            self.num_envs
+        )
+        diagnostics = dict(self._last_shield_diagnostics)
+        diagnostics["shield_blocked_probability_mass"] = values.tolist()
+        self._last_shield_diagnostics = diagnostics
 
     def _project_reward_terms(
         self, red_action: np.ndarray, blue_action: np.ndarray
@@ -156,6 +397,7 @@ class MiniCageMORLEnv:
         rng_state = np.random.get_state()
         probe = copy.deepcopy(self.sim)
         previous_impacted = probe.impacted.copy()
+        previous_state = probe.state.copy()
         true_state, after_red_state, action_reward = probe._process_actions(
             probe.state,
             red_action,
@@ -189,6 +431,7 @@ class MiniCageMORLEnv:
         semantic_info = self._semantic_step_info(
             probe=probe,
             blue_action=blue_action_flat,
+            previous_state=previous_state,
             after_red_state=after_red_state,
             final_state=true_state,
             previous_impacted=previous_impacted,
@@ -269,26 +512,50 @@ class MiniCageMORLEnv:
         *,
         probe: SimplifiedCAGE,
         blue_action: np.ndarray,
+        previous_state: np.ndarray,
         after_red_state: np.ndarray,
         final_state: np.ndarray,
         previous_impacted: np.ndarray,
     ) -> dict[str, Any]:
         action_group, _ = self._action_groups(probe, blue_action)
+        _, host_idx = self._action_groups(probe, blue_action)
+        previous_compromised_mask = self._compromised_host_mask(probe, previous_state)
         final_compromised_mask = self._compromised_host_mask(probe, final_state)
         after_red_compromised_mask = self._compromised_host_mask(probe, after_red_state)
         recovered_mask = np.logical_and(after_red_compromised_mask, np.logical_not(final_compromised_mask))
 
         host_priority = probe.host_priority.astype(np.int32)
         critical_mask = host_priority == 3
+        enterprise_mask = np.isin(HOST_NAMES.reshape(1, -1), np.asarray(["ent0", "ent1", "ent2"]))
+        critical_path_mask = np.isin(HOST_NAMES.reshape(1, -1), np.asarray(sorted(CRITICAL_PATH_HOSTS)))
         current_impacted = probe.impacted.astype(bool)
         new_critical_impacts = np.logical_and(
             np.logical_and(current_impacted, critical_mask),
             np.logical_not(np.logical_and(previous_impacted.astype(bool), critical_mask)),
         )
+        previous_critical = np.logical_and(previous_compromised_mask, critical_mask)
+        current_critical = np.logical_and(final_compromised_mask, critical_mask)
+        after_red_critical = np.logical_and(after_red_compromised_mask, critical_mask)
+        critical_present = current_critical.any(axis=1).astype(int)
+        critical_hit_event = np.logical_and(
+            critical_present.astype(bool),
+            np.logical_not(previous_critical.any(axis=1)),
+        ).astype(int)
+        target_is_user = np.zeros(probe.num_envs, dtype=bool)
+        valid_target = host_idx >= 0
+        if np.any(valid_target):
+            target_is_user[valid_target] = np.char.startswith(
+                HOST_NAMES[host_idx[valid_target]].astype(str),
+                "user",
+            )
+        enterprise_foothold = np.logical_and(after_red_compromised_mask, enterprise_mask).any(axis=1)
 
         return {
             "final_compromised_hosts": final_compromised_mask.sum(axis=1).astype(int).tolist(),
             "final_critical_compromised_hosts": np.logical_and(
+                final_compromised_mask, critical_mask
+            ).sum(axis=1).astype(int).tolist(),
+            "persistent_critical_breach_rate": np.logical_and(
                 final_compromised_mask, critical_mask
             ).sum(axis=1).astype(int).tolist(),
             "critical_impact_count": new_critical_impacts.sum(axis=1).astype(int).tolist(),
@@ -298,6 +565,24 @@ class MiniCageMORLEnv:
             "restore_count": (action_group == 4).astype(int).tolist(),
             "high_disruption_action_count": np.isin(action_group, [3, 4]).astype(int).tolist(),
             "total_action_count": np.ones(probe.num_envs, dtype=int).tolist(),
+            "critical_present": critical_present.astype(int).tolist(),
+            "critical_hit_event": critical_hit_event.astype(int).tolist(),
+            "critical_dwell_flag": critical_present.astype(int).tolist(),
+            "critical_path_compromise_count": np.logical_and(
+                final_compromised_mask, critical_path_mask
+            ).sum(axis=1).astype(int).tolist(),
+            "sleep_during_critical_breach": np.logical_and(
+                action_group == 0,
+                after_red_critical.any(axis=1),
+            ).astype(int).tolist(),
+            "user_action_during_critical_breach": np.logical_and(
+                target_is_user,
+                after_red_critical.any(axis=1),
+            ).astype(int).tolist(),
+            "user_action_after_enterprise_foothold": np.logical_and(
+                target_is_user,
+                enterprise_foothold,
+            ).astype(int).tolist(),
             "blue_action_group": action_group.astype(int).tolist(),
         }
 

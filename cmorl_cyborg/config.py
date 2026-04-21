@@ -6,6 +6,8 @@ from typing import Any, TypeVar
 
 import yaml
 
+from cmorl_minicage.shield import CriticalResponseShieldConfig
+
 
 @dataclass
 class EnvConfig:
@@ -27,6 +29,8 @@ class EnvConfig:
 class ModelConfig:
     hidden_size: int = 128
     obj_dim: int = 3
+    critical_host_safety_enabled: bool = False
+    critical_host_safety_mode: str = "v2_legacy"
 
 
 @dataclass
@@ -70,6 +74,9 @@ class IPOHyperConfig:
 @dataclass
 class SelectionConfig:
     mode: str = "crowding"
+    pool_mode: str = "pareto"
+    near_frontier_quota: int = 6
+    strict_frontier_quota: int = 4
     score_weights: dict[str, float] = field(
         default_factory=lambda: {
             "crowding": 0.30,
@@ -83,6 +90,16 @@ class SelectionConfig:
     coverage_mode: str = "static"
     keep_extremes: bool = True
     semantic_eval_episodes: int = 0
+    semantic_score_mode: str = "legacy"
+    semantic_thresholds_path: str = ""
+    semantic_support_score_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "mean_violation": 0.40,
+            "high_disruption": 0.30,
+            "business": 0.20,
+            "cost": 0.10,
+        }
+    )
     semantic_metric_weights: dict[str, float] = field(
         default_factory=lambda: {
             "high_disruption_action_rate": 0.50,
@@ -90,6 +107,63 @@ class SelectionConfig:
             "critical_impact_count": 0.20,
         }
     )
+
+
+@dataclass
+class DeployabilityGateConfig:
+    mode: str = "disabled"
+    min_strict_margin_improvement: float = 0.25
+    min_mean_violation_reduction: float = 0.25
+    min_high_disruption_reduction: float = 0.01
+    max_business_regression: float = 8.0
+    max_cost_regression: float = 4.0
+    max_final_critical_increase: float = 0.10
+    max_ever_critical_breach_increase: float = 0.0
+    max_persistent_critical_breach_increase: float = 0.05
+    max_critical_hit_latency_score_drop: float = 0.05
+    max_mean_critical_dwell_steps_increase: float = 3.0
+    max_user_action_during_critical_breach_rate_increase: float = 0.02
+    min_ever_critical_breach_reduction: float = 0.05
+    min_persistent_critical_breach_reduction: float = 0.10
+    min_critical_hit_latency_score_improvement: float = 0.10
+
+
+@dataclass
+class DeployabilityTargetConfig:
+    mode: str = "disabled"
+    reference_shell: str = "S0"
+    min_target_score_improvement: float = 0.02
+    min_target_excess_reduction: float = 0.02
+    max_business_regression: float = 8.0
+    max_cost_regression: float = 4.0
+    max_final_critical_increase: float = 0.15
+    max_ever_critical_breach_increase: float = 0.0
+    max_persistent_critical_breach_increase: float = 0.05
+    max_critical_hit_latency_score_drop: float = 0.05
+    max_mean_critical_dwell_steps_increase: float = 3.0
+    max_user_action_during_critical_breach_rate_increase: float = 0.02
+    min_ever_critical_breach_reduction: float = 0.05
+    min_persistent_critical_breach_reduction: float = 0.10
+    min_critical_hit_latency_score_improvement: float = 0.10
+    weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "mean_violation": 0.55,
+            "high_disruption": 0.30,
+            "business": 0.10,
+            "cost": 0.05,
+        }
+    )
+
+
+@dataclass
+class TailAcceptanceConfig:
+    mode: str = "disabled"
+    tail_eval_episodes: int = 16
+    tail_alpha: float = 0.25
+    business_guardrail: float = 8.0
+    cost_guardrail: float = 4.0
+    persistent_non_regression: bool = True
+    dwell_slack: float = 5.0
 
 
 @dataclass
@@ -113,6 +187,9 @@ class Stage1Config:
     output_dir: str = "cmorl_cyborg/outputs/stage1"
     env: EnvConfig = field(default_factory=EnvConfig)
     model: ModelConfig = field(default_factory=ModelConfig)
+    shield: CriticalResponseShieldConfig = field(
+        default_factory=CriticalResponseShieldConfig
+    )
     rollout: RolloutConfig = field(default_factory=RolloutConfig)
     eval: EvalConfig = field(default_factory=EvalConfig)
 
@@ -128,12 +205,15 @@ class Stage2Config:
     extension_mode: str = "constrained"
     constraint_tolerance: float = -0.05
     total_timesteps_per_update: int = 768
-    semantic_penalty_coef: float = 0.0
+    semantic_penalty_coef: float = 0.20
     semantic_penalty_weights: dict[str, float] = field(
         default_factory=lambda: {
-            "high_disruption_action_count": 0.50,
-            "final_critical_compromised_hosts": 0.30,
-            "critical_impact_count": 0.20,
+            "critical_hit_event": 0.40,
+            "critical_present": 0.25,
+            "critical_path_compromise_count": 0.15,
+            "user_action_during_critical_breach": 0.10,
+            "sleep_during_critical_breach": 0.05,
+            "user_action_after_enterprise_foothold": 0.05,
         }
     )
     output_dir: str = "cmorl_cyborg/outputs/stage2"
@@ -141,12 +221,24 @@ class Stage2Config:
         default_factory=lambda: EnvConfig(num_envs=8, max_episode_steps=100, seed=19)
     )
     model: ModelConfig = field(default_factory=ModelConfig)
+    shield: CriticalResponseShieldConfig = field(
+        default_factory=CriticalResponseShieldConfig
+    )
     rollout: RolloutConfig = field(default_factory=RolloutConfig)
     eval: EvalConfig = field(default_factory=EvalConfig)
     selection: SelectionConfig = field(
         default_factory=lambda: SelectionConfig(
             mode="adaptive", coverage_mode="static", keep_extremes=True
         )
+    )
+    deployability_gate: DeployabilityGateConfig = field(
+        default_factory=DeployabilityGateConfig
+    )
+    deployability_target: DeployabilityTargetConfig = field(
+        default_factory=DeployabilityTargetConfig
+    )
+    tail_acceptance: TailAcceptanceConfig = field(
+        default_factory=TailAcceptanceConfig
     )
     ipo: IPOHyperConfig = field(
         default_factory=lambda: IPOHyperConfig(
@@ -201,6 +293,96 @@ class ConstraintEvaluateConfig:
     thresholds_path: str = ""
     output_path: str = ""
     eval_episodes: int = 5
+
+
+@dataclass
+class AssignmentDiagnosticsConfig:
+    buffer_path: str = ""
+    source_set: str = "pareto"
+    thresholds_path: str = ""
+    output_dir: str = "cmorl_cyborg/outputs/assignment_diag"
+    run_label: str = "tight_strict_seed0007"
+    preference_step: float = 0.1
+    eval_episodes: int = 5
+    profile_name: str = "tight_strict_seed0007"
+    mean_violation_max: float = 0.50
+    final_critical_max: float = 0.25
+    high_disruption_max: float = 0.50
+    utility_floor_ratio: float = 0.10
+    risk_penalty_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "business": 1.0,
+            "cost": 1.0,
+            "mean_violation": 2.0,
+            "final_critical": 2.0,
+            "high_disruption": 1.0,
+        }
+    )
+    run_strict_level_on_supply: bool = True
+    strict_level_output_dir: str = "cmorl_cyborg/outputs/strict_level_diag"
+
+
+@dataclass
+class StrictLevelDiagnosticsConfig:
+    candidate_cache_path: str = ""
+    thresholds_path: str = ""
+    output_dir: str = "cmorl_cyborg/outputs/strict_level_diag"
+    run_label: str = "tight_strict_seed0007"
+    profile_name: str = "tight_strict_seed0007"
+    high_disruption_max: float = 0.50
+    levels: list[dict[str, Any]] = field(
+        default_factory=lambda: [
+            {
+                "name": "L0",
+                "final_critical_max": 1.00,
+                "mean_violation_max": 1.25,
+            },
+            {
+                "name": "L1",
+                "final_critical_max": 0.95,
+                "mean_violation_max": 1.00,
+            },
+            {
+                "name": "L2",
+                "final_critical_max": 0.75,
+                "mean_violation_max": 0.75,
+            },
+            {
+                "name": "L3",
+                "final_critical_max": 0.50,
+                "mean_violation_max": 0.60,
+            },
+            {
+                "name": "STRICT",
+                "final_critical_max": 0.25,
+                "mean_violation_max": 0.50,
+            },
+        ]
+    )
+
+
+@dataclass
+class MetricsSanityConfig:
+    assignment_summary_path: str = ""
+    candidate_cache_path: str = ""
+    buffer_path: str = ""
+    thresholds_path: str = ""
+    output_dir: str = "cmorl_cyborg/outputs/metrics_sanity"
+    run_label: str = "tight_strict_seed0007"
+    eval_episodes: int = 5
+
+
+@dataclass
+class SupportShellDiagnosticsConfig:
+    assignment_summary_path: str = ""
+    candidate_cache_path: str = ""
+    thresholds_path: str = ""
+    output_dir: str = "cmorl_cyborg/outputs/support_shell_diag"
+    run_label: str = "tight_strict_seed0007"
+    profile_name: str = "tight_strict_seed0007"
+    strict_mean_violation_max: float = 0.50
+    strict_final_critical_max: float = 0.25
+    strict_high_disruption_max: float = 0.50
 
 
 @dataclass
@@ -300,6 +482,16 @@ DEFAULT_LAGRANGIAN_PPO_CONFIG = CONFIG_DIR / "paper" / "lagrangian_ppo.yaml"
 DEFAULT_PCN_CONFIG = CONFIG_DIR / "paper" / "pcn.yaml"
 DEFAULT_COMPARE_SUITE_CONFIG = CONFIG_DIR / "paper" / "compare_suite_main.yaml"
 DEFAULT_EXPORT_TABLES_CONFIG = CONFIG_DIR / "paper" / "export_tables_main.yaml"
+DEFAULT_ASSIGNMENT_DIAGNOSTICS_CONFIG = (
+    CONFIG_DIR / "diagnostics" / "assignment_diag.yaml"
+)
+DEFAULT_STRICT_LEVEL_DIAGNOSTICS_CONFIG = (
+    CONFIG_DIR / "diagnostics" / "strict_level_diag.yaml"
+)
+DEFAULT_METRICS_SANITY_CONFIG = CONFIG_DIR / "diagnostics" / "metrics_sanity.yaml"
+DEFAULT_SUPPORT_SHELL_DIAGNOSTICS_CONFIG = (
+    CONFIG_DIR / "diagnostics" / "support_shell_diag.yaml"
+)
 
 
 def _merge_dataclass(instance: T, overrides: dict[str, Any]) -> T:
@@ -365,6 +557,42 @@ def load_constraint_evaluate_config(
     path: str | Path | None = None,
 ) -> ConstraintEvaluateConfig:
     config = ConstraintEvaluateConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_assignment_diagnostics_config(
+    path: str | Path | None = None,
+) -> AssignmentDiagnosticsConfig:
+    config = AssignmentDiagnosticsConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_strict_level_diagnostics_config(
+    path: str | Path | None = None,
+) -> StrictLevelDiagnosticsConfig:
+    config = StrictLevelDiagnosticsConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_metrics_sanity_config(
+    path: str | Path | None = None,
+) -> MetricsSanityConfig:
+    config = MetricsSanityConfig()
+    if path is None:
+        return config
+    return _merge_dataclass(config, _load_yaml(path))
+
+
+def load_support_shell_diagnostics_config(
+    path: str | Path | None = None,
+) -> SupportShellDiagnosticsConfig:
+    config = SupportShellDiagnosticsConfig()
     if path is None:
         return config
     return _merge_dataclass(config, _load_yaml(path))

@@ -48,7 +48,11 @@ def _lagrangian_update(model, optimizer, storage, lambdas, config) -> dict[str, 
                 batch_scalar_advantages - scalar_advantages.mean()
             ) / (scalar_advantages.std() + 1e-8)
 
-            values, log_probs, entropy = model.evaluate_actions(batch.obs, batch.actions)
+            values, log_probs, entropy = model.evaluate_actions(
+                batch.obs,
+                batch.actions,
+                action_mask=batch.action_masks,
+            )
             ratio = torch.exp(log_probs - batch.old_log_probs)
             surr1 = ratio * batch_scalar_advantages
             surr2 = torch.clamp(
@@ -116,6 +120,7 @@ def train_lagrangian_ppo(config) -> Path:
         num_envs=config.env.num_envs,
         obs_dim=env.obs_dim,
         obj_dim=env.obj_dim,
+        action_dim=env.action_dim,
         device=device,
     )
     thresholds = {key: float(value) for key, value in load_json(thresholds_path).items()}

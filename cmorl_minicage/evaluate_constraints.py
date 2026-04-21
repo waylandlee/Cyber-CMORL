@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import random
 from pathlib import Path
 from typing import Any
 
@@ -12,9 +13,22 @@ from cmorl_minicage.config import (
     DEFAULT_CONSTRAINT_EVALUATE_CONFIG,
     load_constraint_evaluate_config,
 )
+from cmorl_minicage.deployability import (
+    DEFAULT_FINAL_CRITICAL_MAX,
+    DEFAULT_HIGH_DISRUPTION_MAX,
+    DEFAULT_MEAN_VIOLATION_MAX,
+    build_threshold_profile,
+    candidate_metrics_from_metrics,
+    empty_semantic_totals,
+    evaluate_profile,
+    summarize_semantic_totals,
+)
 from cmorl_minicage.env import MiniCageMORLEnv
 from cmorl_minicage.models import ActorCritic
+from cmorl_minicage.shield import default_policy_action_mask, record_policy_mask_stats
 from cmorl_minicage.utils import load_json, save_json
+
+DEFAULT_CRITICAL_HOST_SAFETY_TAIL_ALPHA = 0.25
 
 
 def _repo_root_from_path(path: str | Path) -> Path:
@@ -65,46 +79,244 @@ def compute_shared_thresholds(
 
 def _build_env_from_metadata(metadata: dict[str, Any]) -> MiniCageMORLEnv:
     env_config = metadata.get("env", {})
+    model_config = metadata.get("model", {})
     return MiniCageMORLEnv(
         num_envs=int(env_config.get("num_envs", 8)),
         red_policy=env_config.get("red_policy", "bline"),
         remove_bugs=bool(env_config.get("remove_bugs", True)),
         max_steps=int(env_config.get("max_episode_steps", 100)),
         seed=int(env_config.get("seed", 7)),
+        obj_dim=int(model_config.get("obj_dim", 3)),
+        critical_host_safety_mode=str(
+            model_config.get("critical_host_safety_mode", "v2_legacy")
+        ),
+        shield_mode=str(metadata.get("shield", {}).get("mode", "disabled")),
     )
 
 
-def _empty_semantics() -> dict[str, list[float]]:
+def _capture_rng_state() -> dict[str, Any]:
     return {
-        "final_compromised_hosts": [],
-        "final_critical_compromised_hosts": [],
-        "critical_impact_count": [],
-        "recovered_hosts": [],
-        "analyse_count": [],
-        "remove_count": [],
-        "restore_count": [],
-        "high_disruption_action_count": [],
-        "total_action_count": [],
+        "python": random.getstate(),
+        "numpy": np.random.get_state(),
+        "torch": torch.random.get_rng_state(),
     }
 
 
-def _semantic_metrics(totals: dict[str, list[float]]) -> dict[str, float]:
-    total_action_sum = max(float(np.sum(totals["total_action_count"])), 1.0)
-    return {
-        "final_compromised_hosts": float(np.mean(totals["final_compromised_hosts"])),
-        "final_critical_compromised_hosts": float(
-            np.mean(totals["final_critical_compromised_hosts"])
+def _restore_rng_state(state: dict[str, Any]) -> None:
+    random.setstate(state["python"])
+    np.random.set_state(state["numpy"])
+    torch.random.set_rng_state(state["torch"])
+
+
+def _seed_eval_rng(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+
+
+def _critical_host_safety_cvar(
+    values: np.ndarray,
+    *,
+    alpha: float = DEFAULT_CRITICAL_HOST_SAFETY_TAIL_ALPHA,
+) -> float | None:
+    arr = np.asarray(values, dtype=np.float64).reshape(-1)
+    if arr.size == 0:
+        return None
+    clipped_alpha = min(max(float(alpha), 1e-8), 1.0)
+    tail_count = max(int(np.ceil(clipped_alpha * arr.size)), 1)
+    sorted_values = np.sort(arr)
+    return float(np.mean(sorted_values[:tail_count]))
+
+
+def _evaluate_actor_critic_policy_detailed(
+    actor_critic: ActorCritic | None,
+    metadata: dict[str, Any],
+    thresholds: dict[str, float],
+    *,
+    eval_episodes: int,
+    baseline_kind: str | None = None,
+) -> dict[str, Any]:
+    env = _build_env_from_metadata(metadata)
+    if actor_critic is not None:
+        actor_critic = actor_critic.to(torch.device("cpu"))
+        actor_critic.eval()
+
+    totals = empty_semantic_totals()
+    episode_vectors: list[list[float]] = []
+    base_seed = int(metadata.get("env", {}).get("seed", 7))
+    max_episode_steps = int(
+        metadata.get("env", {}).get("max_episode_steps", getattr(env, "max_steps", 100))
+    )
+    first_hit_sentinel = float(max_episode_steps + 1)
+    rng_state = _capture_rng_state()
+    try:
+        with torch.no_grad():
+            for episode_idx in range(max(eval_episodes, 1)):
+                episode_seed = base_seed + episode_idx
+                _seed_eval_rng(episode_seed)
+                env.seed = episode_seed
+                obs, _ = env.reset()
+                done = np.zeros(env.num_envs, dtype=bool)
+                returns = np.zeros((env.num_envs, env.obj_dim), dtype=np.float64)
+                episode_semantics = {
+                    "critical_impact_count": np.zeros(env.num_envs, dtype=np.float64),
+                    "recovered_hosts": np.zeros(env.num_envs, dtype=np.float64),
+                    "analyse_count": np.zeros(env.num_envs, dtype=np.float64),
+                    "remove_count": np.zeros(env.num_envs, dtype=np.float64),
+                    "restore_count": np.zeros(env.num_envs, dtype=np.float64),
+                    "high_disruption_action_count": np.zeros(env.num_envs, dtype=np.float64),
+                    "total_action_count": np.zeros(env.num_envs, dtype=np.float64),
+                    "critical_dwell_steps": np.zeros(env.num_envs, dtype=np.float64),
+                    "critical_path_compromise_count": np.zeros(env.num_envs, dtype=np.float64),
+                    "sleep_during_critical_breach": np.zeros(env.num_envs, dtype=np.float64),
+                    "user_action_during_critical_breach": np.zeros(env.num_envs, dtype=np.float64),
+                    "user_action_after_enterprise_foothold": np.zeros(env.num_envs, dtype=np.float64),
+                }
+                final_compromised_hosts = np.zeros(env.num_envs, dtype=np.float64)
+                final_critical_compromised_hosts = np.zeros(env.num_envs, dtype=np.float64)
+                ever_critical_breach = np.zeros(env.num_envs, dtype=np.float64)
+                first_critical_hit_step = np.full(
+                    env.num_envs, first_hit_sentinel, dtype=np.float64
+                )
+                step_idx = 0
+
+                while not np.all(done):
+                    if actor_critic is None:
+                        if baseline_kind == "random_valid":
+                            actions = _random_valid_actions(env).reshape(env.num_envs, 1)
+                        else:
+                            actions = _sleep_actions(env).reshape(env.num_envs, 1)
+                    else:
+                        obs_tensor = torch.as_tensor(obs, dtype=torch.float32)
+                        action_mask = torch.as_tensor(
+                            default_policy_action_mask(env),
+                            dtype=torch.bool,
+                        )
+                        policy_output = actor_critic.act(
+                            obs_tensor,
+                            action_mask=action_mask,
+                        )
+                        record_policy_mask_stats(env, policy_output.blocked_probability_mass)
+                        actions = policy_output.actions.cpu().numpy().reshape(
+                            env.num_envs,
+                            1,
+                        )
+                    obs, reward_vec, done, _, info = env.step(actions)
+                    returns += reward_vec
+                    semantic_info = info["semantic_info"]
+                    final_compromised_hosts = np.asarray(
+                        semantic_info["final_compromised_hosts"], dtype=np.float64
+                    )
+                    final_critical_compromised_hosts = np.asarray(
+                        semantic_info["final_critical_compromised_hosts"], dtype=np.float64
+                    )
+                    for key in episode_semantics:
+                        source_key = (
+                            "critical_dwell_flag"
+                            if key == "critical_dwell_steps"
+                            else key
+                        )
+                        episode_semantics[key] += np.asarray(
+                            semantic_info.get(source_key, np.zeros(env.num_envs)),
+                            dtype=np.float64,
+                        )
+                    critical_present = np.asarray(
+                        semantic_info.get("critical_present", np.zeros(env.num_envs)),
+                        dtype=np.float64,
+                    )
+                    critical_hit_event = np.asarray(
+                        semantic_info.get("critical_hit_event", np.zeros(env.num_envs)),
+                        dtype=np.float64,
+                    )
+                    ever_critical_breach = np.maximum(ever_critical_breach, critical_present)
+                    newly_hit_mask = np.logical_and(
+                        critical_hit_event > 0.0,
+                        first_critical_hit_step >= first_hit_sentinel,
+                    )
+                    first_critical_hit_step[newly_hit_mask] = float(step_idx)
+                    step_idx += 1
+
+                episode_vectors.extend(returns.tolist())
+                totals["final_compromised_hosts"].extend(final_compromised_hosts.tolist())
+                totals["final_critical_compromised_hosts"].extend(
+                    final_critical_compromised_hosts.tolist()
+                )
+                totals["ever_critical_breach"].extend(ever_critical_breach.tolist())
+                totals["first_critical_hit_step"].extend(first_critical_hit_step.tolist())
+                totals["critical_hit_latency_score"].extend(
+                    (first_critical_hit_step / first_hit_sentinel).tolist()
+                )
+                for key in episode_semantics:
+                    totals[key].extend(episode_semantics[key].tolist())
+    finally:
+        _restore_rng_state(rng_state)
+
+    vectors = np.asarray(episode_vectors, dtype=np.float32)
+    business_violation = np.maximum(0.0, thresholds["d_business"] - vectors[:, 1])
+    cost_violation = np.maximum(0.0, thresholds["d_cost"] - vectors[:, 2])
+    feasible = (business_violation <= 1e-12) & (cost_violation <= 1e-12)
+    semantic_metrics = summarize_semantic_totals(totals)
+    aggregate = {
+        "security_return": float(np.mean(vectors[:, 0])),
+        "business_return": float(np.mean(vectors[:, 1])),
+        "cost_return": float(np.mean(vectors[:, 2])),
+        "critical_host_safety_return": (
+            float(np.mean(vectors[:, 3])) if vectors.shape[1] > 3 else None
         ),
-        "critical_impact_count": float(np.mean(totals["critical_impact_count"])),
-        "recovered_hosts": float(np.mean(totals["recovered_hosts"])),
-        "analyse_count": float(np.mean(totals["analyse_count"])),
-        "remove_count": float(np.mean(totals["remove_count"])),
-        "restore_count": float(np.mean(totals["restore_count"])),
-        "high_disruption_action_rate": float(
-            np.sum(totals["high_disruption_action_count"]) / total_action_sum
+        "critical_host_safety_cvar_alpha": (
+            _critical_host_safety_cvar(vectors[:, 3])
+            if vectors.shape[1] > 3
+            else None
         ),
-        "semantic_eval_episodes": int(len(totals["final_compromised_hosts"])),
+        "critical_host_safety_tail_alpha": (
+            float(DEFAULT_CRITICAL_HOST_SAFETY_TAIL_ALPHA)
+            if vectors.shape[1] > 3
+            else None
+        ),
+        "feasible_rate": float(np.mean(feasible.astype(np.float32))),
+        "mean_violation": float(np.mean(business_violation + cost_violation)),
+        "thresholds": thresholds,
+        **semantic_metrics,
     }
+    aggregate["audit_details"] = {
+        "objective_dim": int(vectors.shape[1]) if vectors.ndim == 2 else 0,
+        "episode_vectors": vectors.astype(np.float64).tolist(),
+        "business_violation_values": business_violation.astype(np.float64).tolist(),
+        "cost_violation_values": cost_violation.astype(np.float64).tolist(),
+        "episode_mean_violation_values": (
+            business_violation + cost_violation
+        ).astype(np.float64).tolist(),
+        "critical_host_safety_episode_returns": (
+            vectors[:, 3].astype(np.float64).tolist() if vectors.shape[1] > 3 else []
+        ),
+        "semantic_totals_sum": {
+            key: float(np.sum(np.asarray(values, dtype=np.float64)))
+            for key, values in totals.items()
+        },
+        "semantic_totals_mean": {
+            key: float(np.mean(np.asarray(values, dtype=np.float64))) if values else 0.0
+            for key, values in totals.items()
+        },
+    }
+    return aggregate
+
+
+def _evaluate_actor_critic_model(
+    actor_critic: ActorCritic | None,
+    metadata: dict[str, Any],
+    thresholds: dict[str, float],
+    *,
+    eval_episodes: int,
+    baseline_kind: str | None = None,
+) -> dict[str, Any]:
+    detailed = _evaluate_actor_critic_policy_detailed(
+        actor_critic,
+        metadata,
+        thresholds,
+        eval_episodes=eval_episodes,
+        baseline_kind=baseline_kind,
+    )
+    return {key: value for key, value in detailed.items() if key != "audit_details"}
 
 
 def _sleep_actions(env: MiniCageMORLEnv) -> np.ndarray:
@@ -112,7 +324,7 @@ def _sleep_actions(env: MiniCageMORLEnv) -> np.ndarray:
 
 
 def _random_valid_actions(env: MiniCageMORLEnv) -> np.ndarray:
-    blue_mask = env.sim.get_mask(env.sim.state, env.sim.current_decoys)["Blue"]
+    blue_mask = default_policy_action_mask(env)
     actions = np.zeros(env.num_envs, dtype=np.int32)
     for idx in range(env.num_envs):
         valid_actions = np.flatnonzero(blue_mask[idx] > 0)
@@ -162,6 +374,13 @@ def _select_record_semantic_aware(
         raise ValueError("No candidate records available for constraint selection")
 
     evaluated_candidates: list[dict[str, Any]] = []
+    strict_profile = build_threshold_profile(
+        name="constraint_eval_strict",
+        thresholds=thresholds,
+        mean_violation_max=DEFAULT_MEAN_VIOLATION_MAX,
+        final_critical_max=DEFAULT_FINAL_CRITICAL_MAX,
+        high_disruption_max=DEFAULT_HIGH_DISRUPTION_MAX,
+    )
     for record in records:
         baseline_kind = record.get("notes", {}).get("baseline_kind")
         metrics = _evaluate_actor_critic_record(
@@ -175,10 +394,19 @@ def _select_record_semantic_aware(
             eval_episodes=eval_episodes,
             baseline_kind=baseline_kind,
         )
+        profile_eval = evaluate_profile(
+            candidate_metrics_from_metrics(
+                policy_id=str(record["policy_id"]),
+                objective_vector=list(record.get("objective_vector", [])),
+                metrics=metrics,
+            ),
+            strict_profile,
+        )
         evaluated_candidates.append(
             {
                 "record": record,
                 "metrics": metrics,
+                "profile_eval": profile_eval,
             }
         )
 
@@ -219,16 +447,60 @@ def _select_record_semantic_aware(
                 "policy_id": entry["record"]["policy_id"],
                 "objective_vector": entry["record"]["objective_vector"],
                 "semantic_risk": float(entry["semantic_risk"]),
+                "business_return": float(entry["metrics"]["business_return"]),
+                "cost_return": float(entry["metrics"]["cost_return"]),
                 "feasible_rate": float(entry["metrics"]["feasible_rate"]),
                 "mean_violation": float(entry["metrics"]["mean_violation"]),
                 "security_return": float(entry["metrics"]["security_return"]),
+                "critical_host_safety_return": (
+                    None
+                    if entry["metrics"].get("critical_host_safety_return") is None
+                    else float(entry["metrics"]["critical_host_safety_return"])
+                ),
+                "critical_host_safety_cvar_alpha": (
+                    None
+                    if entry["metrics"].get("critical_host_safety_cvar_alpha") is None
+                    else float(entry["metrics"]["critical_host_safety_cvar_alpha"])
+                ),
                 "final_critical_compromised_hosts": float(
                     entry["metrics"]["final_critical_compromised_hosts"]
+                ),
+                "persistent_critical_breach_rate": float(
+                    entry["metrics"].get(
+                        "persistent_critical_breach_rate",
+                        entry["metrics"]["final_critical_compromised_hosts"],
+                    )
                 ),
                 "critical_impact_count": float(entry["metrics"]["critical_impact_count"]),
                 "high_disruption_action_rate": float(
                     entry["metrics"]["high_disruption_action_rate"]
                 ),
+                "ever_critical_breach_rate": float(
+                    entry["metrics"].get("ever_critical_breach_rate", 0.0)
+                ),
+                "mean_first_critical_hit_step": float(
+                    entry["metrics"].get("mean_first_critical_hit_step", 0.0)
+                ),
+                "critical_hit_latency_score": float(
+                    entry["metrics"].get("critical_hit_latency_score", 0.0)
+                ),
+                "mean_critical_dwell_steps": float(
+                    entry["metrics"].get("mean_critical_dwell_steps", 0.0)
+                ),
+                "sleep_during_critical_breach_rate": float(
+                    entry["metrics"].get("sleep_during_critical_breach_rate", 0.0)
+                ),
+                "user_action_during_critical_breach_rate": float(
+                    entry["metrics"].get("user_action_during_critical_breach_rate", 0.0)
+                ),
+                "user_action_after_enterprise_foothold_rate": float(
+                    entry["metrics"].get(
+                        "user_action_after_enterprise_foothold_rate", 0.0
+                    )
+                ),
+                "passed_strict": bool(entry["profile_eval"]["passed"]),
+                "strict_margin": float(entry["profile_eval"]["strict_margin"]),
+                "fail_dims": list(entry["profile_eval"]["fail_dims"]),
             }
             for entry in sorted(
                 evaluated_candidates,
@@ -313,7 +585,79 @@ def _select_record_semantic_balanced(
     return selected_record, diagnostics
 
 
-def _evaluate_actor_critic_record(
+def _select_record_critical_safe_balanced(
+    records: list[dict[str, Any]],
+    metadata: dict[str, Any],
+    buffer_anchor: str | Path,
+    thresholds: dict[str, float],
+    *,
+    eval_episodes: int,
+    semantic_metric_weights: dict[str, float],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    _, diagnostics = _select_record_semantic_aware(
+        records,
+        metadata,
+        buffer_anchor,
+        thresholds,
+        eval_episodes=eval_episodes,
+        semantic_metric_weights=semantic_metric_weights,
+    )
+    evaluated_candidates = list(diagnostics["evaluated_candidates"])
+    business_floor = float(thresholds["d_business"] - 8.0)
+    cost_floor = float(thresholds["d_cost"] - 4.0)
+    shortlist = [
+        entry
+        for entry in evaluated_candidates
+        if float(entry["business_return"]) >= business_floor
+        and float(entry["cost_return"]) >= cost_floor
+    ]
+    shortlist_reason = "relaxed_budget_band"
+    if not shortlist:
+        shortlist = sorted(
+            evaluated_candidates,
+            key=lambda entry: (
+                float(entry["mean_violation"]),
+                float(entry["ever_critical_breach_rate"]),
+                float(entry["persistent_critical_breach_rate"]),
+                entry["policy_id"],
+            ),
+        )[:5]
+        shortlist_reason = "top5_mean_violation_fallback"
+
+    selected_entry = min(
+        shortlist,
+        key=lambda entry: (
+            float(entry["ever_critical_breach_rate"]),
+            float(entry["persistent_critical_breach_rate"]),
+            -float(
+                entry.get("critical_host_safety_cvar_alpha")
+                if entry.get("critical_host_safety_cvar_alpha") is not None
+                else float("-inf")
+            ),
+            float(entry["mean_critical_dwell_steps"]),
+            -float(entry["critical_hit_latency_score"]),
+            float(entry["user_action_during_critical_breach_rate"]),
+            float(entry["sleep_during_critical_breach_rate"]),
+            float(entry["mean_violation"]),
+            -float(entry["security_return"]),
+            entry["policy_id"],
+        ),
+    )
+    policy_id = str(selected_entry["policy_id"])
+    selected_record = next(record for record in records if record["policy_id"] == policy_id)
+    diagnostics.update(
+        {
+            "selection_policy": "critical_safe_balanced",
+            "business_floor": business_floor,
+            "cost_floor": cost_floor,
+            "shortlist_reason": shortlist_reason,
+            "shortlist_policy_ids": [entry["policy_id"] for entry in shortlist],
+        }
+    )
+    return selected_record, diagnostics
+
+
+def _evaluate_actor_critic_record_detailed(
     checkpoint_path: str | Path | None,
     metadata: dict[str, Any],
     thresholds: dict[str, float],
@@ -321,10 +665,10 @@ def _evaluate_actor_critic_record(
     eval_episodes: int,
     baseline_kind: str | None = None,
 ) -> dict[str, Any]:
-    env = _build_env_from_metadata(metadata)
     model_config = metadata.get("model", {})
     actor_critic = None
     if checkpoint_path is not None:
+        env = _build_env_from_metadata(metadata)
         actor_critic = ActorCritic(
             obs_dim=env.obs_dim,
             action_dim=env.action_dim,
@@ -336,78 +680,35 @@ def _evaluate_actor_critic_record(
         ).to(torch.device("cpu"))
         checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
         actor_critic.load_state_dict(checkpoint)
-        actor_critic.eval()
+    return _evaluate_actor_critic_policy_detailed(
+        actor_critic,
+        metadata,
+        thresholds,
+        eval_episodes=eval_episodes,
+        baseline_kind=baseline_kind,
+    )
 
-    totals = _empty_semantics()
-    episode_vectors: list[list[float]] = []
-    base_seed = int(metadata.get("env", {}).get("seed", 7))
-    with torch.no_grad():
-        for episode_idx in range(max(eval_episodes, 1)):
-            env.seed = base_seed + episode_idx
-            obs, _ = env.reset()
-            done = np.zeros(env.num_envs, dtype=bool)
-            returns = np.zeros((env.num_envs, env.obj_dim), dtype=np.float64)
-            episode_semantics = {
-                "critical_impact_count": np.zeros(env.num_envs, dtype=np.float64),
-                "recovered_hosts": np.zeros(env.num_envs, dtype=np.float64),
-                "analyse_count": np.zeros(env.num_envs, dtype=np.float64),
-                "remove_count": np.zeros(env.num_envs, dtype=np.float64),
-                "restore_count": np.zeros(env.num_envs, dtype=np.float64),
-                "high_disruption_action_count": np.zeros(env.num_envs, dtype=np.float64),
-                "total_action_count": np.zeros(env.num_envs, dtype=np.float64),
-            }
-            final_compromised_hosts = np.zeros(env.num_envs, dtype=np.float64)
-            final_critical_compromised_hosts = np.zeros(env.num_envs, dtype=np.float64)
 
-            while not np.all(done):
-                if actor_critic is None:
-                    if baseline_kind == "random_valid":
-                        actions = _random_valid_actions(env).reshape(env.num_envs, 1)
-                    else:
-                        actions = _sleep_actions(env).reshape(env.num_envs, 1)
-                else:
-                    obs_tensor = torch.as_tensor(obs, dtype=torch.float32)
-                    actions = (
-                        actor_critic.act(obs_tensor)
-                        .actions.cpu()
-                        .numpy()
-                        .reshape(env.num_envs, 1)
-                    )
-                obs, reward_vec, done, _, info = env.step(actions)
-                returns += reward_vec
-                semantic_info = info["semantic_info"]
-                final_compromised_hosts = np.asarray(
-                    semantic_info["final_compromised_hosts"], dtype=np.float64
-                )
-                final_critical_compromised_hosts = np.asarray(
-                    semantic_info["final_critical_compromised_hosts"], dtype=np.float64
-                )
-                for key in episode_semantics:
-                    episode_semantics[key] += np.asarray(semantic_info[key], dtype=np.float64)
-
-            episode_vectors.extend(returns.tolist())
-            totals["final_compromised_hosts"].extend(final_compromised_hosts.tolist())
-            totals["final_critical_compromised_hosts"].extend(
-                final_critical_compromised_hosts.tolist()
-            )
-            for key in episode_semantics:
-                totals[key].extend(episode_semantics[key].tolist())
-
-    vectors = np.asarray(episode_vectors, dtype=np.float32)
-    business_violation = np.maximum(0.0, thresholds["d_business"] - vectors[:, 1])
-    cost_violation = np.maximum(0.0, thresholds["d_cost"] - vectors[:, 2])
-    feasible = (business_violation <= 1e-12) & (cost_violation <= 1e-12)
-    semantic_metrics = _semantic_metrics(totals)
+def _evaluate_actor_critic_record(
+    checkpoint_path: str | Path | None,
+    metadata: dict[str, Any],
+    thresholds: dict[str, float],
+    *,
+    eval_episodes: int,
+    baseline_kind: str | None = None,
+) -> dict[str, Any]:
+    detailed = _evaluate_actor_critic_record_detailed(
+        checkpoint_path,
+        metadata,
+        thresholds,
+        eval_episodes=eval_episodes,
+        baseline_kind=baseline_kind,
+    )
     return {
-        "security_return": float(np.mean(vectors[:, 0])),
-        "business_return": float(np.mean(vectors[:, 1])),
-        "cost_return": float(np.mean(vectors[:, 2])),
-        "feasible_rate": float(np.mean(feasible.astype(np.float32))),
-        "mean_violation": float(np.mean(business_violation + cost_violation)),
-        "thresholds": thresholds,
-        **semantic_metrics,
+        key: value
+        for key, value in detailed.items()
+        if key != "audit_details"
     }
-
 
 def evaluate_constraints(
     *,
@@ -454,6 +755,15 @@ def evaluate_constraints(
                 security_margin=security_margin,
                 feasible_rate_tolerance=feasible_rate_tolerance,
                 mean_violation_tolerance=mean_violation_tolerance,
+            )
+        elif selection_policy == "critical_safe_balanced":
+            selected, selection_diagnostics = _select_record_critical_safe_balanced(
+                candidates,
+                payload.get("metadata", {}),
+                input_path,
+                thresholds,
+                eval_episodes=eval_episodes,
+                semantic_metric_weights=semantic_metric_weights or {},
             )
         else:
             selected = _select_record(candidates, thresholds)
@@ -521,7 +831,16 @@ def main() -> None:
     parser.add_argument("--input-kind", choices=("buffer", "single_policy"), default=None)
     parser.add_argument("--input-path", default=None)
     parser.add_argument("--selection-source", choices=("pareto", "records"), default=None)
-    parser.add_argument("--selection-policy", choices=("objective", "semantic_aware", "semantic_balanced"), default=None)
+    parser.add_argument(
+        "--selection-policy",
+        choices=(
+            "objective",
+            "semantic_aware",
+            "semantic_balanced",
+            "critical_safe_balanced",
+        ),
+        default=None,
+    )
     parser.add_argument("--thresholds-path", default=None)
     parser.add_argument("--output-path", default=None)
     args = parser.parse_args()

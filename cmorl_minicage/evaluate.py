@@ -12,8 +12,10 @@ from cmorl_minicage.algorithms.assignment import assign_policy
 from cmorl_minicage.algorithms.selection import nondominated_filter
 from cmorl_minicage.buffer import load_policy_buffer
 from cmorl_minicage.config import DEFAULT_EVALUATE_CONFIG, load_evaluate_config
+from cmorl_minicage.deployability import empty_semantic_totals, summarize_semantic_totals
 from cmorl_minicage.env import MiniCageMORLEnv
 from cmorl_minicage.models import ActorCritic
+from cmorl_minicage.shield import default_policy_action_mask, record_policy_mask_stats
 from cmorl_minicage.utils import save_json, simplex_grid
 
 
@@ -165,7 +167,7 @@ def _sleep_actions(env: MiniCageMORLEnv) -> np.ndarray:
 
 
 def _random_valid_actions(env: MiniCageMORLEnv) -> np.ndarray:
-    blue_mask = env.sim.get_mask(env.sim.state, env.sim.current_decoys)["Blue"]
+    blue_mask = default_policy_action_mask(env)
     actions = np.zeros(env.num_envs, dtype=np.int32)
     for idx in range(env.num_envs):
         valid_actions = np.flatnonzero(blue_mask[idx] > 0)
@@ -188,6 +190,10 @@ def _semantic_metrics_for_record(
         remove_bugs=bool(env_config.get("remove_bugs", True)),
         max_steps=int(env_config.get("max_episode_steps", 100)),
         seed=int(env_config.get("seed", 7)),
+        critical_host_safety_mode=str(
+            model_config.get("critical_host_safety_mode", "v2_legacy")
+        ),
+        shield_mode=str(metadata.get("shield", {}).get("mode", "disabled")),
     )
     baseline_kind = record.get("notes", {}).get("baseline_kind")
     actor_critic = None
@@ -206,19 +212,11 @@ def _semantic_metrics_for_record(
         actor_critic.load_state_dict(checkpoint)
         actor_critic.eval()
 
-    totals: dict[str, list[float]] = {
-        "final_compromised_hosts": [],
-        "final_critical_compromised_hosts": [],
-        "critical_impact_count": [],
-        "recovered_hosts": [],
-        "analyse_count": [],
-        "remove_count": [],
-        "restore_count": [],
-        "high_disruption_action_count": [],
-        "total_action_count": [],
-    }
+    totals: dict[str, list[float]] = empty_semantic_totals()
 
     base_seed = int(env_config.get("seed", 7))
+    max_episode_steps = int(env_config.get("max_episode_steps", getattr(env, "max_steps", 100)))
+    first_hit_sentinel = float(max_episode_steps + 1)
     with torch.no_grad():
         for batch_idx in range(max(eval_batches, 1)):
             env.seed = base_seed + batch_idx
@@ -232,9 +230,21 @@ def _semantic_metrics_for_record(
                 "restore_count": np.zeros(env.num_envs, dtype=np.float32),
                 "high_disruption_action_count": np.zeros(env.num_envs, dtype=np.float32),
                 "total_action_count": np.zeros(env.num_envs, dtype=np.float32),
+                "critical_dwell_steps": np.zeros(env.num_envs, dtype=np.float32),
+                "critical_path_compromise_count": np.zeros(env.num_envs, dtype=np.float32),
+                "sleep_during_critical_breach": np.zeros(env.num_envs, dtype=np.float32),
+                "user_action_during_critical_breach": np.zeros(env.num_envs, dtype=np.float32),
+                "user_action_after_enterprise_foothold": np.zeros(env.num_envs, dtype=np.float32),
             }
             final_compromised_hosts = np.zeros(env.num_envs, dtype=np.float32)
             final_critical_compromised_hosts = np.zeros(env.num_envs, dtype=np.float32)
+            ever_critical_breach = np.zeros(env.num_envs, dtype=np.float32)
+            first_critical_hit_step = np.full(
+                env.num_envs,
+                first_hit_sentinel,
+                dtype=np.float32,
+            )
+            step_idx = 0
 
             while not np.all(done):
                 if actor_critic is None:
@@ -246,7 +256,19 @@ def _semantic_metrics_for_record(
                         raise ValueError(f"Unsupported baseline_kind: {baseline_kind}")
                 else:
                     obs_tensor = torch.as_tensor(obs, dtype=torch.float32, device=torch.device("cpu"))
-                    actions = actor_critic.act(obs_tensor).actions.cpu().numpy().reshape(env.num_envs, 1)
+                    action_mask = torch.as_tensor(
+                        default_policy_action_mask(env),
+                        dtype=torch.bool,
+                        device=torch.device("cpu"),
+                    )
+                    policy_output = actor_critic.act(
+                        obs_tensor,
+                        action_mask=action_mask,
+                    )
+                    record_policy_mask_stats(env, policy_output.blocked_probability_mass)
+                    actions = (
+                        policy_output.actions.cpu().numpy().reshape(env.num_envs, 1)
+                    )
                 obs, _, done, _, info = env.step(actions)
                 semantic_info = info["semantic_info"]
                 final_compromised_hosts = np.asarray(
@@ -256,31 +278,44 @@ def _semantic_metrics_for_record(
                     semantic_info["final_critical_compromised_hosts"], dtype=np.float32
                 )
                 for key in episode_totals:
-                    episode_totals[key] += np.asarray(semantic_info[key], dtype=np.float32)
+                    source_key = (
+                        "critical_dwell_flag"
+                        if key == "critical_dwell_steps"
+                        else key
+                    )
+                    episode_totals[key] += np.asarray(
+                        semantic_info.get(source_key, np.zeros(env.num_envs)),
+                        dtype=np.float32,
+                    )
+                critical_present = np.asarray(
+                    semantic_info.get("critical_present", np.zeros(env.num_envs)),
+                    dtype=np.float32,
+                )
+                critical_hit_event = np.asarray(
+                    semantic_info.get("critical_hit_event", np.zeros(env.num_envs)),
+                    dtype=np.float32,
+                )
+                ever_critical_breach = np.maximum(ever_critical_breach, critical_present)
+                newly_hit_mask = np.logical_and(
+                    critical_hit_event > 0.0,
+                    first_critical_hit_step >= first_hit_sentinel,
+                )
+                first_critical_hit_step[newly_hit_mask] = float(step_idx)
+                step_idx += 1
 
             totals["final_compromised_hosts"].extend(final_compromised_hosts.tolist())
             totals["final_critical_compromised_hosts"].extend(
                 final_critical_compromised_hosts.tolist()
             )
+            totals["ever_critical_breach"].extend(ever_critical_breach.tolist())
+            totals["first_critical_hit_step"].extend(first_critical_hit_step.tolist())
+            totals["critical_hit_latency_score"].extend(
+                (first_critical_hit_step / first_hit_sentinel).tolist()
+            )
             for key in episode_totals:
                 totals[key].extend(episode_totals[key].tolist())
 
-    total_action_sum = max(float(np.sum(totals["total_action_count"])), 1.0)
-    return {
-        "final_compromised_hosts": float(np.mean(totals["final_compromised_hosts"])),
-        "final_critical_compromised_hosts": float(
-            np.mean(totals["final_critical_compromised_hosts"])
-        ),
-        "critical_impact_count": float(np.mean(totals["critical_impact_count"])),
-        "recovered_hosts": float(np.mean(totals["recovered_hosts"])),
-        "analyse_count": float(np.mean(totals["analyse_count"])),
-        "remove_count": float(np.mean(totals["remove_count"])),
-        "restore_count": float(np.mean(totals["restore_count"])),
-        "high_disruption_action_rate": float(
-            np.sum(totals["high_disruption_action_count"]) / total_action_sum
-        ),
-        "semantic_eval_episodes": int(len(totals["final_compromised_hosts"])),
-    }
+    return summarize_semantic_totals(totals)
 
 
 def _assignment_weighted_semantic_metrics(
@@ -291,16 +326,14 @@ def _assignment_weighted_semantic_metrics(
         return {}
     weighted_metrics: dict[str, float] = {}
     total_weight = float(sum(assignment_counts.values()))
-    metric_keys = [
-        "final_compromised_hosts",
-        "final_critical_compromised_hosts",
-        "critical_impact_count",
-        "recovered_hosts",
-        "analyse_count",
-        "remove_count",
-        "restore_count",
-        "high_disruption_action_rate",
-    ]
+    metric_keys = sorted(
+        {
+            key
+            for metrics in per_policy_semantics.values()
+            for key, value in metrics.items()
+            if isinstance(value, (int, float))
+        }
+    )
     for key in metric_keys:
         weighted_metrics[key] = float(
             sum(

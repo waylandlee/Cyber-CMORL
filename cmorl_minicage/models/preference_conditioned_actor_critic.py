@@ -6,6 +6,8 @@ import torch
 from torch import nn
 from torch.distributions import Categorical
 
+from .actor_critic import masked_logits_and_stats
+
 
 @dataclass
 class ConditionedPolicyOutput:
@@ -13,6 +15,8 @@ class ConditionedPolicyOutput:
     log_probs: torch.Tensor
     entropy: torch.Tensor
     values: torch.Tensor
+    blocked_probability_mass: torch.Tensor | None = None
+    allowed_action_count: torch.Tensor | None = None
 
 
 class PreferenceConditionedActorCritic(nn.Module):
@@ -49,23 +53,36 @@ class PreferenceConditionedActorCritic(nn.Module):
         return values
 
     def act(
-        self, obs: torch.Tensor, preference: torch.Tensor
+        self,
+        obs: torch.Tensor,
+        preference: torch.Tensor,
+        action_mask: torch.Tensor | None = None,
     ) -> ConditionedPolicyOutput:
         logits, values = self.forward(obs, preference)
-        dist = Categorical(logits=logits)
+        masked_logits, blocked_probability_mass, allowed_action_count = (
+            masked_logits_and_stats(logits, action_mask)
+        )
+        dist = Categorical(logits=masked_logits)
         actions = dist.sample()
         return ConditionedPolicyOutput(
             actions=actions,
             log_probs=dist.log_prob(actions),
             entropy=dist.entropy(),
             values=values,
+            blocked_probability_mass=blocked_probability_mass,
+            allowed_action_count=allowed_action_count,
         )
 
     def evaluate_actions(
-        self, obs: torch.Tensor, preference: torch.Tensor, actions: torch.Tensor
+        self,
+        obs: torch.Tensor,
+        preference: torch.Tensor,
+        actions: torch.Tensor,
+        action_mask: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         logits, values = self.forward(obs, preference)
-        dist = Categorical(logits=logits)
+        masked_logits, _, _ = masked_logits_and_stats(logits, action_mask)
+        dist = Categorical(logits=masked_logits)
         log_probs = dist.log_prob(actions)
         entropy = dist.entropy()
         return values, log_probs, entropy

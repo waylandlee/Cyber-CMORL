@@ -5,6 +5,14 @@ extension_rounds: 2
 constrained_updates: 2
 constraint_tolerance: 1.0e-6
 total_timesteps_per_update: 512
+semantic_penalty_coef: 0.20
+semantic_penalty_weights:
+  critical_hit_event: 0.40
+  critical_present: 0.25
+  critical_path_compromise_count: 0.15
+  user_action_during_critical_breach: 0.10
+  sleep_during_critical_breach: 0.05
+  user_action_after_enterprise_foothold: 0.05
 output_dir: cmorl_minicage/outputs/stage2
 env:
   num_envs: 8
@@ -20,6 +28,11 @@ rollout:
 eval:
   eval_episodes: 3
   preference_step:
+selection:
+  mode: crowding
+  pool_mode: pareto
+  near_frontier_quota: 6
+  strict_frontier_quota: 4
 ipo:
   clip_param: 0.2
   ppo_epochs: 4

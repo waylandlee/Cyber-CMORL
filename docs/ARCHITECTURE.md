@@ -2,64 +2,64 @@
 
 ## 模块结构
 
-MiniCAGE C-MORL 复现线的核心目录是 [cmorl_minicage](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage)。
+MiniCAGE C-MORL 复现线的核心目录是 [cmorl_minicage](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage)。
 
 主要模块分工如下：
 
-- [env.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/env.py)
+- [env.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/env.py)
   - 把 `mini_CAGE` 包装成多目标训练接口。
   - 输出 Blue 观测和 3 维 reward vector。
   - 负责构造 `security / business / cost` 三目标。
   - 保留 MiniCAGE 原始标量 reward 作为对照信息，而不是强制与三目标逐项对账。
-- [models/actor_critic.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/models/actor_critic.py)
+- [models/actor_critic.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/models/actor_critic.py)
   - Actor 输出离散动作分布。
   - Critic 输出向量 value。
-- [storage/rollout_storage.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/storage/rollout_storage.py)
+- [storage/rollout_storage.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/storage/rollout_storage.py)
   - 保存向量 rewards、returns、advantages。
-- [algorithms/ppo_vector.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/ppo_vector.py)
+- [algorithms/ppo_vector.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/ppo_vector.py)
   - Stage-1 的 vector-critic PPO。
   - 用 `ω^T A_vec` 做 actor 标量化更新。
-- [algorithms/selection.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/selection.py)
+- [algorithms/selection.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/selection.py)
   - `nondominated_filter`
   - `crowding_distance`
   - `select_top_n_by_crowding`
-- [algorithms/adaptive_selection.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/adaptive_selection.py)
+- [algorithms/adaptive_selection.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/adaptive_selection.py)
   - AdaCS 选择模块。
   - 输出 `crowding / expansion / low_risk / coverage` 四项组件与总分。
-- [algorithms/dynamic_beta.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/dynamic_beta.py)
+- [algorithms/dynamic_beta.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/dynamic_beta.py)
   - DCS 动态 beta 调度模块。
   - 按 `policy x objective x round` 生成扩展路径级 beta。
-- [algorithms/ipo.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/ipo.py)
+- [algorithms/ipo.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/ipo.py)
   - Stage-2 的 IPO-style constrained extension。
   - 当前是 PPO-compatible 的近似实现。
-- [algorithms/assignment.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/algorithms/assignment.py)
+- [algorithms/assignment.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/algorithms/assignment.py)
   - SMP assignment。
   - 给定任意 preference，返回 utility 最大的 policy。
-- [buffer.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/buffer.py)
+- [buffer.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/buffer.py)
   - 定义 solution buffer schema、record、metadata。
-- [config.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/config.py)
+- [config.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/config.py)
   - YAML 配置加载。
   - dataclass 配置定义。
-- [train_stage1.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/train_stage1.py)
+- [train_stage1.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/train_stage1.py)
   - Stage-1 训练入口。
   - 初始策略池构建。
   - 当前支持：
     - `legacy` 串行共享协议
     - `independent` 独立 reseed / 独立 env 协议
     - preference 级 process 并行 worker
-- [train_stage2.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/train_stage2.py)
+- [train_stage2.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/train_stage2.py)
   - Stage-2 selection-extension 训练入口。
   - 负责读取 Stage-1 buffer，选择 Pareto 解并扩展。
-- [evaluate.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/evaluate.py)
+- [evaluate.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/evaluate.py)
   - HV、EU、SP 与 assignment summary。
-- [visualize.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/visualize.py)
+- [visualize.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/visualize.py)
   - 单 run 图像生成。
   - 多实验对比图。
   - 主线图、suite 图、2D/3D/pairwise 论文风格图。
-- [baselines.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/baselines.py)
+- [baselines.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/baselines.py)
   - baseline 实验入口。
   - 统一管理 `sleep`、`random-valid`、`stage1-only`、`single-objective`、`weighted-sum`。
-- [select_policy.py](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/cmorl_minicage/select_policy.py)
+- [select_policy.py](/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_minicage/select_policy.py)
   - 给定任意 preference，从 `solution_buffer.json` 中返回当前最优策略。
 
 ## 核心类与关键函数
@@ -272,7 +272,7 @@ MiniCAGE C-MORL 复现线的核心目录是 [cmorl_minicage](/home/waylandlee/Cy
 - `plots/*.png`
   - 图形化结果
 
-这些产物共同组成实验记录体系的事实来源；文本结论再同步写入 [EXPERIMENT_LOG.md](/home/waylandlee/Cyber-CMORL/CybORG_plus_plus/docs/EXPERIMENT_LOG.md)。
+这些产物共同组成实验记录体系的事实来源；文本结论再同步写入 [EXPERIMENT_LOG.md](/home/waylandlee/CMORL2/Cyber-CMORL/docs/EXPERIMENT_LOG.md)。
 
 ## 当前架构与论文同构度
 

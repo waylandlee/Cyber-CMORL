@@ -323,7 +323,11 @@ def run_weighted_sum_baseline(
     *,
     preferences: Sequence[Sequence[float]] | None = None,
 ) -> tuple[Path, Path]:
-    preference_list = preferences or DEFAULT_WEIGHTED_SUM_PREFERENCES
+    preference_list = (
+        preferences
+        or stage1_config.explicit_preferences
+        or DEFAULT_WEIGHTED_SUM_PREFERENCES
+    )
     per_policy_timesteps = max(
         int(stage1_config.total_timesteps // max(len(preference_list), 1)),
         stage1_config.rollout.num_steps * stage1_config.env.num_envs,
