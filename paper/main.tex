@@ -55,34 +55,15 @@
 % 3.摘要里面部分用词不是很准确（business impact、operational constraints），这个能不能参考一下
 % =========================
 \begin{abstract}
-Autonomous Cyber Defense(ACD) requires sequential decision-making under competing defensive objectives.
-Defenders must confront attackers while preserving continuity, limiting cost, and decreasing disruption, making the problem inherently constrained and multi-objective.
-However, most existing learning-based approaches optimize a scalarized objective or produce a single deployable policy.
-In this paper, we formulate an autonomous defender as a constrained multi-objective reinforcement learning problem with three objectives: security effect, business impact, and defense cost.
-We adopt a two-stage Pareto-oriented learning framework that first-phase learns an initial set of preference-diverse defense policies and then expands the policy set under operational constraints to improve the Pareto-frontier quality and deployment flexibility.
-We evaluate both candidate-set quality and final deployment quality in CybORG using Pareto metrics, preference-conditioned utility, and cyber-semantic outcomes.
-Experiment results show that our approach yields higher-quality policy sets, broader preference coverage, and stronger feasible deployment choices under strict operational constraints than scalarization-based and conditioned-policy baselines.
+LLM-enabled cyber attacks pose a realistic threat in cyberspace, and the autonomous cyber defense (ACD) is a promising technology for confronting AI-enabled attacks.
+However, deep reinforcement learning (DRL)-based decision-making for ACD in preventing lateral-movement and responding ransomware in IT\&OT scenarios is a time-sensitive sequential decision problem.
+Existing methods typically collapse the problem into a scalarized reward or a single operating point, which ignored the disruptions of critical services, exhaustion of defending resource, and rising critical risks in hindering sophisticated attackers.
 
-%按照上述要求，新修改的摘要
-AI-enabled attack--defense interaction makes autonomous cyber defense a time-sensitive sequential decision problem: in lateral-movement containment and ransomware-style response, defenders must suppress attacker progress without disrupting critical services or exhausting response capacity.
-Existing learning-based defenses typically collapse these trade-offs into a scalarized reward or a single operating point, which poorly matches organizations with heterogeneous tolerances for residual risk, service disruption, and response overhead.
-
-We formulate blue-team defense in CybORG as a constrained multi-objective reinforcement learning problem with three deployment objectives: security effectiveness, service continuity, and response overhead. We learn deployable defense policy sets through a two-stage Pareto-oriented framework that initializes preference-diverse policies and expands them via constraint-aware Pareto optimization.
-Under a common constrained protocol, our method improves hyper-volume by 62.2\% over weighted-sum scalarization, increases expected utility by 36.3 points, and reduces mean constraint violation by 38.8\% while maintaining competitive security performance.
-These results suggest that autonomous cyber defense is better framed as constrained trade-off management over deployable policy sets than as single-policy reward maximization.
-
-%  20260420 熊改
-LLM-enabled cyber-attacks have posed a realistic threat in cyber-space. The autonomous cyber defense (ACD) is a promising technology in confronting AI-enabled attacks.
-However, the deep reinforcement learning (DRL) based decision-making of ACD in preventing lateral-movement and responding ransomware in IT\&OT scenarios is a time-sensitive sequential decision problem.
-Existing methods typically collapsed the problem into a scalarized reward or a single operating point, which ignored the disruptions of critical services or exhausting defending resource in hindering sophisticated attackers.
-
-This paper presents a constrained multi-objective DRL method for ACD agents by formulating the defender with 3 deployable objectives: security effectiveness, service continuity, and response overhead.
-%括一句，细写一下自己的修改，添加了基于环境中的实际语义，多加一点
-We propose a two-stage Pareto-oriented framework that initializes preference-diverse policies and expands them via the constraint-awared Pareto optimization to yield deployable policy sets in ACD.
-% 因为摘要后面可能不能修改了，所以现在里面的实验结果最好确认好，别修改后对不上
-By implemented in the CybORG simulators, our method improves hyper-volume by 62.2\% over weighted-sum scalarization, increases expected utility by 36.3 points, and reduces mean constraint violation by 38.8\% while maintaining competitive security performance.
+This paper presents a constrained multi-objective DRL method for ACD agents by formulating the defender with four deployable objectives: \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}.
+Instead of maximizing a single reward policy, our method constructs a deployable policy set through cyber-semantic objectives and constraint-aware Pareto expansion, which different operational preferences can be realized without re-training.
+We propose a two-stage Pareto-oriented framework that initializes preference-diverse policies and expands them via constraint-aware Pareto optimization to yield a deployable policy set for ACD.
+By implemented in the CybORG++ simulators, our method achieves \textbf{$3.9\times$} higher hypervolume than weighted-sum scalarization, raises expected utility from $-161.57$ to $-41.92$, increases feasible deployment rate to $0.64$, and reduces mean constraint violation from $93.54$ to $0.09$, without critical compromised hosts and critical-impact events.
 These experiments show that a constrained trade-off management over multi-objective policy sets can enable the ACD agent with more deployable guarantees than straightforward single-policy reward maximization.
-%最后进行升华，升华到一类的领域问题
 
 \end{abstract}
 
@@ -146,295 +127,287 @@ The main contributions of this paper are as follows:
 \section{Threat Model and Deployment Assumptions}
 \label{sec:threat-deployment}
 
-We study a simulated enterprise-defense setting in which a blue defender responds to an adversarial red process over a finite horizon. The purpose of this section is to make explicit the operational assumptions under which the learned policies are trained, evaluated, and selected for deployment. Our focus is not only whether a defender can accumulate high reward, but whether it can prevent attacker progress toward critical assets while preserving service continuity and staying within operationally acceptable response limits.
+We study autonomous blue-team defense in CybORG++~\cite{baillie2020cyborg,emerson2024cyborgpp}, a cyber-range setting in which a defender must react to attacker progress under partial observability and operational side effects. The purpose of this section is to state the assumptions under which policies are trained, evaluated, and selected for deployment. Our focus is not only whether a blue agent can obtain high reward, but whether it can prevent attacker progress toward critical assets while preserving \emph{Business Continuity}, limiting \emph{Defense Cost}, and maintaining \emph{Critical-Asset Safety}.
 
-\subsection{Attacker Model}
+\subsection{CybORG++ Enterprise Defense Setting}
+\label{subsec:threat-env}
 
-The attacker is represented by the red process implemented in the CybORG environment~\cite{baillie2020cyborg, emerson2024cyborgpp}. Within a given training or evaluation regime, the red process is standardized and fixed. It may generate stochastic trajectories through the environment, but it is not a co-learning adversary that adapts its strategy online in response to the learned blue policy. This design choice allows us to isolate the quality of blue-team decision making rather than confounding it with equilibrium learning or online red--blue adaptation.
+The environment is a finite-horizon enterprise-defense process. At each step, the defender receives a cyber observation, selects a blue-team response action, and the environment advances according to both the blue action and a standardized red process. In the concrete CybORG++ instantiation used in this paper, the environment is Scenario2 with a fixed default \texttt{bline} red process and an episode horizon of $T=100$ steps. This setting exposes the main operational structure needed for our study: attacker lateral movement, enterprise footholds, defensive intervention, business-impacting side effects, and critical-host compromise.
 
-The attacker's objective is to progress through the enterprise network toward higher-value states and critical assets over an episode horizon of \(T=100\) steps. Operationally, this captures lateral movement, persistence, and attack-impact behavior that can result in compromised critical hosts or service-impacting events. The defender's task is therefore not merely to react to isolated alerts, but to make long-horizon response decisions that slow or suppress attacker progress before critical impact accumulates.
+The standardized red process is a deliberate modeling choice. We do not treat the attacker as a co-learning adversary that adapts online to the current blue policy. Instead, the red process defines a controlled attack--defense process under which different blue-team learning methods can be compared fairly. This allows us to isolate whether a method learns a useful \emph{set} of deployable defense policies rather than confounding the evaluation with equilibrium learning or online red--blue adaptation. We consider broader red-side variation as a robustness question, but it is not the primary threat model of this paper.
 
-To probe limited robustness beyond the default red process, we additionally evaluate a held-out attacker shift without retraining. This stress test is not intended to establish full attacker-robust generalization. Instead, it measures whether policies trained under the default red process retain useful behavior when directly evaluated against a different red-side behavior.
+\subsection{Attacker Progression and Critical Assets}
+\label{subsec:threat-attacker}
+
+The attacker seeks to progress through the enterprise network toward high-value assets. We summarize this progression using three semantic phases. First, an \emph{enterprise foothold} occurs when the attacker compromises an enterprise host that can support further lateral movement. Second, the interaction may enter a \emph{pre-critical window}, where the attacker has not yet compromised the critical asset but the current compromise pattern creates elevated risk. Third, a \emph{critical breach} occurs when a critical asset becomes compromised; if the compromise persists across steps, the run enters a persistent-breach regime.
+
+These phases are not intended to reveal privileged information to the deployed blue policy. They are semantic summaries derived from environment-side state for reward construction, candidate diagnostics, and replay-level audit. The deployed policy acts only on defender-visible observations. The phase structure matters because critical compromise is a tail-risk event: a policy that performs well in average return can still be unacceptable if it repeatedly allows the attacker to cross from the pre-critical window into realized critical breach.
 
 \subsection{Defender Observability and Response Space}
+\label{subsec:threat-defender}
 
-The blue defender operates under partial observability. At each time step, it receives a cyber-specific observation summarizing defender-visible information such as host status, alerts, and telemetry exposed by the environment. The defender does not observe the full latent cyber state, the attacker's internal plan, or future attacker actions. It must therefore infer risk from incomplete evidence and choose actions whose consequences unfold over multiple time steps.
+The blue defender operates under partial observability. At time $t$, the defender observes $o_t$, which summarizes information exposed by CybORG++ such as alerts, host-level telemetry, and defender-visible status. The defender does not observe the full latent cyber state, the attacker's internal plan, or future attacker actions. It must therefore infer risk from incomplete evidence and choose actions whose consequences unfold over multiple steps.
 
-The defender selects one response action from the available CybORG action set at each step. These actions include analysis, removal, restoration, and related host-level interventions. They differ not only in security effect but also in operational side effects. Some actions are relatively local and low cost, while others can be disruptive, consume response capacity, or trigger recovery overhead. We therefore treat defensive actions as deployment-sensitive interventions rather than abstract control moves.
+The defender selects one action from the CybORG++ blue action space. These actions include analysis, removal, restoration, decoy placement, and other host-level interventions made available by the environment. Such actions differ in both security effect and operational side effect. For example, a restoration action may remove attacker presence but can disrupt business operation; a decoy action may improve security posture but consumes response capacity and can be costly; conservative actions may reduce immediate disruption but allow an attacker foothold to deepen. We therefore treat actions as deployment-sensitive cyber interventions rather than abstract control moves.
 
-This distinction is important for autonomous cyber defense. A policy that suppresses attacker progress by repeatedly restoring or aggressively intervening on hosts may look strong from a containment perspective, but it may be unacceptable in a service-sensitive deployment. Conversely, a policy that avoids intervention may preserve continuity in the short term while allowing attacker footholds to deepen. The defender's action space therefore naturally induces trade-offs among security effectiveness, service continuity, and defense overhead.
+This distinction is central to our formulation. Aggressively suppressing attacker progress may improve \emph{Security Effectiveness} while harming \emph{Business Continuity} or increasing \emph{Defense Cost}. Conversely, minimizing intervention can reduce cost in the short term but may degrade \emph{Critical-Asset Safety}. A deployable autonomous defender must therefore manage trade-offs rather than optimize a single scalar objective.
 
-\subsection{Deployment Preferences, Limits, and Regimes}
+\subsection{Deployment Preferences and Hard Limits}
+\label{subsec:threat-deployment-preferences}
 
-We distinguish between \emph{preferences} and \emph{hard deployment limits}. Preferences specify how an organization ranks competing objectives such as containment, continuity, and cost. For example, an organization under active incident containment may prefer stronger security actions, whereas a service-sensitive organization during peak load may prioritize continuity. These preferences are later represented by a deployment-time weight vector over the three objectives.
+We distinguish between deployment preferences and hard deployment limits. A deployment preference specifies how an organization ranks the four objectives: \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}. For instance, an organization in active containment may assign more weight to security and critical-asset protection, while a business-sensitive regime may place more weight on continuity and response cost.
 
-Hard limits are different. They define behaviors that remain unacceptable regardless of preference. Examples include exceeding a disruption budget, relying too heavily on high-impact actions, or sustaining intervention patterns that a human operator would reject. These limits are later formalized as feasibility constraints over business disruption and costly intervention. A policy may have high scalar utility under a particular preference but still be excluded from deployment if it violates these operational limits.
+Hard limits play a different role. They define behavior that should be rejected regardless of its scalar utility under a particular preference. Examples include excessive business disruption, excessive reliance on high-disruption actions, unacceptable mean constraint violation, or realized compromise of a critical asset. These limits are deployment constraints, not merely soft preferences. A policy may score well under a preference vector and still be excluded from deployment if it violates these limits.
 
-This separation is central to our setting. Standard scalarization can express what a defender values, but it does not by itself enforce what a defender is unwilling to tolerate. We therefore model deployment as constrained policy selection: a policy must first satisfy operational limits and only then be compared according to the organization's preference over security, business continuity, and cost.
-
-In the experiments, we instantiate deployment regimes through common constraint thresholds. A loose regime represents moderate tolerance for disruption and high-impact intervention, while a tight regime represents stricter deployment conditions with a narrower acceptable response space. These regimes are protocol-level abstractions of realistic operating contexts such as peak service hours, after-hours response, or active incident containment.
-
-\subsection{Deployment-Time Policy Use}
-
-The learned object in this paper is a policy set rather than a single universal defense policy. Training produces an archive of candidate blue-team policies with different operational trade-offs. At deployment time, an organization specifies its preference over the three objectives together with the applicable business and cost limits. The system then filters the archive to feasible policies and assigns the feasible policy with the highest utility for that preference.
-
-This deployment protocol assumes no retraining during policy assignment. The defender does not learn a new policy for each organization, each preference, or each evaluation episode. Instead, the policy set is constructed offline, and deployment-time adaptation occurs through feasible policy selection. This assumption reflects the practical goal of providing a reusable set of operating points that can support different regimes without requiring new training whenever operational priorities change.
+The deployment object in this paper is therefore a policy set rather than a single universal policy. Training constructs an archive of candidate blue policies that occupy different regions of the four-objective trade-off surface. At deployment time, an organization specifies a preference vector and applicable deployment limits; the system then selects a feasible policy from the archive. No policy is retrained during deployment-time assignment.
 
 \subsection{Scope and Non-Goals}
+\label{subsec:threat-scope}
 
-Our setting is a controlled cyber-range model for studying deployment-aware blue-team learning. It is not a fully general stochastic game, and we do not attempt to compute adaptive red--blue equilibria. The attacker process is standardized within each regime, and the held-out attacker evaluation is treated as a limited stress test rather than a comprehensive robustness guarantee.
+Our setting is a controlled CybORG++ cyber-range study of deployment-aware blue-team learning. It is not a full stochastic-game formulation and does not claim equilibrium guarantees against an adaptive learning attacker. The operational constraints are also abstractions of deployment acceptability: they capture business-disruption tolerance, costly-intervention tolerance, and semantic critical-safety guards, but they do not encode organization-specific service-level agreements, approval workflows, legal rules, or human escalation procedures.
 
-We also do not claim that the learned policies are ready for unsupervised deployment in live enterprise networks. The operational constraints used in this paper are proxy abstractions of disruption tolerance and response overhead; they do not yet encode organization-specific service-level agreements, approval workflows, legal requirements, or asset-criticality policies. Our claims are therefore intentionally bounded: we evaluate whether deployment-aware policy-set learning provides more useful constrained blue-team choices than scalarized or single-policy alternatives under a shared CybORG protocol.
+The claim supported by this setting is intentionally bounded. We evaluate whether learning a constrained four-objective policy set provides more useful deployable blue-team choices than scalarized or reduced alternatives under a shared CybORG++ attack--defense process. We do not claim that the resulting policies are ready for unsupervised live-network deployment or that they eliminate all cyber risk.
 
 \section{Constrained Multi-Objective Formulation of Blue-Team Defense}
 \label{sec:formulation}
 
-We now formalize the deployment setting introduced above as a constrained multi-objective blue-team decision problem. The formulation is designed to preserve the operational semantics of autonomous cyber defense: a useful policy should suppress attacker progress, preserve service continuity, and avoid excessive response overhead. The key distinction is between \emph{preferences}, which determine how an organization values different trade-offs, and \emph{hard deployment constraints}, which define behavior that is unacceptable regardless of preference.
+We now formalize the preceding deployment setting as a constrained multi-objective reinforcement learning problem. The formulation is designed to preserve cyber-defense semantics while making policy-set learning and deployment-time assignment explicit. The four optimized objectives are \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}. Throughout the paper, larger values are preferable in every objective dimension; in particular, the \emph{Defense Cost} objective is implemented as a negative cost return, so a larger value corresponds to lower realized cost.
 
-\subsection{Partially Observable Blue-Team Decision Process}
+\subsection{Partially Observable Cyber MOMDP}
+\label{subsec:formulation-momdp}
 
-We model the cyber-defense environment as a finite-horizon partially observable decision process,
+We model CybORG++ blue-team defense as a finite-horizon partially observable multi-objective decision process,
 \begin{equation}
-\mathcal{M}
-=
-\langle
-\mathcal{S}, \mathcal{O}, \mathcal{A}, P, Z, \mathbf{r}, \mathbf{c}, \gamma
-\rangle ,
+    \mathcal{M} = \langle \mathcal{S}, \mathcal{O}, \mathcal{A}, P, Z, \mathbf{r}, \boldsymbol{\psi}, \gamma, T \rangle .
 \end{equation}
-where \(\mathcal{S}\) is the latent cyber state space, \(\mathcal{O}\) is the defender observation space, \(\mathcal{A}\) is the defender action space, \(P\) is the transition kernel, \(Z\) is the observation kernel, \(\mathbf{r}\) is a vector-valued reward signal, \(\mathbf{c}\) is a vector of constraint signals, and \(\gamma \in [0,1]\) is a discount factor used during learning.
+Here, $\mathcal{S}$ is the latent cyber state space, $\mathcal{O}$ is the defender observation space, $\mathcal{A}$ is the blue-team action space, $P$ is the transition kernel induced by the red process and blue action, $Z$ is the observation kernel, $\mathbf{r}$ is a four-dimensional reward vector, $\boldsymbol{\psi}$ denotes semantic rollout summaries used for constraints and audit, $\gamma \in [0,1]$ is the discount factor, and $T$ is the episode horizon.
 
-At time \(t\), the defender receives a partial observation
+At each time step,
 \begin{equation}
-o_t \sim Z(\cdot \mid s_t), \qquad o_t \in \mathcal{O},
+    o_t \sim Z(\cdot \mid s_t), \qquad
+    a_t \sim \pi(\cdot \mid o_t), \qquad
+    s_{t+1} \sim P(\cdot \mid s_t,a_t).
 \end{equation}
-selects a blue-team response action
-\begin{equation}
-a_t \in \mathcal{A},
-\end{equation}
-and the environment evolves according to
-\begin{equation}
-s_{t+1} \sim P(\cdot \mid s_t, a_t).
-\end{equation}
-The transition kernel captures both the standardized red process and the downstream effects of blue-team intervention. Thus, attacker progress, service impact, and recovery consequences are path dependent. A policy must therefore be evaluated through rollout-level outcomes rather than through isolated single-step reward alone.
-
 A trajectory is denoted by
 \begin{equation}
-\tau = (s_0,o_0,a_0,\ldots,s_T,o_T),
+    \tau = (s_0,o_0,a_0,r_0,\ldots,s_T,o_T).
 \end{equation}
-where \(T=100\) in our CybORG experiments. A blue-team policy \(\pi(a \mid o)\) maps defender observations to response actions under partial observability.
+The policy $\pi(a\mid o)$ is observation-based. Environment-side state information may be used to compute semantic rewards and audit signals, but it is not provided as privileged input to the deployed policy.
 
-\subsection{Operational Objective Signals}
+\subsection{Four Optimized Objectives}
+\label{subsec:formulation-objectives}
 
-We use three deployment-relevant objectives: \emph{security effectiveness}, \emph{service continuity}, and \emph{defense overhead}. Rather than defining these objectives only as abstract reward dimensions, we instantiate them through cyber-semantic rollout summaries that can be logged and interpreted by a defender:
-\begin{itemize}
-    \item \(H_{\mathrm{crit}}(\tau)\): final number of critical compromised hosts;
-    \item \(N_{\mathrm{impact}}(\tau)\): realized critical-impact events;
-    \item \(D_{\mathrm{svc}}(\tau)\): cumulative service-disruption proxy;
-    \item \(N_{\mathrm{restore}}(\tau)\): number of restore or recovery actions;
-    \item \(N_{\mathrm{int}}(\tau)\): total intervention count, including analysis, removal, restoration, and related actions;
-    \item \(N_{\mathrm{exp}}(\tau)\): number of expensive or high-disruption actions.
-\end{itemize}
-
-Using positive coefficients \(\alpha_{\cdot}, \beta_{\cdot}, \eta_{\cdot} > 0\), we define the trajectory-level objective vector
+The per-step reward vector is
 \begin{equation}
-\mathbf{R}(\tau)
-=
-\left[
-R^{\mathrm{sec}}(\tau),
-R^{\mathrm{svc}}(\tau),
-R^{\mathrm{ovh}}(\tau)
-\right],
+    \mathbf{r}_t =
+    \left[
+        r^{\mathrm{sec}}_t,
+        r^{\mathrm{bus}}_t,
+        r^{\mathrm{cost}}_t,
+        r^{\mathrm{crit}}_t
+    \right]^{\top},
 \end{equation}
-where
+where the four dimensions correspond to \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}. For a policy $\pi$, the expected return vector is
+\begin{equation}
+    \mathbf{J}(\pi)
+    = \mathbb{E}_{\tau\sim\pi}\left[\sum_{t=0}^{T-1}\gamma^t\mathbf{r}_t\right]
+    = \left[
+        J^{\mathrm{sec}}(\pi),
+        J^{\mathrm{bus}}(\pi),
+        J^{\mathrm{cost}}(\pi),
+        J^{\mathrm{crit}}(\pi)
+    \right]^{\top} .
+\end{equation}
+The objective semantics are as follows.
+
+\paragraph{Security Effectiveness.}
+This objective rewards suppression of attacker progress and recovery from compromise. It is improved when the defender reduces security exposure, prevents new compromise, and recovers compromised hosts. In the CybORG++ implementation, this signal combines the environment reward with semantic exposure and recovery terms so that security return reflects more than a raw scalar reward.
+
+\paragraph{Business Continuity.}
+This objective captures the operational continuity of defended services. It penalizes business-weighted exposure, disruption caused by defensive actions, and critical events that affect business-relevant assets. A higher Business Continuity return means that the policy maintains more acceptable business operation while still responding to the attacker.
+
+\paragraph{Defense Cost.}
+This objective captures response burden and costly intervention. It penalizes expensive or high-disruption actions such as restoration, removal, decoy deployment, or other actions with nontrivial operational cost. Since the objective is represented as negative cost, a higher Defense Cost return means lower realized defense cost.
+
+\paragraph{Critical-Asset Safety.}
+This objective explicitly represents tail-risk behavior around critical assets. It penalizes ever entering a critical breach, persistent critical compromise, early critical compromise, and critical dwell time. This objective is part of the optimized reward vector itself. It is not a post-hoc audit score and not a fifth auxiliary penalty.
+
+At the trajectory level, the same semantics can be summarized abstractly as
 \begin{align}
-R^{\mathrm{sec}}(\tau)
-&=
--\alpha_h H_{\mathrm{crit}}(\tau)
--\alpha_i N_{\mathrm{impact}}(\tau),
-\\
-R^{\mathrm{svc}}(\tau)
-&=
--\beta_d D_{\mathrm{svc}}(\tau)
--\beta_r N_{\mathrm{restore}}(\tau),
-\\
-R^{\mathrm{ovh}}(\tau)
-&=
--\eta_n N_{\mathrm{int}}(\tau)
--\eta_e N_{\mathrm{exp}}(\tau).
+    R^{\mathrm{sec}}(\tau)
+        &= -\alpha_1 E_{\mathrm{sec}}(\tau)
+           + \alpha_2 N_{\mathrm{rec}}(\tau)
+           - \alpha_3 I_{\mathrm{crit}}(\tau), \\
+    R^{\mathrm{bus}}(\tau)
+        &= -\beta_1 E_{\mathrm{bus}}(\tau)
+           - \beta_2 D_{\mathrm{act}}(\tau)
+           - \beta_3 I_{\mathrm{crit}}(\tau), \\
+    R^{\mathrm{cost}}(\tau)
+        &= -\eta_1 A_{\mathrm{cost}}(\tau), \\
+    R^{\mathrm{crit}}(\tau)
+        &= -\lambda_1 B_{\mathrm{ever}}(\tau)
+           -\lambda_2 B_{\mathrm{persist}}(\tau)
+           -\lambda_3\bigl(1-L_{\mathrm{hit}}(\tau)\bigr)
+           -\lambda_4 D_{\mathrm{crit}}(\tau).
 \end{align}
+Here, $E_{\mathrm{sec}}$ and $E_{\mathrm{bus}}$ are security and business exposure summaries, $N_{\mathrm{rec}}$ counts recovery from compromise, $I_{\mathrm{crit}}$ counts realized critical-impact events, $D_{\mathrm{act}}$ summarizes business disruption induced by blue actions, $A_{\mathrm{cost}}$ is action operation cost, $B_{\mathrm{ever}}$ indicates whether a critical breach ever occurs, $B_{\mathrm{persist}}$ indicates persistent critical breach, $L_{\mathrm{hit}}$ is a normalized latency score for the first critical hit, and $D_{\mathrm{crit}}$ is critical dwell. The coefficients are nonnegative and fixed by the CybORG++ instantiation. The equations are intended to define the objective semantics; the implementation uses equivalent per-step vector rewards for learning.
 
-The sign convention makes larger values preferable for all objectives. A policy is better on the security objective when it leaves fewer critical hosts compromised and triggers fewer attack-impact events. It is better on the service-continuity objective when it causes less disruption and requires fewer recovery actions. It is better on the defense-overhead objective when it uses fewer interventions and relies less on high-impact responses.
+\subsection{Deployment Constraints and Semantic Guardrails}
+\label{subsec:formulation-constraints}
 
-For a policy \(\pi\), the expected objective vector is
+Preferences express what an organization values, while constraints express what the organization will not deploy. Let $\mathbf{g}(\pi)$ denote deployment-relevant violation summaries, including business-disruption violation, costly-intervention violation, high-disruption action rate, and semantic critical-risk indicators. A policy is feasible under deployment budget $\boldsymbol{\delta}$ if
 \begin{equation}
-\mathbf{J}(\pi)
-=
-\mathbb{E}_{\tau \sim \pi}
-\left[
-\mathbf{R}(\tau)
-\right]
-=
-\left[
-J^{\mathrm{sec}}(\pi),
-J^{\mathrm{svc}}(\pi),
-J^{\mathrm{ovh}}(\pi)
-\right].
+    \pi \in \mathcal{F}(\boldsymbol{\delta})
+    \quad \Longleftrightarrow \quad
+    g_m(\pi) \leq \delta_m, \qquad m=1,\ldots,M .
 \end{equation}
-The same objectives can be implemented through per-step vector rewards during learning, but the deployment interpretation is defined at the rollout level.
-
-The use of both \(N_{\mathrm{restore}}\) and \(N_{\mathrm{int}}\) is intentional. Restore actions reflect recovery churn and service instability, so they contribute to the service-continuity objective. They also require operator effort and response capacity, so they may also contribute to the intervention count. This overlap captures two distinct operational meanings of recovery activity rather than accidental double counting.
-
-\subsection{Hard Deployment Constraints}
-
-Some response patterns should not be treated only as soft reward penalties. In deployment, a policy may be unacceptable even if it achieves high utility under a particular preference. We therefore introduce hard feasibility constraints over rollout-level signals.
-
-In the general case, let
+In the main CybORG++ deployment evaluation, the primary deployment-facing constraints are business and cost limits. These limits are naturally expressed as lower bounds on the corresponding returns,
 \begin{equation}
-\mathbf{C}(\tau)
-=
-\left[
-C_1(\tau),\ldots,C_M(\tau)
-\right]
+    J^{\mathrm{bus}}(\pi) \geq d_{\mathrm{bus}},
+    \qquad
+    J^{\mathrm{cost}}(\pi) \geq d_{\mathrm{cost}},
 \end{equation}
-denote deployment-relevant constraint summaries. A policy is feasible with respect to budget vector \(\boldsymbol{\delta}\) if
+where a larger $J^{\mathrm{cost}}$ means lower realized Defense Cost. During policy-set construction and deployment diagnostics, we also track semantic safety guardrails such as final critical compromised hosts, ever-critical breach, persistent critical breach, and critical dwell. These semantic guardrails ensure that a policy is not considered deployable merely because it has good average scalar utility.
+
+This separation avoids conflating objectives and rejection rules. Critical-Asset Safety is one of the four optimized objectives; semantic guardrails are the deployment and audit mechanisms used to check whether the learned behavior actually satisfies the intended safety semantics.
+
+\subsection{Pareto Dominance and Candidate Policy Sets}
+\label{subsec:formulation-pareto}
+
+Because the four objectives conflict, a single policy need not dominate all others. We say that policy $\pi'$ dominates policy $\pi$ if
 \begin{equation}
-C_m(\pi)
-=
-\mathbb{E}_{\tau \sim \pi}
-\left[
-C_m(\tau)
-\right]
-\leq
-\delta_m,
-\qquad
-m=1,\ldots,M.
+    J_i(\pi') \geq J_i(\pi) \quad \text{for all } i\in\{\mathrm{sec},\mathrm{bus},\mathrm{cost},\mathrm{crit}\},
 \end{equation}
-
-In our CybORG instantiation, we use two deployment-facing constraints:
-\begin{align}
-C_{\mathrm{biz}}(\pi)
-&=
-\mathbb{E}_{\tau \sim \pi}
-\left[
-D_{\mathrm{svc}}(\tau)
-\right]
-\leq
-\delta_{\mathrm{biz}},
-\\
-C_{\mathrm{cost}}(\pi)
-&=
-\mathbb{E}_{\tau \sim \pi}
-\left[
-N_{\mathrm{exp}}(\tau)
-\right]
-\leq
-\delta_{\mathrm{cost}}.
-\end{align}
-The first constraint represents business or service-disruption tolerance. The second represents tolerance for high-impact defensive actions. These two signals are used as hard constraints because they correspond directly to deployment rejection conditions: a real operator may reject a policy that causes too much service disruption or repeatedly uses disruptive remediation, even if that policy improves containment.
-
-Other signals, such as intervention count or restore count, still affect the objective vector and therefore influence preference-based utility. They are not all used as hard feasibility gates because our deployment protocol separates broad operational quality from strict rejection thresholds.
-
-\subsection{Feasible Preference-Based Policy Assignment}
-
-Deployment preferences are represented by a weight vector
+with strict inequality for at least one objective. A policy is Pareto-optimal within a candidate set if it is not dominated by any other candidate. A learned policy archive $\Pi$ induces a four-dimensional Pareto-front approximation
 \begin{equation}
-\mathbf{w} \in \Delta_3
-=
-\left\{
-\mathbf{w} \in \mathbb{R}_{\geq 0}^{3}
-:
-\sum_{i=1}^{3} w_i = 1
-\right\},
+    \mathcal{P}(\Pi) = \{\mathbf{J}(\pi): \pi \in \Pi \text{ and } \pi \text{ is nondominated in } \Pi\}.
 \end{equation}
-where the three dimensions correspond to security effectiveness, service continuity, and defense overhead.
+The goal of learning is not to obtain one universally best policy, but to construct a finite archive that covers meaningful feasible trade-offs in this four-objective space.
 
-Because the three objective dimensions may have different numerical scales, we define deployment utility over a calibrated objective vector \(\widetilde{\mathbf{J}}(\pi)\). This calibration is fixed across methods within the evaluation protocol; when raw returns are used directly, \(\widetilde{\mathbf{J}}(\pi)=\mathbf{J}(\pi)\). The utility of policy \(\pi\) under preference \(\mathbf{w}\) is
+\subsection{Constrained Deployment-Time Assignment}
+\label{subsec:formulation-assignment}
+
+Deployment preferences are represented by a weight vector over the four objectives,
 \begin{equation}
-U(\pi;\mathbf{w})
-=
-\mathbf{w}^{\top}
-\widetilde{\mathbf{J}}(\pi).
+    \mathbf{w} \in \Delta_4
+    = \left\{\mathbf{w}\in\mathbb{R}_{\geq 0}^{4}: \sum_{i=1}^{4} w_i=1\right\}.
 \end{equation}
-
-Let \(\Pi\) denote a learned candidate policy set. Under deployment budgets \((\delta_{\mathrm{biz}}, \delta_{\mathrm{cost}})\), the feasible subset is
+Because objective dimensions may have different scales, assignment is performed using a calibrated objective vector $\widetilde{\mathbf{J}}(\pi)$ fixed across methods within the same evaluation setting. The utility of policy $\pi$ under preference $\mathbf{w}$ is
 \begin{equation}
-\Pi_{\mathrm{feas}}
-=
-\left\{
-\pi \in \Pi
-:
-C_{\mathrm{biz}}(\pi) \leq \delta_{\mathrm{biz}},
-\;
-C_{\mathrm{cost}}(\pi) \leq \delta_{\mathrm{cost}}
-\right\}.
+    U(\pi;\mathbf{w}) = \mathbf{w}^{\top}\widetilde{\mathbf{J}}(\pi).
 \end{equation}
-If \(\Pi_{\mathrm{feas}}\neq \emptyset\), the deployed policy is selected by
+Given an archive $\Pi$ and deployment budget $\boldsymbol{\delta}$, the feasible archive is
 \begin{equation}
-\pi^{\star}(\mathbf{w})
-=
-\arg\max_{\pi \in \Pi_{\mathrm{feas}}}
-U(\pi;\mathbf{w}).
+    \Pi_{\mathrm{feas}}(\boldsymbol{\delta})
+    = \Pi \cap \mathcal{F}(\boldsymbol{\delta}).
 \end{equation}
-
-If \(\Pi_{\mathrm{feas}}=\emptyset\), the assignment is marked infeasible for that preference and deployment regime. For diagnostic reporting, one may additionally record the least-violating candidate, but such a candidate is not counted as a feasible deployment. This convention is important for evaluating tight deployment regimes, where a method may produce a high-quality Pareto archive but still fail to provide an admissible policy under strict thresholds.
-
-\subsection{Policy-Set Learning Goal}
-
-The learning problem is therefore not to find a single universally optimal blue-team policy. Instead, the goal is to learn a finite policy set \(\Pi\) that satisfies three deployment-oriented requirements: it should cover meaningful trade-offs among the three objectives, contain policies that satisfy hard operational constraints, and support feasible preference-based assignment without retraining.
-
-This formulation directly motivates the learning framework in the next section. Stage 1 constructs a diverse initial archive of blue-team behaviors, while Stage 2 expands that archive toward additional feasible Pareto trade-offs under the business and cost constraints defined above.
+If this set is nonempty, the deployed policy is
+\begin{equation}
+    \pi^{\star}(\mathbf{w},\boldsymbol{\delta})
+    = \arg\max_{\pi\in\Pi_{\mathrm{feas}}(\boldsymbol{\delta})} U(\pi;\mathbf{w}).
+\end{equation}
+If $\Pi_{\mathrm{feas}}(\boldsymbol{\delta})$ is empty, the assignment is marked infeasible for that preference and deployment regime. For diagnostics, one may report the least-violating candidate, but it is not counted as a feasible deployment. This constrained assignment rule is the deployment counterpart of policy-set learning: preferences choose among acceptable policies; constraints determine which policies are acceptable in the first place.
 
 \section{Learning Deployable Defense Policy Sets}
 \label{sec:learning}
 
-In this section, we introduce the learning framework for constructing deployable defense policy sets. The objective is to learn a set of policies that are not only effective in managing trade-offs between competing objectives but are also deployable under strict operational constraints. The learning process consists of two main stages: \emph{Pareto Initialization} and \emph{Pareto Extension}, which together ensure that the learned policy set covers a broad range of feasible operational regimes.
+We now describe the learning framework used to construct deployable CybORG++ defense policy sets. The method follows a two-stage Pareto policy-set structure: Stage~1 learns a preference-diverse initial archive, and Stage~2 expands the archive through constrained, semantic-safety-aware Pareto extension. This design builds on the C-MORL view that Pareto-front discovery can be improved by first initializing diverse policies and then extending selected policies toward underexplored objective directions~\cite{liu2025efficient}. Our cyber-defense instantiation modifies this idea in two ways: the objective vector is the four-dimensional CybORG++ semantic reward vector, and Stage~2 is constrained by deployment and critical-safety guardrails.
 
-\subsection{Pareto Initialization: Learning Preference-Diverse Policies}
+\subsection{Overview}
+\label{subsec:learning-overview}
 
-The first stage of the learning process, Pareto Initialization, is designed to provide a diverse set of initial policies that span the preference space. In this stage, multiple policies are trained in parallel, each optimized for a specific preference vector \( \mathbf{w} \in \mathcal{W}_{\text{init}} \), where \( \mathcal{W}_{\text{init}} \) is a set of predefined preferences sampled from the preference space \( \Delta_3 \).
+The training pipeline has five components. First, CybORG++ transitions are projected into a four-dimensional semantic reward vector over \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}. Second, Stage~1 trains policies under sampled four-objective preferences to obtain a diverse archive. Third, Stage~2 repeatedly selects promising parent policies from the archive and extends them toward individual objective directions while preserving the other objectives. Fourth, candidate children are ranked and accepted using deployment-aware and semantic-safety-aware criteria. Fifth, deployment-time assignment selects a feasible archive policy for each operational preference without retraining.
 
-For each preference vector \( \mathbf{w} \), we solve the following multi-objective optimization problem:
+\subsection{Semantic Reward Projection in CybORG++}
+\label{subsec:learning-reward-projection}
 
-\[
-J_{\mathbf{w}}(\pi) = \mathbb{E}_{\pi}\left[\sum_{t=0}^{T} \gamma^t \mathbf{w}^\top \mathbf{r}_t \right],
-\]
-where \( \mathbf{r}_t = [r_t^{\text{sec}}, r_t^{\text{svc}}, r_t^{\text{ovh}}] \) is the per-step reward vector, and \( \gamma \) is the discount factor. This objective maximizes the utility under each preference, producing an initial archive of policies \( \Pi_{\text{init}} = \{\pi_{\mathbf{w}} \mid \mathbf{w} \in \mathcal{W}_{\text{init}} \} \).
+Each CybORG++ step produces a raw environment transition and a defender observation. For learning, the environment-side transition is projected into the four reward dimensions defined in Section~\ref{sec:formulation}. The policy itself receives only the observation $o_t$ and action mask exposed to the blue defender. True-state-derived semantic summaries are used by the environment wrapper to construct rewards, constraint diagnostics, and replay-level audit statistics, not as privileged policy input.
 
-The key idea of this stage is to capture a diverse set of policies that represent different trade-offs between security, service continuity, and defense overhead. The resulting policies are preference-irrelevant, meaning they are not tied to a specific set of preferences and can be adapted to new preferences during the subsequent stages of the learning process.
+The projection is cyber-semantic rather than a direct reuse of a scalar environment reward. Security Effectiveness combines attacker-suppression and recovery information. Business Continuity incorporates business-weighted exposure and action disturbance. Defense Cost measures the operational cost of the selected blue action. Critical-Asset Safety penalizes realized or persistent critical compromise, early critical hit, and critical dwell. The output of this projection is
+\begin{equation}
+    \mathbf{r}_t
+    = \left[
+        r_t^{\mathrm{sec}},
+        r_t^{\mathrm{bus}},
+        r_t^{\mathrm{cost}},
+        r_t^{\mathrm{crit}}
+      \right]^{\top}.
+\end{equation}
+This representation gives the learner direct access to critical-asset safety as an optimized objective while preserving process-level auditability.
 
-\subsection{Pareto Extension: Expanding the Policy Set Under Constraints}
+\subsection{Stage~1: Preference-Diverse Pareto Initialization}
+\label{subsec:learning-stage1}
 
-The second stage, Pareto Extension, focuses on refining the initial policy set \( \Pi_{\text{init}} \) by expanding it to cover more diverse operating points along the Pareto front. In this stage, we employ constrained optimization to iteratively improve the policies and explore additional regions of the Pareto front while satisfying operational constraints.
+Stage~1 constructs an initial archive of policies by sampling preference vectors from the four-objective simplex $\Delta_4$. Let $\mathcal{W}_{\mathrm{init}}\subset\Delta_4$ denote this preference set. For each $\mathbf{w}\in\mathcal{W}_{\mathrm{init}}$, we train a separate blue policy using vector-valued rollouts and scalarized policy improvement,
+\begin{equation}
+    J_{\mathbf{w}}(\pi)
+    = \mathbb{E}_{\tau\sim\pi}
+      \left[\sum_{t=0}^{T-1}\gamma^t\mathbf{w}^{\top}\mathbf{r}_t\right].
+\end{equation}
+The actor--critic model uses a vector critic head, and the rollout buffer stores vector rewards, vector returns, and vector advantages. During PPO-style policy updates, the vector advantage $\mathbf{A}_t$ is scalarized only for the current preference,
+\begin{equation}
+    A^{\mathbf{w}}_t = \mathbf{w}^{\top}\mathbf{A}_t .
+\end{equation}
+Thus, the policy-gradient update optimizes the selected preference while retaining objective-wise value estimates.
 
-We optimize one objective at a time while ensuring that the other objectives remain above predefined thresholds. The constrained optimization problem at iteration \(r\) for objective \(l\) is formulated as:
+The resulting policies are not treated as permanently preference-conditioned controllers. The preference vector is used to train each initial policy, but once saved, the policy is an archive element with an associated four-objective return vector. Intermediate and final checkpoints are evaluated, stored in a solution buffer, and filtered for nondominated candidates. The output of Stage~1 is an initial archive $\Pi_{\mathrm{init}}$ that covers diverse trade-offs but may still leave gaps in the feasible Pareto frontier.
 
-\[
-\pi_{r+1} = \arg \max_{\pi} \, J_l(\pi) \quad \text{subject to} \quad J_i(\pi) \geq \kappa_i, \, i \neq l, \quad C_{\text{biz}}(\pi) \leq \delta_{\text{biz}}, \quad C_{\text{cost}}(\pi) \leq \delta_{\text{cost}},
-\]
-where \( J_l(\pi) \) is the reward for objective \(l\), \( \kappa_i \) are the thresholds for the other objectives, and \( C_{\text{biz}}(\pi) \) and \( C_{\text{cost}}(\pi) \) are the business disruption and cost constraints, respectively. This formulation allows the policies to be refined toward optimal trade-offs in different objective directions.
+\subsection{Stage~2: Constraint-Aware Pareto Extension}
+\label{subsec:learning-stage2}
 
-The Pareto front is extended by selecting policies based on their crowding distance, which indicates how densely packed policies are along the Pareto front. Policies with larger crowding distances are prioritized because they fill more sparsely populated regions of the Pareto front, improving the diversity of the policy set. The policy selection is repeated until a sufficiently diverse set of policies is obtained.
+Stage~2 improves the archive by extending selected parent policies toward individual objective directions. At each extension round, the current archive is filtered to identify nondominated candidates. Candidate parents are selected using objective-space diversity and deployment-aware signals. Crowd distance prioritizes sparsely covered regions of the Pareto frontier, while support-aware diagnostics prioritize candidates with stronger Business Continuity, lower realized Defense Cost, lower mean violation, lower high-disruption action rate, and better critical-safety behavior.
 
-\subsection{Policy Selection and Assignment}
+Given a selected parent policy $\pi_r$ and a target objective $l\in\{\mathrm{sec},\mathrm{bus},\mathrm{cost},\mathrm{crit}\}$, Stage~2 solves a constrained extension problem of the form
+\begin{equation}
+    \max_{\pi} \; J_l(\pi)
+    \quad \text{s.t.} \quad
+    J_i(\pi) \geq \beta J_i(\pi_r),\; i\neq l,
+    \qquad
+    \pi \in \mathcal{F}(\boldsymbol{\delta}),
+\end{equation}
+where $\beta\in(0,1]$ controls how much non-target objectives may regress relative to the parent. The first set of constraints prevents extension toward one objective from destroying the other three objectives. The feasibility constraint incorporates deployment limits and semantic guardrails.
 
-Policy selection plays a crucial role in ensuring that the final policy set \( \Pi \) contains only the most relevant policies for deployment. During both Pareto Initialization and Pareto Extension, we use the crowd distance criterion to select policies that are far from each other on the Pareto front, thus improving the diversity of the learned policies.
+We implement this step with an interior-point-style policy optimization objective rather than relying on a second-order constrained policy optimization update. Let $\widehat{J}_i(\pi)$ denote the sampled surrogate estimate of objective $i$ during the update. The extension objective can be written as
+\begin{equation}
+    \mathcal{L}_{\mathrm{ext}}(\pi)
+    = \mathcal{L}^{\mathrm{clip}}_l(\pi)
+      + \frac{1}{t}\sum_{i\neq l}
+        \log\left(\widehat{J}_i(\pi)-\beta J_i(\pi_r)+\epsilon\right)
+      - \mathcal{P}_{\mathrm{deploy}}(\pi),
+\end{equation}
+where $\mathcal{L}^{\mathrm{clip}}_l$ is the PPO-style clipped surrogate for the target objective, $t$ is the barrier parameter, $\epsilon$ is a small numerical stabilizer, and $\mathcal{P}_{\mathrm{deploy}}$ penalizes or rejects deployment-constraint violations. The log-barrier term discourages movement into regions that degrade non-target objectives below the parent-relative threshold, following the IPO motivation for constrained policy optimization~\cite{achiam2017cpo,liu2020ipo,liu2025efficient}.
 
-The policy selection procedure is summarized as follows:
-\begin{itemize}
-    \item Select policies with the largest crowd distance to ensure they occupy distinct regions on the Pareto front.
-    \item Perform constrained optimization to expand the set by refining policies in underexplored regions.
-    \item Repeat the selection and expansion process until the policy set contains a sufficient number of high-quality, diverse policies.
-\end{itemize}
+\subsection{Semantic-Safety-Aware Candidate Acceptance}
+\label{subsec:learning-acceptance}
 
-At deployment time, given a preference vector \( \mathbf{w} \), the defender selects the policy that maximizes the utility function \( U(\pi; \mathbf{w}) = \mathbf{w}^\top \tilde{\mathbf{J}}(\pi) \), where \( \tilde{\mathbf{J}}(\pi) \) is the normalized objective vector. The policy selection process is constrained to only consider feasible policies that meet the deployment thresholds \( C_{\text{biz}}(\pi) \leq \delta_{\text{biz}} \) and \( C_{\text{cost}}(\pi) \leq \delta_{\text{cost}} \).
+After a child policy is trained for a target objective, it is re-evaluated before being added to the archive. Acceptance is not based solely on target-objective improvement. The candidate must also remain deployable and must not introduce unacceptable critical-risk regression. The diagnostics include Business Continuity return, Defense Cost return, mean constraint violation, high-disruption action rate, final critical compromised hosts, ever-critical breach, persistent critical breach, critical dwell, and critical-hit latency.
 
-If no feasible policy is available, the assignment is marked as infeasible for the given preference and deployment regime. In such cases, the least-violating policy can be reported for diagnostic purposes, but it will not be considered a valid deployment.
+This acceptance rule is designed for pre-critical containment. A useful child should improve or diversify the four-objective archive while preserving the ability to stop attacker progression before realized critical breach. The method does not hard-code a single fixed action pattern such as always restoring. Instead, it uses the four-objective reward and semantic guardrails to prefer policies whose rollout behavior remains deployable and whose critical-asset risk does not regress.
 
-\subsection{Efficiency and Time Complexity}
+When multiple feasible children are available, the archive update ranks them by deployment support, strict feasibility margin, semantic low-risk score, and objective improvement. When a child improves a target objective but worsens deployment acceptability or critical-safety behavior, it can be excluded even if it appears attractive in raw objective space. This is the key difference between unconstrained Pareto expansion and deployable policy-set learning for cyber defense.
 
-The proposed method is designed to be computationally efficient while maintaining high-quality performance. In particular, we note that the C-MORL approach scales well with the number of objectives, as the time complexity is linear in the number of objectives. The training process involves two main steps: the initial policy training and the constrained optimization for Pareto extension. The expected running time for the entire process is \( O(nKN) \), where \(n\) is the number of objectives, \(K\) is the number of Pareto extension steps, and \(N\) is the number of policies selected for extension.
+\subsection{Deployment-Time Policy Assignment}
+\label{subsec:learning-deployment-assignment}
 
-This time complexity is significantly more efficient than methods that rely on solving complex optimization problems for each grid point in the objective space, such as the epsilon-constraint method, which has exponential complexity. C-MORL’s efficient policy selection and extension mechanism enable it to handle complex MORL tasks with multiple objectives, making it a promising approach for real-world autonomous defense systems.
+After Stage~2, the learned archive $\Pi$ contains candidate policies and their four-objective return vectors. Deployment-time adaptation is performed by constrained assignment, not by additional training. For a preference $\mathbf{w}\in\Delta_4$ and deployment budget $\boldsymbol{\delta}$, the system first forms $\Pi_{\mathrm{feas}}(\boldsymbol{\delta})$ and then selects
+\begin{equation}
+    \pi^{\star}(\mathbf{w},\boldsymbol{\delta})
+    = \arg\max_{\pi\in\Pi_{\mathrm{feas}}(\boldsymbol{\delta})}
+      \mathbf{w}^{\top}\widetilde{\mathbf{J}}(\pi).
+\end{equation}
+This rule is the constrained version of set-max policy assignment: the selected policy maximizes preference utility among deployable candidates. If the feasible archive is empty, the deployment request is reported as infeasible for that preference and regime. This convention prevents an unsafe or overly disruptive policy from being counted as a successful deployment merely because it is the least bad available candidate.
+
+\subsection{Replay-Level Semantic Audit}
+\label{subsec:learning-semantic-audit}
+
+The final component is replay-level semantic audit. Although audit metrics are not additional training objectives, they are essential for interpreting whether the learned policy set achieves the intended cyber behavior. We partition rollouts into enterprise foothold, pre-critical window, critical breach, and persistent critical breach. We then report semantic outcomes such as ever-critical-breach rate, persistent-critical-breach rate, mean critical dwell, critical-hit latency, risk-tier distribution, and pre-critical action-family statistics.
+
+This audit separates two claims that would otherwise be conflated. A method may prevent realized critical breach in a controlled CybORG++ evaluation while still allowing near-miss trajectories in which the attacker reaches an enterprise foothold. Such a method should be described as breach-free under the evaluated setting, not risk-free. This distinction is important for deployment because the absence of realized critical compromise does not imply the absence of operational risk.
+
+\subsection{Computational Structure}
+\label{subsec:learning-complexity}
+
+The computational structure follows the two-stage C-MORL template. If $n$ is the number of objectives, $N$ is the number of selected extension parents, and $K$ is the number of extension rounds, the Pareto extension component scales as $O(nKN)$ under a fixed per-extension training budget. In our CybORG++ instantiation, $n=4$. This linear dependence on the number of objectives is important because the method optimizes Critical-Asset Safety as a first-class objective rather than collapsing it into a scalar penalty or handling it only after training.
 
 \section{Experimental Testbed and Evaluation Questions}
 \label{sec:setup}
@@ -456,9 +429,9 @@ This fourth objective is part of the optimization problem itself; it is not an a
 \subsection{Compared Methods}
 \label{subsec:setup-baselines}
 
-The main-text comparison is intentionally minimal and strictly same-protocol. We report four methods that were all executed under the current four-objective protocol: \emph{Constraint-Aware Stage-2 Policy Set} (our method), \emph{Stage-1 Policy Archive}, \emph{Weighted-Sum Scalarization}, and \emph{Unconstrained Stage-2 Policy Set}. Table~\ref{tab:set-quality} compares the first three methods at the candidate-set level, while Table~\ref{tab:deployment-quality} adds the unconstrained Stage~2 ablation for deployment-time comparison.
+The main-text comparison is intentionally minimal and strictly same-protocol. Across the two main tables, we report six methods that were all executed under the current four-objective protocol: \emph{Constraint-Aware Stage-2 Policy Set} (our method), \emph{Stage-1 Policy Archive}, \emph{Weighted-Sum Scalarization}, \emph{Preference-Conditioned PPO}, \emph{Lagrangian PPO}, and \emph{Unconstrained Stage-2 Policy Set}. Table~\ref{tab:set-quality} compares the candidate-set methods \emph{Constraint-Aware Stage-2}, \emph{Stage-1 Archive}, \emph{Weighted-Sum}, and \emph{Preference-Conditioned PPO}. Table~\ref{tab:deployment-quality} compares deployment-time performance for \emph{Constraint-Aware Stage-2}, \emph{Stage-1 Archive}, \emph{Weighted-Sum}, \emph{Lagrangian PPO}, and the \emph{Unconstrained Stage-2} ablation.
 
-\emph{Weighted-Sum Scalarization} is the scalarization baseline. \emph{Stage-1 Policy Archive} measures how far a preference-diverse initialization archive can go without Stage~2 expansion. \emph{Unconstrained Stage-2 Policy Set} keeps Stage~2 expansion but removes explicit constraint-aware shaping, letting us isolate the role of constrained expansion. Older baselines such as PCN, preference-conditioned baselines, Lagrangian PPO, and single-objective methods are not included in the current main-text comparison because they were not rerun under the same four-objective protocol; mixing them with the current results would not be a fair comparison.
+\emph{Weighted-Sum Scalarization} is the scalarization baseline. \emph{Stage-1 Policy Archive} measures how far a preference-diverse initialization archive can go without Stage~2 expansion. \emph{Preference-Conditioned PPO} is a conditioned-policy baseline evaluated on the same shared preference grid and summarized here only at the candidate-set level. \emph{Lagrangian PPO} is a deployment-only single-policy constrained baseline that optimizes a security-plus-critical-safety objective under shared business and cost thresholds, rather than constructing a candidate archive. \emph{Unconstrained Stage-2 Policy Set} keeps Stage~2 expansion but removes explicit constraint-aware shaping, letting us isolate the role of constrained expansion. Older baselines such as PCN and single-objective methods are not included in the current main-text comparison because they were not rerun under the same four-objective protocol; mixing them with the current results would not be a fair comparison.
 
 \subsection{Evaluation Questions and Metrics}
 \label{subsec:setup-metrics}
@@ -471,8 +444,8 @@ At the set level, we report hypervolume (HV), expected utility (EU), coverage ra
 \paragraph{RQ2: Does the Constraint-Aware Stage-2 Policy Set achieve stronger constrained deployment performance?}
 At deployment time, we report security return, business return, cost return, feasible rate, mean constraint violation, final critical compromised hosts, and critical-impact count under a shared-threshold assignment protocol.
 
-\paragraph{RQ3: Does the method improve security semantics rather than only scalar metrics?}
-We run replay-level semantic audits that partition trajectories into \emph{enterprise foothold}, \emph{pre-critical}, and \emph{critical breach} phases. The audit reports risk tiers (Tier~0 safe, Tier~1 near-miss, Tier~2 transient critical breach, Tier~3 persistent critical breach), questionable action rules Q2--Q5, and pre-critical action-family statistics.
+\paragraph{RQ3: Does constraint-aware Stage~2 change replay-level cyber semantics relative to Unconstrained Stage~2?}
+We run a symmetric replay-level semantic audit on the \emph{shared-threshold selected deployed policy} for both Stage~2 variants. Each selected policy is replayed for 20 audit episodes per seed, partitioned into \emph{enterprise foothold}, \emph{pre-critical}, and \emph{critical-present} phases, and summarized with risk tiers, questionable action rules Q2--Q5, pre-critical action-family statistics, and phase-conditioned target-focus summaries.
 
 \paragraph{RQ4: What do Stage~2 expansion and constraint-aware extension contribute?}
 We compare the Constraint-Aware Stage-2 Policy Set against the Stage-1 Policy Archive to isolate the value of Stage~2 expansion, and against the Unconstrained Stage-2 Policy Set to isolate the value of explicit constraint-aware shaping during expansion.
@@ -482,7 +455,7 @@ All methods are evaluated on the same shared preference grid over the four-objec
 \subsection{Implementation and Reproducibility}
 \label{subsec:setup-impl}
 
-All main-text results use three seeds $\{7,11,19\}$. The same seeds are used for candidate-set evaluation, constrained deployment evaluation, and semantic replay audit. For policy-set methods, Stage~2 starts from the Stage~1 archive, expands selected parent policies, and evaluates final deployment through the same shared-threshold assignment protocol. Detailed hyperparameters, semantic rule definitions, and configuration files are deferred to the artifact package.
+All main-text results use three seeds $\{7,11,19\}$. The same seeds are used for candidate-set evaluation, constrained deployment evaluation, and semantic replay audit. For policy-set methods, Stage~2 starts from the Stage~1 archive, expands selected parent policies, and evaluates final deployment through the same shared-threshold assignment protocol. For RQ3, we replay only the final selected deployed policy from Table~\ref{tab:deployment-quality} for Constraint-Aware and Unconstrained Stage~2; best-feasible alternates and multi-candidate shortlists are intentionally excluded from the main-text semantic comparison. Detailed hyperparameters, semantic rule definitions, and configuration files are deferred to the artifact package.
 
 \section{Results}
 \label{sec:results}
@@ -501,25 +474,27 @@ Unless otherwise noted, all results below use the common three-seed protocol wit
 \input{table/set_quality_4obj.tex}
 \end{table*}
 
-Table~\ref{tab:set-quality} answers RQ1. In four-dimensional objective space, the Constraint-Aware Stage-2 Policy Set yields the strongest overall candidate set. It achieves the highest hypervolume ($2.29\times10^7$) and the best expected utility ($-41.92$), outperforming both the Stage-1 Policy Archive and the Weighted-Sum Scalarization baseline. The gap to Weighted-Sum Scalarization is especially large: the scalarized baseline reaches only $5.84\times10^6$ HV with expected utility $-161.57$, indicating that scalarization fails to recover a comparably strong four-objective frontier.
+Table~\ref{tab:set-quality} answers RQ1. In four-dimensional objective space, the Constraint-Aware Stage-2 Policy Set yields the strongest overall candidate set. It achieves the highest hypervolume ($2.29\times10^7$) and the best expected utility ($-41.92$), outperforming the Stage-1 Policy Archive, Weighted-Sum Scalarization, and Preference-Conditioned PPO. The gap to the two non-archive baselines is especially large: Weighted-Sum reaches only $5.84\times10^6$ HV with expected utility $-161.57$, while Preference-Conditioned PPO reaches $3.68\times10^6$ HV with expected utility $-167.93$. Under the shared reference point, neither scalarization nor direct preference conditioning recovers a comparably strong four-objective frontier.
 
-The comparison with the Stage-1 Policy Archive is more subtle and more informative. Stage~1 alone already produces a useful archive, but Stage~2 expansion still improves both headline set-value metrics, moving from $2.22\times10^7$ to $2.29\times10^7$ in HV and from $-44.88$ to $-41.92$ in expected utility. The Stage-1 Policy Archive attains a higher coverage ratio, but that broader coverage does not translate into stronger overall set value. The takeaway is that Stage~2 is not simply producing more points; it is producing better four-objective operating points.
+The Preference-Conditioned PPO result is nevertheless informative because it separates candidate-set density from candidate-set quality. The conditioned baseline retains many Pareto records on average ($15.33$), achieves the lowest sparsity ($77.18$), and uses the most unique assigned policies ($5.00$), which means it can sweep many nearby preference-conditioned operating points. However, this denser set does not translate into stronger set value: its hypervolume remains below Weighted-Sum, its expected utility is the lowest in the table, and its coverage ratio ($0.36$) still trails both archive-based methods. The interpretation is that preference conditioning can generate many trade-off points, but without explicit archive construction it does not organize them into a strong frontier.
+
+The comparison with the Stage-1 Policy Archive is more subtle and more informative. Stage~1 alone already produces a useful archive, but Stage~2 expansion still improves both headline set-value metrics, moving from $2.22\times10^7$ to $2.29\times10^7$ in HV and from $-44.88$ to $-41.92$ in expected utility. The Stage-1 Policy Archive attains a higher coverage ratio, but that broader coverage does not translate into stronger overall set value. Together with the Preference-Conditioned PPO baseline, the takeaway is that Stage~2 is not simply producing more points or denser local samples; it is producing better four-objective operating points.
 
 \begin{figure*}[t]
 \centering
 \begin{subfigure}[t]{0.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/candidate_set_4obj_3d_projection.png}
-    \caption{Three-dimensional projection of the four-objective candidate sets. The three axes show \emph{Security Effectiveness}, \emph{Business Continuity}, and \emph{Defense Cost}; point color encodes \emph{Critical-Asset Safety}. Each column corresponds to one method, so the reader can compare the geometry of the Pareto candidates method by method. The Constraint-Aware Stage-2 archive concentrates points in a markedly better region of the projected space, while the Weighted-Sum baseline spreads many candidates into lower-value, lower-safety regions.}
+    \caption{Three-dimensional projection of the four-objective candidate sets. The three axes show \emph{Security Effectiveness}, \emph{Business Continuity}, and \emph{Defense Cost}; point color encodes \emph{Critical-Asset Safety}. Each column corresponds to one of the three plotted policy-set comparators, so the reader can compare the geometry of the Pareto candidates method by method. The Constraint-Aware Stage-2 archive concentrates points in a markedly better region of the projected space, while the Weighted-Sum baseline spreads many candidates into lower-value, lower-safety regions.}
     \label{fig:4obj-3d}
 \end{subfigure}\hfill
 \begin{subfigure}[t]{0.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/candidate_set_4obj_pairwise_matrix.png}
-    \caption{Pairwise objective-space projections of the same candidate sets. Each panel shows one two-objective slice of the four-objective frontier, making it easier to inspect trade-offs that may be hidden in a single 3D view. Across these pairwise slices, the Constraint-Aware Stage-2 candidates consistently dominate a larger high-value region than Weighted-Sum, while also improving over the Stage-1 archive in the objective combinations most relevant to deployment.}
+    \caption{Pairwise objective-space projections of the same three plotted candidate sets. Each panel shows one two-objective slice of the four-objective frontier, making it easier to inspect trade-offs that may be hidden in a single 3D view. Across these pairwise slices, the Constraint-Aware Stage-2 candidates consistently dominate a larger high-value region than Weighted-Sum, while also improving over the Stage-1 archive in the objective combinations most relevant to deployment.}
     \label{fig:4obj-pairwise}
 \end{subfigure}
-\caption{Objective-space views of the four-objective candidate sets used in Table~\ref{tab:set-quality}. Figure~\ref{fig:4obj-3d} provides an intuitive geometric view of the archive, while Figure~\ref{fig:4obj-pairwise} exposes the same candidates through pairwise projections to avoid hiding trade-offs in a single projection. Together, they show that the Constraint-Aware Stage-2 method does not merely improve scalar summary metrics; it also produces a visibly stronger four-objective candidate set geometry.}
+\caption{Objective-space views of the three plotted policy-set comparators from Table~\ref{tab:set-quality}: Constraint-Aware Stage-2, Stage-1 Archive, and Weighted-Sum. Figure~\ref{fig:4obj-3d} provides an intuitive geometric view of the archive, while Figure~\ref{fig:4obj-pairwise} exposes the same candidates through pairwise projections to avoid hiding trade-offs in a single projection. These plots are used to interpret policy-set geometry; Preference-Conditioned PPO is compared numerically in Table~\ref{tab:set-quality} but is not shown here.}
 \label{fig:4obj-candidate-views}
 \end{figure*}
 
@@ -537,23 +512,58 @@ The comparison with the Stage-1 Policy Archive is more subtle and more informati
 
 Table~\ref{tab:deployment-quality} answers RQ2. The relevant question is not whether one method can obtain the numerically strongest raw return in isolation, but whether it can produce a stronger \emph{deployable compromise} under shared business and cost thresholds. On that reading, the Constraint-Aware Stage-2 Policy Set is the strongest method in the comparison set. It combines zero final critical compromised hosts and zero critical-impact events with the highest feasible rate ($0.6417$) and the lowest mean violation ($0.0942$).
 
-The contrast against Weighted-Sum Scalarization is decisive. The scalarized baseline collapses under the shared-threshold protocol, with feasible rate $0.0$, mean violation $93.54$, and non-zero critical compromise and impact counts. The comparison against the Stage-1 Policy Archive shows that Stage~2 materially improves deployment viability: the full method more than doubles feasible rate ($0.6417$ vs. $0.3083$) and reduces mean violation from $1.9770$ to $0.0942$. Finally, the comparison against the Unconstrained Stage-2 Policy Set clarifies the role of explicit constraint-aware shaping. The unconstrained expansion variant achieves slightly less negative raw security and business returns, but it does so with much higher mean violation ($2.1274$) and higher high-disruption-action rate ($0.7942$ vs. $0.4748$). Constraint-aware Stage~2 therefore does not merely change the score; it changes which operating points remain acceptable at deployment time.
+The contrast against the two single-policy baselines is decisive. Weighted-Sum Scalarization and Lagrangian PPO both collapse under the shared-threshold protocol, each with feasible rate $0.0$ and extremely large mean violation ($93.54$ and $95.61$, respectively). Lagrangian PPO does not rescue deployment quality relative to Weighted-Sum: it is even worse on security return ($-922.51$ vs. $-688.22$), business return ($-123.07$ vs. $-120.81$), and final critical compromised hosts ($0.88$ vs. $0.83$), although it yields fewer critical-impact events ($2.16$ vs. $3.99$). This result is important because it shows that adding business/cost dual penalties to a single deployed policy is still not enough to recover a usable four-objective operating point.
+
+The comparison against the Stage-1 Policy Archive shows that Stage~2 materially improves deployment viability: the full method more than doubles feasible rate ($0.6417$ vs. $0.3083$) and reduces mean violation from $1.9770$ to $0.0942$. Finally, the comparison against the Unconstrained Stage-2 Policy Set clarifies the role of explicit constraint-aware shaping. The unconstrained expansion variant achieves slightly less negative raw security and business returns, but it does so with much higher mean violation ($2.1274$) and higher high-disruption-action rate ($0.7942$ vs. $0.4748$). Constraint-aware Stage~2 therefore does not merely change the score; it changes which operating points remain acceptable at deployment time.
 
 \subsection{Cyber-Semantic Safety Analysis}
 \label{subsec:results-semantics}
 
-The strongest result of V2.4 is not only in reward space. We also evaluate the selected policy for each seed with a replay-level semantic audit that models the attack--defense process explicitly. The audit tracks whether the attacker has established an enterprise foothold, whether the interaction has entered a pre-critical window, and whether a true critical breach ever occurs. It then summarizes each rollout with risk tiers, questionable action rules, and phase-specific action-family statistics.
+Constraint-Aware Stage~2 not only improves deployment feasibility, but also changes the replay-level attack--defense process relative to Unconstrained Stage~2. To keep the main text focused on the part of RQ3 that is actually discriminative, we summarize only the hard-breach indicators and the two post-foothold semantic rules that separate the selected policies in the main text, and defer the full audit vector to Appendix Table~\ref{tab:rq3-semantic-full-audit}.
 
-At the aggregate level, the Constraint-Aware Stage-2 Policy Set eliminates critical breach in the three-seed evaluation: the selected policies achieve $0.0$ ever-critical-breach rate, $0.0$ persistent-critical-breach rate, $0.0$ mean critical dwell steps, and $0.0$ high-confidence bad-run rate. The same audit also shows that questionable critical-time behavior is almost entirely removed: Q2, Q3, and Q5 all drop to $0.0$, while Q4 is reduced to $0.0021$. Relative to the baseline, these changes are not incremental; they correspond to removing catastrophic failure modes that were previously common.
+\begin{table*}[t]
+\centering
+\caption{Compact RQ3 semantic comparison between the shared-threshold selected deployed policies of Constraint-Aware and Unconstrained Stage~2. Both selected policies are breach-free on the main three-seed protocol, so the main-text summary reports only the hard-breach indicators and the two post-foothold rules that separate the methods. Lower is better for all columns; the full semantic audit vector is deferred to Appendix Table~\ref{tab:rq3-semantic-full-audit}.}
+\label{tab:rq3-semantic-comparison}
+\small
+\setlength{\tabcolsep}{3pt}
+\input{table/rq3_semantic_comparison_4obj.tex}
+\end{table*}
 
-The process-level evidence is equally important. Across all three seeds, the semantic audit shows that pre-critical defense becomes fully restore-focused: the aggregate pre-critical action-family rate is $1.0$ for \texttt{restore} and $0.0$ for \texttt{decoy}, while the pre-critical compromised-target focus rate is also $1.0$. The seed-level casebooks show the same qualitative pattern: the attacker reaches an enterprise foothold, and the defender responds by restoring the compromised enterprise host before the interaction ever enters a critical-present state. This is why the method should be described as \emph{breach-free but not risk-free}. Tier~2 and Tier~3 are eliminated, but Tier~1 Near-Miss remains $1.0$ and Tier~0 Safe remains $0.0$. Our strongest supported claim is therefore that V2.4 eliminates critical breach while preserving near-miss risk, not that it removes all cyber risk.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{images/phase_conditioned_action_semantics.png}
+\caption{Foothold-phase semantic comparison for the shared-threshold selected deployed policies of Constraint-Aware and Unconstrained Stage~2. The selected Unconstrained Stage~2 policy is decoy-heavy and critical-path-directed immediately after foothold, whereas the selected Constraint-Aware Stage~2 policy remains dominated by lower-disruption monitoring and much weaker early critical-path focus.}
+\label{fig:rq3-phase-semantics}
+\end{figure}
 
-\subsection{Ablation: Why Stage~2 and Why Constraint-Aware Extension?}
+Table~\ref{tab:rq3-semantic-comparison} makes the main-text claim first. Under the same shared-threshold deployment rule used in RQ2, the selected policies of both Stage~2 variants satisfy the hard safety boundary on the three main-text seeds: both the ever-critical-breach rate and the persistent-critical-breach rate are $0.0$. The remaining difference is therefore process-level rather than end-state. Relative to Unconstrained Stage~2, Constraint-Aware Stage~2 reduces post-foothold drift from $0.3375$ to $0.0021$ and repeated low-value decoy loops from $0.2542$ to $0.0$. The immediate conclusion is not that only one method is breach-free, but that the two selected policies arrive at the same breach-free label through materially different replay behavior.
+
+Figure~\ref{fig:rq3-phase-semantics} shows where this difference is concentrated. Immediately after the enterprise foothold, the selected Unconstrained Stage~2 policies allocate $0.6460$ of their blue-action mass to decoys and place $0.4604$ of their target focus directly on critical-path hosts. The selected Constraint-Aware Stage~2 policies do almost none of this: foothold-phase decoy mass is only $0.0081$ and critical-path focus is only $0.0337$, with substantially more mass on \texttt{analyse}, \texttt{sleep}, and no-target monitoring behavior. Appendix Table~\ref{tab:rq3-semantic-full-audit} confirms that this gap is concentrated before the recovery window closes: Q2 and Q3 remain $0.0$ for both methods, and the pre-critical action summaries tie. The main semantic distinction is therefore not whether the policies eventually respond, but how disciplined that response process remains immediately after foothold.
+
+This yields a narrower and more defensible RQ3 conclusion than a simple breach/non-breach narrative. Constraint-Aware Stage~2 is \emph{breach-free but not risk-free} on the current selected-policy protocol: Appendix Table~\ref{tab:rq3-semantic-full-audit} shows that the runs remain dominated by Tier~1 Near-Miss rather than Tier~0 Safe. Unconstrained Stage~2 is also mostly breach-free in this selected-policy analysis, but it reaches that outcome through a materially less deployment-disciplined replay process. The strongest supported claim is therefore that constraint-aware shaping improves replay-level cyber semantics under the same deployment filter, not that it eliminates cyber risk altogether.
+
+\subsection{Ablation: Why Stage~2, Why Constraint-Aware Extension, and Why a Fourth Objective?}
 \label{subsec:results-ablation}
 
-The ablation question has two parts. First, does Stage~2 expansion help beyond a preference-diverse initialization archive? Second, does explicit constraint-aware shaping matter during expansion?
+Table~\ref{tab:rq4-ablation} now isolates three distinct mechanisms within the current four-objective line. Panel~A addresses a discovery question: whether Stage~2 expansion contributes beyond the Stage-1 archive. Panel~B addresses an acceptability question: whether explicit constraint-aware shaping determines whether the resulting operating points remain deployable and replay-semantically disciplined. Panel~C addresses an objective-design question: whether adding Critical-Asset Safety as a fourth objective changes the frontier, deployment selection, and replay semantics relative to an otherwise matched three-objective Stage~2 method. To keep the main text focused, Table~\ref{tab:rq4-ablation} reports only the rows needed to answer each question; fuller semantic evidence remains in Appendix Table~\ref{tab:rq4-objective-semantic-full-audit}. Because objective count differs in Panel~C, its set-level comparison is reported only in the shared three-dimensional projection over security, business, and cost; the value of the fourth objective is then assessed through matched deployment and replay-semantic indicators under the current \texttt{paper\_4obj} thresholds.
 
-Comparing the Constraint-Aware Stage-2 Policy Set against the Stage-1 Policy Archive shows that Stage~2 is materially useful at both the set and deployment levels. The full method improves hypervolume and expected utility, while also improving feasible rate and sharply reducing mean violation under the shared-threshold deployment protocol. Comparing the constrained and unconstrained Stage~2 variants shows a different effect: removing explicit constraint awareness can yield a more aggressive operating point in raw return space, but it substantially worsens deployment acceptability and high-disruption behavior. In short, Stage~2 expansion improves the archive, and constraint-aware expansion determines whether the deployed points remain operationally acceptable.
+\begin{table}[t]
+\centering
+\caption{Compact RQ4 ablation summary under the current \texttt{paper\_4obj} protocol. Each panel keeps only the minimum set-level, deployment-level, and semantic indicators needed to answer its ablation question. Panel~C uses the shared three-dimensional projection over security, business, and cost for set-quality, while deployment and semantic metrics use the current shared-threshold selected deployed policy and the matched replay20 audit.}
+\label{tab:rq4-ablation}
+\small
+\setlength{\tabcolsep}{3pt}
+\input{table/rq4_ablation_summary.tex}
+\end{table}
+
+Panel~A answers the first question cleanly. Comparing the Stage-1 Policy Archive against Constraint-Aware Stage~2 shows that the second stage improves both candidate quality and deployment viability. Hypervolume rises from $22.17\times10^6$ to $22.91\times10^6$ and expected utility improves from $-44.88$ to $-41.92$. The deployment effect is larger: feasible rate more than doubles from $0.31$ to $0.64$, and mean violation drops from $1.98$ to $0.09$. The supported conclusion is that Stage~2 contributes new four-objective operating points that are not only better in archive value but also materially easier to deploy under the shared thresholds.
+
+Panel~B addresses a different mechanism. Comparing Unconstrained Stage~2 against Constraint-Aware Stage~2 shows that removing explicit constraint-aware shaping does not merely perturb returns; it changes whether the expanded operating points remain acceptable at deployment time and how the selected policies behave under replay. Feasible rate drops from $0.64$ to $0.46$ and mean violation rises from $0.09$ to $2.13$. Section~\ref{subsec:results-semantics} shows that this degradation is also semantic rather than purely numeric: Q4 increases from $0.00$ to $0.34$ and Q5 from $0.00$ to $0.25$, even though both selected policies remain breach-free on the main three-seed protocol. Constraint-aware shaping therefore affects not only which policies survive deployment filtering, but also how those deployed policies manage the post-foothold response process.
+
+Panel~C closes the remaining objective-level question. Under the protocol-matched comparison between the three-objective Stage~2 method and the current four-objective Stage~2 method, the four-objective frontier does not degrade when both are projected into the shared three-dimensional space. Instead, projected hypervolume increases from $2.84\times10^6$ to $5.59\times10^6$ and projected expected utility improves from $-175.40$ to $-55.92$. The deployment difference under the current shared thresholds is far larger: the matched three-objective selected policies are never feasible ($0.00$ feasible rate) and incur mean violation $86.22$, whereas the four-objective selected policies remain deployable with feasible rate $0.64$ and mean violation $0.09$. The semantic gap is equally decisive. The matched three-objective selected policies exhibit ever-critical-breach rate $0.99$, persistent-critical-breach rate $0.65$, Q4 $0.68$, and Q5 $0.47$, while the four-objective selected policies keep all four indicators at or near zero. The supported interpretation is that Critical-Asset Safety is not a cosmetic auxiliary objective: it materially changes which Stage~2 operating points represent acceptable tail-risk behavior under the current deployment rule.
+
+The resulting RQ4 conclusion is therefore three-part rather than two-part. Stage~2 solves a discovery problem: it enlarges the archive with stronger candidates that translate into much better deployment viability. Constraint-aware shaping solves an acceptability problem: it steers Stage~2 expansion toward points that remain feasible under the shared thresholds and more disciplined under replay-level semantic audit. Critical-Asset Safety as a fourth objective solves a representation problem: it prevents Stage~2 from selecting operating points that can still look competitive in the older three-objective formulation yet fail catastrophically once deployment is evaluated against current critical-safety requirements.
 
 \section{Related Work}
 \label{sec:related}
@@ -579,9 +589,9 @@ Multi-objective reinforcement learning studies sequential decision problems with
 \subsection{What the Results Support}
 \label{subsec:discussion-claims}
 
-The empirical evidence supports a specific claim: deployment-aware policy-set learning provides a stronger basis for autonomous cyber defense than scalarized or reduced alternatives when the goal is to support heterogeneous deployment preferences under operational constraints. The evidence now appears at three aligned levels: improved four-objective candidate-set quality, stronger constrained deployment performance, and markedly better cyber-semantic safety under replay-level audit.
+The empirical evidence supports a specific claim: deployment-aware policy-set learning provides a stronger basis for autonomous cyber defense than scalarized or reduced alternatives when the goal is to support heterogeneous deployment preferences under operational constraints. The evidence now appears at three aligned levels: improved four-objective candidate-set quality, stronger constrained deployment performance, and more disciplined replay-level cyber semantics relative to Unconstrained Stage~2 under a symmetric selected-policy audit.
 
-The paper does \emph{not} support a stronger claim of universal dominance or complete risk elimination. The unconstrained Stage~2 variant can still look better on some raw return dimensions, and the selected V2.4 policies remain in Tier~1 Near-Miss rather than Tier~0 Safe. These boundaries matter because they show that the present contribution is a breach-free, constraint-aware deployment perspective for blue-team defense, not a complete solution to all cyber-defense decision settings.
+The paper does \emph{not} support a stronger claim of universal dominance or complete risk elimination. The unconstrained Stage~2 variant can still look better on some raw return dimensions, and in the symmetric RQ3 comparison both selected Stage~2 variants remain dominated by Tier~1 Near-Miss rather than Tier~0 Safe. These boundaries matter because they show that the present contribution is a constraint-aware deployment perspective for blue-team defense, not a complete solution to all cyber-defense decision settings.
 
 \subsection{Limitations and Practical Implications}
 \label{subsec:discussion-limitations}
@@ -597,7 +607,7 @@ A second practical implication concerns interpretability. By tying the four obje
 
 We studied autonomous cyber defense as a constrained four-objective blue-team decision problem in which defenders must balance security effectiveness, business continuity, defense cost, and critical-asset safety under explicit deployment limits. We instantiated this view in CybORG with a two-stage learning framework that constructs a deployment-aware set of feasible blue-team policies rather than one fixed response policy.
 
-The resulting evidence is both conceptual and empirical. Deployment-aware policy-set learning improves candidate-set quality, yields stronger constrained deployment performance than scalarized and reduced baselines under a shared protocol, and eliminates critical breach in replay-level semantic audit while preserving near-miss risk. More broadly, the paper argues that autonomous cyber defense should be treated not only as policy optimization, but as constrained deployment under heterogeneous operational preferences and explicit critical-safety semantics.
+The resulting evidence is both conceptual and empirical. Deployment-aware policy-set learning improves candidate-set quality, yields stronger constrained deployment performance than scalarized and reduced baselines under a shared protocol, and changes replay-level cyber semantics relative to Unconstrained Stage~2 while remaining breach-free but not risk-free. More broadly, the paper argues that autonomous cyber defense should be treated not only as policy optimization, but as constrained deployment under heterogeneous operational preferences and explicit critical-safety semantics.
 
 % =========================
 % Bibliography
@@ -625,7 +635,7 @@ This submission relies on an implementation, experimental evaluation, and genera
     \item Source code for training and evaluation, including the current main branch snapshot used to generate the reported results.
     \item Configuration files for the environment, objectives, constraints, seeds, and preference grids.
     \item Scripts for reproducing the main tables and figures, including deployment evaluation, set-quality evaluation, and plotting.
-    \item Aggregated result files used to generate Table~\ref{tab:set-quality}, Table~\ref{tab:deployment-quality}, and the semantic-risk summaries discussed in Section~\ref{subsec:results-semantics}.
+    \item Aggregated result files used to generate Table~\ref{tab:set-quality}, Table~\ref{tab:deployment-quality}, and the paired RQ3 semantic-comparison, phase-conditioned, and casebook artifacts discussed in Section~\ref{subsec:results-semantics}.
     \item Documentation explaining how to run the main experiments and how to reproduce the paper figures from stored result files.
 \end{itemize}
 
@@ -660,9 +670,78 @@ All methods in the current paper are evaluated on the same four-objective prefer
 \section{Additional Results}
 \label{sec:appendix-results}
 
-\subsection{Per-Seed Semantic Casebooks}
+\subsection{Per-Seed Paired Semantic Casebooks: Constraint-Aware vs. Unconstrained Stage~2}
 \label{subsec:appendix-semantic-casebooks}
 
-For each seed, the selected V2.4 policy is accompanied by a semantic casebook that records representative attack--defense traces, phase transitions, and pre-critical containment summaries. These casebooks are intended to complement the aggregate numbers in Section~\ref{subsec:results-semantics}. In particular, they document how the defender reacts immediately after enterprise footholds and how restore-focused pre-critical containment prevents trajectories from entering a critical-present state.
+The appendix version of RQ3 is organized as three paired casebooks, one for each main-text seed. Each pair uses only the shared-threshold selected deployed policy and includes the replay timeline table, host-level summary, host attack--defense heatmap, questionable-defense-action table, and critical-path heatmap for both Constraint-Aware and Unconstrained Stage~2. These pairs are intended to complement the aggregate comparison in Section~\ref{subsec:results-semantics} by showing not only which action family was used, but when it was used and on which hosts it was focused. Appendix Table~\ref{tab:rq3-semantic-full-audit} retains the full semantic audit vector that is compressed into the compact main-text RQ3 table.
+
+\begin{table*}[t]
+\centering
+\caption{Full RQ3 semantic audit vector for the shared-threshold selected deployed policies of Constraint-Aware and Unconstrained Stage~2. The appendix version retains the full risk-tier distribution, Q2--Q5 questionable-action rules, and pre-critical action summaries that are compressed in the compact main-text RQ3 table.}
+\label{tab:rq3-semantic-full-audit}
+\small
+\setlength{\tabcolsep}{3pt}
+\input{table/rq3_semantic_full_audit_4obj.tex}
+\end{table*}
+
+\paragraph{Seed 0007.}
+Both selected policies remain breach-free. Constraint-Aware Stage~2 responds at step~8 with \texttt{Restore Enterprise1}. Unconstrained Stage~2 also avoids breach, but its paired casebook still records larger post-foothold drift, with Q4 $=0.2000$, Q5 $=0.0250$, and only $0.0063$ Tier~0 safe rollouts. The host-level heatmaps show that the unconstrained selected policy spends more foothold-phase attention on critical-path hosts before recovery becomes dominant.
+
+\paragraph{Seed 0011.}
+After the enterprise foothold at step~6, Constraint-Aware Stage~2 uses \texttt{Restore Enterprise1} at step~8, whereas Unconstrained Stage~2 first applies \texttt{DecoyApache Enterprise0} at step~7. The paired appendix figures make the same point at host level: the unconstrained selected policy expends early effort on critical-path decoy placement rather than immediately restoring the compromised enterprise host.
+
+\paragraph{Seed 0019.}
+Constraint-Aware Stage~2 again responds with \texttt{Restore Enterprise0} at step~8 and keeps both Q4 and Q5 at $0.0$. Unconstrained Stage~2 remains breach-free in aggregate outcome, but its paired casebook shows another decoy-first response pattern, here \texttt{DecoyVsftpd Enterprise0} at step~7, with Q4 $=0.4625$ and Q5 $=0.1188$. This seed is important because it shows that the semantic difference is not confined to one isolated example.
+
+Taken together, the paired appendix casebooks reinforce the main-text claim: under the same deployment-time selection rule, the two selected policies can end with the same breach-free label while still exhibiting materially different action timing, target focus, and semantically questionable post-foothold behavior.
+
+\subsection{Protocol-Matched Objective-Level Ablation: 3-Objective vs. 4-Objective Stage~2}
+\label{subsec:appendix-objective-ablation}
+
+We also constructed a protocol-matched objective-level ablation between the legacy three-objective full Stage~2 method (\texttt{ours\_stage2}) and the current four-objective full Stage~2 method (\texttt{ours\_stage2\_v2\_4}). The comparison uses the same three seeds $\{7,11,19\}$, the current \texttt{paper\_4obj} shared thresholds for deployment selection, and the same selected-policy replay20 semantic audit as the main text. Because the objective counts differ, the set-level comparison is first projected into the shared three-dimensional space over security, business, and cost; deployment and semantic differences are then evaluated under the current four-objective deployment rule.
+
+\begin{table*}[t]
+\centering
+\caption{Projected set-quality summary for the protocol-matched objective-level ablation. The four-objective Stage~2 frontier is projected into the shared three-dimensional space over security, business, and cost before hypervolume and expected utility are recomputed.}
+\label{tab:rq4-objective-projected-set}
+\small
+\setlength{\tabcolsep}{3pt}
+\input{table/rq4_objective_projected_set_quality.tex}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{Per-seed selected deployed policies and semantic-audit artifact roots for the protocol-matched objective-level ablation. These policy IDs are produced by reevaluating the three-objective Stage~2 buffer under the current \texttt{paper\_4obj} shared thresholds rather than reusing the legacy three-objective deployment summary.}
+\label{tab:rq4-objective-selected-policies}
+\small
+\setlength{\tabcolsep}{3pt}
+\input{table/rq4_objective_selected_policies.tex}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{Full semantic audit vector for the protocol-matched objective-level ablation between three-objective and four-objective Stage~2. This appendix table retains the full tier distribution, Q2--Q5 questionable-action rules, and pre-critical action summaries that are compressed into Panel~C of Table~\ref{tab:rq4-ablation}.}
+\label{tab:rq4-objective-semantic-full-audit}
+\small
+\setlength{\tabcolsep}{3pt}
+\input{table/rq4_objective_semantic_full_audit.tex}
+\end{table*}
+
+These appendix tables reinforce the Panel~C interpretation in Section~\ref{subsec:results-ablation}. The projected three-dimensional frontier does not show a hidden frontier-preservation trade-off in favor of the legacy method; the current four-objective method remains stronger even after the projection. More importantly, the selected-policy and semantic tables show why this matters operationally: once the current deployment rule and replay audit are imposed, the three-objective method repeatedly selects policies that breach critical assets, whereas the four-objective method remains breach-free but still near-miss dominated. In other words, the fourth objective improves not only end-state reporting, but also which Stage~2 candidates are treated as acceptable under deployment-time selection.
+
+\subsection{Held-Out Attacker Shift as Supporting Robustness}
+\label{subsec:appendix-attacker-shift}
+
+We also generated an appendix-only robustness package that keeps training on the default \texttt{bline} red process but reevaluates the current \texttt{paper\_4obj} method buffers under a held-out \texttt{meander} attacker, with the same shared-threshold deployment evaluator and the same three seeds $\{7,11,19\}$. We do \emph{not} treat this as an additional RQ claim, because the paper is not an attacker-generalization study.
+
+\begin{table}[t]
+\centering
+\caption{Held-out attacker-shift summary under a \texttt{bline}$\rightarrow$\texttt{meander} reevaluation. Training remains on the default \texttt{bline} red process, while deployment evaluation is rerun under the held-out \texttt{meander} attacker with the same shared-threshold selector and the same three seeds $\{7,11,19\}$.}
+\small
+\setlength{\tabcolsep}{4pt}
+\input{table/attacker_shift_summary_4obj.tex}
+\end{table}
+
+The table above makes the robustness point numerically. The result is mainly cautionary: all archive-based methods degrade sharply under the held-out attacker. Constraint-Aware Stage~2 falls to feasible rate $0.000$ with mean violation $6.994$, Stage-1 reaches only $0.017$ feasible rate with mean violation $8.074$, and Unconstrained Stage~2 reaches $0.025$ feasible rate with mean violation $6.409$. Weighted-Sum remains clearly unusable under shift, with mean violation $99.314$ and $0.608$ final critical compromised hosts. This appendix summary therefore reinforces the limitation in Section~\ref{subsec:discussion-limitations}: broader attacker variation remains an open robustness problem rather than a solved property of the current method family.
 
 \end{document}
