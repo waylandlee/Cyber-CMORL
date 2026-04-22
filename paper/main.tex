@@ -101,28 +101,72 @@ These experiments show that a constrained trade-off management over multi-object
 \section{Introduction}
 \label{sec:introduction}
 
-AI-enabled attack--defense interaction is making autonomous cyber defense a time-sensitive sequential decision problem rather than a single-objective control task. In realistic enterprise networks, defenders must respond to attacker progression under operational pressure: actions that suppress compromise may also interrupt critical services, degrade business workflows, or consume limited response capacity. During lateral movement or ransomware-style propagation, this tension becomes especially severe. Aggressive containment can reduce security risk but impose substantial collateral disruption, whereas conservative intervention may preserve short-term availability while allowing attacker footholds to deepen. Autonomous cyber defense is therefore fundamentally a problem of managing competing operational objectives under deployment constraints, not merely maximizing a single reward signal.
+AI-enabled cyber operations are increasing the pressure on enterprise defenders to react faster than traditional human-centered response loops can support.
+In particular, automated reconnaissance, lateral movement, and ransomware-style propagation can turn a local compromise into enterprise-wide disruption or critical-asset exposure within a short decision window.
+Autonomous cyber defense (ACD) is therefore an attractive direction: a blue-team agent observes an evolving network state, chooses defensive actions, and attempts to contain attacker progress over time.
+Yet the core difficulty is not merely to learn a policy with high average reward.
+In enterprise IT and OT environments, defensive actions are operational interventions: restoring a host may remove attacker presence but disrupt a business process; deploying decoys may increase security coverage but consume response resources; delaying intervention may preserve short-term continuity but allow the attacker to approach critical assets.
+ACD is therefore a time-sensitive sequential decision problem under conflicting security and operational objectives.
 
-This deployment perspective matters because defensive success in practice is inherently preference-dependent. Different organizations, and even the same organization at different moments, may rationally prefer different trade-offs among security effectiveness, service continuity, and defense overhead. A hospital during active service degradation, a cloud provider during peak traffic hours, and an enterprise responding overnight need not choose the same operating point. As a result, a single fixed defense policy is unlikely to be suitable across all deployment settings. What is needed instead is a policy set that spans meaningful trade-offs and supports policy assignment under changing operational preferences and strict operational limits.
+Most learning-based formulations of ACD do not fully capture this deployment tension.
+A common approach is to collapse the defender's goals into a scalar reward and then train a single policy for that reward.
+This design is convenient for deep reinforcement learning, but it is a poor abstraction for deployment.
+First, scalarization hides trade-offs: two policies with similar scalar return may differ substantially in business disruption, intervention cost, or critical-asset exposure.
+Second, deployment preferences are not fixed.
+A hospital during active service degradation, an enterprise during overnight containment, and an industrial operator protecting an OT process may rationally choose different balances between aggressive containment and service preservation.
+Third, cyber risk is often semantic and tail-driven.
+A policy that performs well on average can still be unacceptable if it repeatedly allows an attacker to cross from an enterprise foothold into a critical breach.
+These issues suggest that the deployable object should not be a single reward-maximizing policy, but a set of feasible defense policies that expose meaningful trade-offs.
 
-Recent progress in reinforcement learning has made autonomous cyber defense increasingly tractable in simulated environments. However, most existing learning-based approaches still optimize a scalarized objective or aim to learn a single deployable policy. Such formulations are a poor match for cyber defense deployment. They collapse heterogeneous operational requirements into one reward or one operating point, making it difficult to adapt to organizations with different tolerances for disruption, residual risk, and intervention cost. More importantly, in cyber operations, the practical value of a defense method is not only whether it can produce a strong policy on average, but whether it can provide multiple feasible policies that remain usable under strict deployment constraints.
+This paper studies ACD as constrained multi-objective policy-set learning in CybORG++, a controlled enterprise cyber-range environment for blue-team defense under partial observability~\cite{baillie2020cyborg,emerson2024cyborgpp}.
+We formulate the defender with four deployment-facing objectives:
+\emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}.
+The first objective measures how well the defender suppresses attacker progress and recovers compromised hosts.
+The second captures whether defensive behavior preserves business-relevant services.
+The third represents the operational burden of defensive actions, where larger return corresponds to lower realized cost.
+The fourth makes critical-asset risk a first-class optimization objective rather than a post-hoc diagnostic.
+Together, these objectives encode the central deployment question: can an autonomous defender provide effective containment while remaining acceptable under business, cost, and critical-safety constraints?
 
-These limitations motivate a constrained multi-objective view of autonomous cyber defense. Rather than reducing all defensive outcomes to a single scalar objective, we formulate blue-team defense as a constrained multi-objective reinforcement learning problem with three deployment-relevant objectives: security effectiveness, business continuity, and defense overhead. We additionally impose operational constraints to capture unacceptable behavior, such as excessive disruption or overly aggressive intervention. Under this formulation, the goal is not to learn one universally best policy, but to construct a deployable policy set that approximates the Pareto trade-off frontier and supports flexible policy selection for different deployment preferences.
+Our key idea is to separate \emph{policy learning} from \emph{deployment-time policy selection}.
+Instead of training a single policy for one scalarized reward, we construct a Pareto-oriented archive of blue-team policies.
+At deployment time, an organization specifies an operational preference over the four objectives and applies hard limits that reject unacceptable behavior, such as excessive disruption, excessive intervention cost, or realized critical compromise.
+The system then selects a feasible policy from the archive without retraining.
+This policy-set view follows the broader multi-objective reinforcement learning principle that heterogeneous preferences are better served by approximating a Pareto front than by committing to one operating point~\cite{hayes2022guide,liu2025efficient}.
+However, autonomous cyber defense adds an important security-specific requirement: the archive must not only cover the objective space, but also contain policies whose rollout behavior remains semantically acceptable under attack progression.
 
-In this paper, we study this problem in CybORG~\cite{baillie2020cyborg, emerson2024cyborgpp} and adopt a two-stage Pareto-oriented learning framework for autonomous blue-team defense. In the first stage, we initialize a set of preference-diverse defense policies. In the second stage, we expand the policy set through constraint-aware Pareto optimization in order to improve frontier quality and deployment flexibility. This design is motivated by a practical observation: in cyber defense, discovering a strong candidate set is not the same as achieving strong final deployment. A method may appear effective at the set level while still failing to provide feasible or desirable policies once strict operational constraints and concrete deployment preferences are imposed.
+We instantiate this view with a two-stage learning framework.
+Stage~1 initializes a preference-diverse archive by training blue-team policies under sampled four-objective preferences.
+The policies are trained with vector-valued rewards and vector critics, while each update scalarizes advantages only for the current preference.
+Stage~2 then expands the archive through constraint-aware Pareto optimization.
+Given a parent policy and a target objective, the extension step improves the target objective while using interior-point-style constraints to prevent excessive regression on the other objectives~\cite{achiam2017cpo,liu2020ipo,liu2025efficient}.
+In our CybORG++ instantiation, this extension is also semantic-safety-aware: candidate policies are evaluated not only by objective-space improvement, but also by deployment feasibility and critical-asset risk indicators such as critical breach, persistent breach, critical dwell, and pre-critical response behavior.
+The resulting archive supports constrained deployment-time assignment: preferences choose among acceptable policies, while hard limits determine which policies are acceptable in the first place.
 
-Accordingly, we evaluate autonomous cyber defense from two complementary perspectives. At the candidate-set level, we measure Pareto-front quality, expected utility, and preference coverage. At the deployment level, we assess feasible policy assignment under strict constraints and report cyber-semantic outcomes such as critical-asset protection, attack-impact suppression, service disruption, and defense overhead. This separation between set quality and deployment quality reflects the central practical question of autonomous defense: not only whether a method can discover good trade-offs, but whether it can offer deployable choices for different operational regimes.
+We evaluate this approach in a four-objective CybORG++ enterprise-defense setting with partial observations, lateral movement, business-impacting defensive actions, and critical assets.
+Our evaluation separates three questions that are often conflated in ACD studies.
+First, we measure candidate-set quality in the four-dimensional objective space using hypervolume, expected utility, sparsity, coverage, and assigned-policy diversity.
+Second, we evaluate constrained deployment performance under shared business and cost thresholds.
+Third, we conduct replay-level semantic audits to examine whether selected policies actually prevent realized critical compromise or merely obtain favorable aggregate returns.
+This separation is important because a method can look strong at the candidate-set level while still failing to provide feasible deployed policies, and a policy can appear breach-free while still producing near-miss trajectories that matter operationally.
 
-Our results show that a constrained Pareto policy-set formulation provides a more realistic basis for autonomous cyber defense than single-policy or purely scalarized baselines. By explicitly modeling deployment trade-offs and evaluating both frontier quality and constrained deployment behavior, we show that autonomous cyber defense is better framed as constrained trade-off management over deployable policy sets than as single-policy reward maximization.
+The results show that constrained policy-set learning provides a stronger basis for deployable ACD than scalarized single-policy training.
+At the candidate-set level, our Constraint-Aware Stage-2 policy set achieves $22.91\times 10^6$ hypervolume, compared with $5.84\times 10^6$ for weighted-sum scalarization, corresponding to approximately $3.9\times$ the hypervolume.
+It also improves expected utility from $-161.57$ to $-41.92$ under the shared preference grid.
+At deployment time, it increases feasible deployment rate from $0.00$ to $0.64$ and reduces mean constraint violation from $93.54$ to $0.09$ relative to weighted-sum scalarization, while reporting zero final critical compromised hosts and zero critical-impact events in the main deployment table.
+Replay-level semantic audit further shows that the selected policies eliminate realized critical breach and persistent critical breach under the evaluated setting, while still leaving near-miss risk visible.
+Thus, the supported claim is deliberately bounded: the method is breach-free in this controlled evaluation, but not risk-free.
 
-The main contributions of this paper are as follows:
+This paper makes the following contributions:
+
 \begin{itemize}
-    \item We formulate autonomous cyber defense as a constrained multi-objective sequential decision problem with three operational objectives---security effectiveness, business continuity, and defense overhead---under deployment-relevant operational constraints.
-    \item We instantiate a two-stage Pareto-oriented learning framework in CybORG to construct deployment-aware defense policy sets rather than a single fixed operating point.
-    \item We introduce a deployment-aware evaluation protocol that explicitly separates candidate-set quality from final deployment quality, combining Pareto metrics with strict-constraint policy assignment and cyber-semantic outcomes.
-    \item We provide empirical evidence that constrained Pareto policy sets yield stronger deployment flexibility and more useful feasible choices than scalarization-based and preference-conditioned baselines for autonomous cyber defense.
-\end{itemize}
+    \item We formulate autonomous cyber defense as a constrained four-objective sequential decision problem in CybORG++, with \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety} as first-class deployment objectives.
 
+    \item We introduce a deployment-aware policy-set learning framework for ACD that combines preference-diverse Pareto initialization, constraint-aware Pareto expansion, semantic-safety-aware candidate acceptance, and constrained deployment-time policy assignment.
+
+    \item We develop an evaluation methodology that separates candidate-set quality, constrained deployment performance, and replay-level cyber semantics, allowing policy archives to be judged not only by Pareto metrics but also by deployability and critical-asset behavior.
+
+    \item We provide empirical evidence that constrained four-objective policy sets outperform scalarized and reduced alternatives in CybORG++: they achieve substantially stronger hypervolume and expected utility, higher feasible deployment rate, lower constraint violation, and zero realized critical-asset compromise under the main deployment and semantic-audit setting.
+\end{itemize}
 
 \section{Threat Model and Deployment Assumptions}
 \label{sec:threat-deployment}
