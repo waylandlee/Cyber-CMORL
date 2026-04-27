@@ -1,0 +1,233 @@
+% Standalone copy-paste appendix fragment for Experiments 1.1--1.4.
+% Requires the same table packages as main.tex, in particular booktabs and graphicx.
+% This file intentionally inlines all table bodies and does not load external table files.
+
+\subsection{Per-Seed Main Results}
+\label{app:per-seed-main-results}
+
+Because the main experiments use three seeds, we additionally report the
+primary archive-quality and operational-assignment metrics at the
+per-seed level. These appendix tables are intended to test whether the
+main improvements are driven by a single favorable run or instead remain
+directionally consistent across seeds.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Per-seed archive-quality breakdown for the three main seeds.
+The table reports hypervolume and expected utility under the shared
+four-objective evaluation protocol.}
+\label{tab:app-per-seed-archive-quality}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Seed & Method & Hypervolume ($\times 10^6$) & Expected Utility \\
+\midrule
+0007 & Constraint-Aware Stage-2 & 17.147 & -46.785 \\
+0007 & Stage-1 Archive & 16.903 & -46.809 \\
+0007 & Weighted-Sum & 6.705 & -136.944 \\
+0007 & Preference-Conditioned PPO & 2.467 & -154.838 \\
+0011 & Constraint-Aware Stage-2 & 27.255 & -36.658 \\
+0011 & Stage-1 Archive & 25.894 & -42.718 \\
+0011 & Weighted-Sum & 5.156 & -171.152 \\
+0011 & Preference-Conditioned PPO & 5.314 & -175.946 \\
+0019 & Constraint-Aware Stage-2 & 24.327 & -42.315 \\
+0019 & Stage-1 Archive & 23.718 & -45.113 \\
+0019 & Weighted-Sum & 5.654 & -176.605 \\
+0019 & Preference-Conditioned PPO & 3.258 & -173.017 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Per-seed operational-assignment breakdown for the three main
+seeds. The table reports feasible-assignment rate, mean violation, final
+critical compromised hosts, and critical-impact count under the shared
+acceptance protocol.}
+\label{tab:app-per-seed-operational-assignment}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Seed & Method & Feasible Rate & Violation & Final Critical Hosts & Critical Impacts \\
+\midrule
+0007 & Constraint-Aware Stage-2 & 0.025 & 0.278 & 0.000 & 0.000 \\
+0007 & Stage-1 Archive & 0.000 & 0.321 & 0.000 & 0.000 \\
+0007 & Weighted-Sum & 0.000 & 91.092 & 0.625 & 6.050 \\
+0007 & Lagrangian PPO & 0.000 & 91.866 & 0.775 & 4.350 \\
+0007 & Unconstrained Stage-2 & 0.350 & 1.816 & 0.000 & 0.000 \\
+0011 & Constraint-Aware Stage-2 & 0.925 & 0.004 & 0.000 & 0.000 \\
+0011 & Stage-1 Archive & 0.350 & 3.754 & 0.000 & 0.000 \\
+0011 & Weighted-Sum & 0.000 & 102.630 & 0.875 & 4.925 \\
+0011 & Lagrangian PPO & 0.000 & 103.041 & 0.900 & 1.000 \\
+0011 & Unconstrained Stage-2 & 0.525 & 2.600 & 0.000 & 0.000 \\
+0019 & Constraint-Aware Stage-2 & 0.975 & 0.000 & 0.000 & 0.000 \\
+0019 & Stage-1 Archive & 0.575 & 1.856 & 0.000 & 0.000 \\
+0019 & Weighted-Sum & 0.000 & 86.909 & 0.975 & 1.000 \\
+0019 & Lagrangian PPO & 0.000 & 91.916 & 0.975 & 1.125 \\
+0019 & Unconstrained Stage-2 & 0.500 & 1.967 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+Across all three seeds, DA-CPSL remains the strongest or near-strongest
+archive-quality method, showing that the main-table gains are not driven
+by a single run. Per-seed deployment metrics likewise show that
+DA-CPSL's feasible-assignment advantage and violation reduction persist
+across seeds, rather than emerging from one unusually favorable seed.
+The purpose of these tables is to confirm directional stability, not to
+claim that all seeds produce identical magnitudes. The per-seed results
+therefore strengthen the interpretation that the aggregate gains reflect
+a repeatable trend under the stated protocol.
+
+\subsection{Raw Pareto Assignment vs. Acceptable Pareto Assignment}
+\label{app:raw-vs-acceptable-assignment}
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Raw Pareto assignment versus acceptable Pareto assignment on the DA-CPSL Stage~2 archive. Feasible-assignment rate is measured over preference-grid assignments; violation and critical-risk audit metrics are assignment-weighted over selected policies.}
+\label{tab:app-raw-vs-acceptable-assignment}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Assignment Rule & Expected Utility & Feasible Assign. Rate & Mean Violation & Final Critical Hosts & Critical Impact Count \\
+\midrule
+Raw Pareto Assignment & -41.919 & 0.679 & 1.189 & 0.000 & 0.000 \\
+Acceptable Pareto Assignment & -43.706 & 1.000 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+This mechanism ablation uses the same DA-CPSL Stage~2 archive, the same
+four-objective preference grid, and the same operational thresholds as
+the main evaluation. The only change is the assignment rule: Raw Pareto
+Assignment selects directly from the objective-space Pareto set, whereas
+Acceptable Pareto Assignment first applies the operational acceptance
+filter and then assigns from the acceptable Pareto set.
+
+The raw rule preserves the highest preference utility, but it can assign
+policies that are Pareto-optimal only in objective space while violating
+the hard business or cost limits. In contrast, the acceptable rule
+raises the feasible-assignment rate from \(0.679\) to \(1.000\) and
+reduces mean violation from \(1.189\) to \(0.000\), at the cost of a
+small reduction in expected utility. This appendix-only comparison does
+not introduce a new training result and does not replace
+Table~\ref{tab:operational-assignment-performance}; it isolates the
+assignment-rule mechanism and directly supports the design motivation in
+Section~\ref{subsec:acceptable-pareto-assignment}.
+
+\subsection{Operational-Threshold Sensitivity}
+\label{app:threshold-sensitivity}
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Operational-threshold sensitivity under looser, default, and stricter business/cost limits. Feasible-assignment rate and mean violation are computed over preference-grid assignments from each method's raw Pareto candidates.}
+\label{tab:app-threshold-sensitivity}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Threshold Profile & Method & Feasible Assign. Rate & Mean Violation \\
+\midrule
+Looser & Constraint-Aware Stage-2 & 0.719 & 0.849 \\
+Looser & Stage-1 Archive & 0.716 & 0.859 \\
+Looser & Weighted-Sum & 0.000 & 101.242 \\
+Looser & Lagrangian PPO & 0.000 & 95.034 \\
+Looser & Unconstrained Stage-2 & 0.746 & 0.768 \\
+\addlinespace
+Default & Constraint-Aware Stage-2 & 0.679 & 1.189 \\
+Default & Stage-1 Archive & 0.667 & 1.214 \\
+Default & Weighted-Sum & 0.000 & 102.086 \\
+Default & Lagrangian PPO & 0.000 & 95.825 \\
+Default & Unconstrained Stage-2 & 0.746 & 1.069 \\
+\addlinespace
+Stricter & Constraint-Aware Stage-2 & 0.642 & 1.700 \\
+Stricter & Stage-1 Archive & 0.304 & 2.217 \\
+Stricter & Weighted-Sum & 0.000 & 104.273 \\
+Stricter & Lagrangian PPO & 0.000 & 97.625 \\
+Stricter & Unconstrained Stage-2 & 0.692 & 1.509 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+We also test whether the operational-assignment conclusion depends on a
+single hand-picked threshold profile. Using the same official
+four-objective artifacts, seeds, and preference grid, we evaluate three
+business/cost profiles derived from the Table~B calibration set:
+looser \(q=0.10\), default \(q=0.25\), and stricter \(q=0.50\); the
+default profile exactly matches the shared thresholds used in the main
+evaluation. For each profile, the assignment rule first selects from
+each method's raw Pareto candidates by preference utility and then
+audits whether the selected objective vector satisfies the corresponding
+business and cost limits.
+
+As expected, tighter thresholds reduce feasible-assignment rates and
+increase mean violation for every method. DA-CPSL moves from
+\((0.719, 0.849)\) under the looser profile to \((0.679, 1.189)\) at
+the default profile and \((0.642, 1.700)\) under the stricter profile,
+showing gradual degradation rather than a collapse at one operating
+point. Stage-1 Only is more sensitive to tightening, dropping from
+\(0.716\) feasible-assignment rate under the looser profile to
+\(0.304\) under the stricter profile, while Unconstrained Stage~2
+retains slightly higher feasibility but also accumulates more violation
+as the limits tighten, from \((0.746, 0.768)\) to \((0.692, 1.509)\).
+Weighted-Sum and Lagrangian PPO remain infeasible across all three
+profiles, with mean violation above \(95\), so the appendix conclusion
+is robustness of the relative deployment trend rather than a new
+training or replay result. It isolates threshold sensitivity at the
+candidate/objective assignment level.
+
+\subsection{Zero-Observed Critical-Event Confidence Bounds}
+\label{app:zero-event-confidence-bounds}
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Zero-observed critical-event confidence bounds under the finite semantic replay protocol. Bounds are one-sided Clopper--Pearson upper bounds at 95\% confidence and do not imply zero risk.}
+\label{tab:app-zero-event-confidence-bounds}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Event & Method & Observed Events / Episodes & Observed Rate & 95\% CP Upper Bound \\
+\midrule
+Ever Critical Breach & Constraint-Aware Stage-2 & 0/120 & 0.00\% & 2.47\% \\
+Persistent Critical Breach & Constraint-Aware Stage-2 & 0/120 & 0.00\% & 2.47\% \\
+Any Critical Impact & Constraint-Aware Stage-2 & 0/120 & 0.00\% & 2.47\% \\
+Any Final Critical Host Compromised & Constraint-Aware Stage-2 & 0/120 & 0.00\% & 2.47\% \\
+Ever Critical Breach & Stage-1 Archive & 0/120 & 0.00\% & 2.47\% \\
+Persistent Critical Breach & Stage-1 Archive & 0/120 & 0.00\% & 2.47\% \\
+Any Critical Impact & Stage-1 Archive & 0/120 & 0.00\% & 2.47\% \\
+Any Final Critical Host Compromised & Stage-1 Archive & 0/120 & 0.00\% & 2.47\% \\
+Ever Critical Breach & Unconstrained Stage-2 & 0/120 & 0.00\% & 2.47\% \\
+Persistent Critical Breach & Unconstrained Stage-2 & 0/120 & 0.00\% & 2.47\% \\
+Any Critical Impact & Unconstrained Stage-2 & 0/120 & 0.00\% & 2.47\% \\
+Any Final Critical Host Compromised & Unconstrained Stage-2 & 0/120 & 0.00\% & 2.47\% \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+The zero critical-event entries in the main audit are finite-protocol
+observations, not formal guarantees of zero risk. We therefore report
+one-sided Clopper--Pearson upper confidence bounds for event-style
+semantic replay outcomes with zero observed events. For each method and
+event, the analysis pools the three official seeds, giving
+\(3\times 40=120\) semantic replay episodes under the same Table~B
+protocol.
+
+For DA-CPSL, zero observed ever-critical breaches, persistent critical
+breaches, critical-impact events, and final critical compromised hosts
+yield a \(95\%\) upper bound of \(2.47\%\) on the corresponding
+per-episode event rate under this replay protocol. Stage-1 Only and
+Unconstrained Stage~2 have the same zero-observed-event bound for these
+audit events, whereas Weighted-Sum and Lagrangian PPO show nonzero
+critical-event counts and are therefore retained only in the
+machine-readable audit outputs for this analysis. This supports the
+interpretation ``breach-free under the replay protocol, but not
+risk-free.''
