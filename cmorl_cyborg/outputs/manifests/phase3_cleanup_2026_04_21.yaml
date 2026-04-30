@@ -1,0 +1,41 @@
+phase: third_cleanup_pass
+date: 2026-04-21
+scope:
+  - normalize legacy absolute repository roots in active configs
+  - document the remaining Git-tracked surface under outputs
+  - remove heavy outputs from the Git index while keeping local files on disk
+
+path_normalization:
+  config_policy: repo_relative
+  docs_policy: current_absolute_links_allowed
+  legacy_roots_removed:
+    - /home/waylandlee/Cyber-CMORL/CybORG_plus_plus/
+    - /home/waylandlee/Cyber-CMORL/
+  examples:
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0007/run_ddb937f9/solution_buffer.json
+    - cmorl_cyborg/outputs/paper_table_b/shared_thresholds.json
+    - cmorl_minicage/outputs/stage2
+
+git_tracking:
+  outputs_files_tracked_before: 3088
+  outputs_files_tracked_after: 8
+  tracked_surface:
+    - cmorl_cyborg/outputs/README.md
+    - cmorl_cyborg/outputs/archive/README.md
+    - cmorl_cyborg/outputs/manifests/README.md
+    - cmorl_cyborg/outputs/manifests/official_artifacts.yaml
+    - cmorl_cyborg/outputs/manifests/archive_second_phase_2026_04_21.yaml
+    - cmorl_cyborg/outputs/manifests/phase3_cleanup_2026_04_21.yaml
+    - cmorl_minicage/outputs/README.md
+    - cmorl_minicage/outputs/archive/README.md
+
+compatibility:
+  archive_symlinks_kept: true
+  note: existing paths under paper_table_a and paper_appendix still resolve
+  archived_manifest: cmorl_cyborg/outputs/manifests/archive_second_phase_2026_04_21.yaml
+
+verification:
+  checks:
+    - no legacy repository roots remain outside outputs
+    - active configs now point to repo-relative artifact paths
+    - Git ls-files under outputs returns only the tracked surface

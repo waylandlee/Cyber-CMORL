@@ -214,6 +214,158 @@ def build_semantic_risk_summary(
     return output_dir / "semantic_risk_aggregate.json"
 
 
+def build_method_comparison_semantic_summary(
+    seed_summary_paths: list[str | Path],
+    *,
+    output_dir: str | Path,
+    left_method_name: str,
+    left_display_name: str,
+    right_method_name: str,
+    right_display_name: str,
+) -> Path:
+    if not seed_summary_paths:
+        raise ValueError("seed_summary_paths must not be empty")
+
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    seed_rows: list[dict[str, Any]] = []
+    metric_keys: list[str] = []
+    for raw_path in seed_summary_paths:
+        summary_path = Path(raw_path).resolve()
+        summary = load_json(summary_path)
+        left_path = summary.get("left_risk_summary_path")
+        right_path = summary.get("right_risk_summary_path")
+        if not left_path or not right_path:
+            raise ValueError(
+                f"Seed comparison summary must include left_risk_summary_path and right_risk_summary_path: {summary_path}"
+            )
+        left_metrics = _risk_metrics(left_path)
+        right_metrics = _risk_metrics(right_path)
+        metric_keys = list(left_metrics.keys())
+        row: dict[str, Any] = {
+            "seed": _seed_from_summary(summary_path, summary),
+            "left_method_name": str(summary.get("left_method_name") or left_method_name),
+            "left_display_name": str(summary.get("left_display_name") or left_display_name),
+            "left_policy_id": str(summary.get("left_policy_id") or ""),
+            "right_method_name": str(summary.get("right_method_name") or right_method_name),
+            "right_display_name": str(summary.get("right_display_name") or right_display_name),
+            "right_policy_id": str(summary.get("right_policy_id") or ""),
+            "seed_summary_path": str(summary_path),
+            "left_risk_summary_path": str(Path(left_path).resolve()),
+            "right_risk_summary_path": str(Path(right_path).resolve()),
+        }
+        for key, value in left_metrics.items():
+            row[f"left_{key}"] = value
+        for key, value in right_metrics.items():
+            row[f"right_{key}"] = value
+        for key in metric_keys:
+            row[f"delta_{key}"] = float(row[f"left_{key}"]) - float(
+                row[f"right_{key}"]
+            )
+        seed_rows.append(row)
+
+    seed_rows.sort(key=lambda row: int(row["seed"]))
+
+    aggregate_left = {key: _mean(seed_rows, f"left_{key}") for key in metric_keys}
+    aggregate_right = {key: _mean(seed_rows, f"right_{key}") for key in metric_keys}
+    aggregate_delta = {key: _mean(seed_rows, f"delta_{key}") for key in metric_keys}
+
+    seedwise_payload = {
+        "num_seeds": len(seed_rows),
+        "left_method_name": left_method_name,
+        "left_display_name": left_display_name,
+        "right_method_name": right_method_name,
+        "right_display_name": right_display_name,
+        "source_seed_summary_paths": [str(Path(path).resolve()) for path in seed_summary_paths],
+        "seed_summaries": seed_rows,
+    }
+    aggregate_payload = {
+        "num_seeds": len(seed_rows),
+        "left_method_name": left_method_name,
+        "left_display_name": left_display_name,
+        "right_method_name": right_method_name,
+        "right_display_name": right_display_name,
+        "left": aggregate_left,
+        "right": aggregate_right,
+        "delta_left_minus_right": aggregate_delta,
+    }
+
+    save_json(output_dir / "semantic_comparison_seedwise.json", seedwise_payload)
+    save_json(output_dir / "semantic_comparison_aggregate.json", aggregate_payload)
+
+    csv_fieldnames = [
+        "seed",
+        "left_method_name",
+        "left_policy_id",
+        "right_method_name",
+        "right_policy_id",
+    ]
+    for prefix in ("left", "right", "delta"):
+        csv_fieldnames.extend(f"{prefix}_{key}" for key in metric_keys)
+    with (output_dir / "semantic_comparison_seedwise.csv").open(
+        "w", encoding="utf-8", newline=""
+    ) as handle:
+        writer = csv.DictWriter(handle, fieldnames=csv_fieldnames)
+        writer.writeheader()
+        for row in seed_rows:
+            writer.writerow({field: row.get(field, "") for field in csv_fieldnames})
+
+    md_lines = [
+        "# RQ3 Semantic Comparison Summary",
+        "",
+        f"- Left method: `{left_display_name}` (`{left_method_name}`)",
+        f"- Right method: `{right_display_name}` (`{right_method_name}`)",
+        "",
+        "| seed | left_policy_id | right_policy_id | left_ever | right_ever | delta_ever | left_persistent | right_persistent | delta_persistent | left_tier1 | right_tier1 | delta_tier1 |",
+        "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for row in seed_rows:
+        md_lines.append(
+            "| "
+            f"{row['seed']} | "
+            f"{row['left_policy_id']} | "
+            f"{row['right_policy_id']} | "
+            f"{row['left_ever_critical_breach_rate']:.4f} | "
+            f"{row['right_ever_critical_breach_rate']:.4f} | "
+            f"{row['delta_ever_critical_breach_rate']:.4f} | "
+            f"{row['left_persistent_critical_breach_rate']:.4f} | "
+            f"{row['right_persistent_critical_breach_rate']:.4f} | "
+            f"{row['delta_persistent_critical_breach_rate']:.4f} | "
+            f"{row['left_Tier 1 Near-Miss']:.4f} | "
+            f"{row['right_Tier 1 Near-Miss']:.4f} | "
+            f"{row['delta_Tier 1 Near-Miss']:.4f} |"
+        )
+    md_lines.extend(
+        [
+            "",
+            "## Aggregate",
+            "",
+            f"- `{left_display_name} ever_critical_breach_rate = {aggregate_left['ever_critical_breach_rate']:.4f}`",
+            f"- `{right_display_name} ever_critical_breach_rate = {aggregate_right['ever_critical_breach_rate']:.4f}`",
+            f"- `delta ever_critical_breach_rate = {aggregate_delta['ever_critical_breach_rate']:.4f}`",
+            f"- `{left_display_name} persistent_critical_breach_rate = {aggregate_left['persistent_critical_breach_rate']:.4f}`",
+            f"- `{right_display_name} persistent_critical_breach_rate = {aggregate_right['persistent_critical_breach_rate']:.4f}`",
+            f"- `delta persistent_critical_breach_rate = {aggregate_delta['persistent_critical_breach_rate']:.4f}`",
+            f"- `{left_display_name} Tier 1 Near-Miss = {aggregate_left['Tier 1 Near-Miss']:.4f}`",
+            f"- `{right_display_name} Tier 1 Near-Miss = {aggregate_right['Tier 1 Near-Miss']:.4f}`",
+            f"- `delta Tier 1 Near-Miss = {aggregate_delta['Tier 1 Near-Miss']:.4f}`",
+            f"- `{left_display_name} precritical restore step rate = {aggregate_left['precritical_action_family_step_rates.restore']:.4f}`",
+            f"- `{right_display_name} precritical restore step rate = {aggregate_right['precritical_action_family_step_rates.restore']:.4f}`",
+            f"- `delta precritical restore step rate = {aggregate_delta['precritical_action_family_step_rates.restore']:.4f}`",
+            f"- `{left_display_name} precritical decoy step rate = {aggregate_left['precritical_action_family_step_rates.decoy']:.4f}`",
+            f"- `{right_display_name} precritical decoy step rate = {aggregate_right['precritical_action_family_step_rates.decoy']:.4f}`",
+            f"- `delta precritical decoy step rate = {aggregate_delta['precritical_action_family_step_rates.decoy']:.4f}`",
+        ]
+    )
+    (output_dir / "semantic_comparison_summary.md").write_text(
+        "\n".join(md_lines),
+        encoding="utf-8",
+    )
+
+    return output_dir / "semantic_comparison_aggregate.json"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Aggregate selected-vs-baseline semantic risk summaries across seeds."

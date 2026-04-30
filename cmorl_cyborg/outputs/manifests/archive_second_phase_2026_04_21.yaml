@@ -1,0 +1,55 @@
+schema_version: 1
+archived_on: 2026-04-21
+archive_root: cmorl_cyborg/outputs/archive/2026-04-21_second_phase
+archive_strategy:
+  mode: move_then_link
+  compatibility: "Original paths remain accessible via symlink-compatible entry points."
+  rationale:
+    - "Reduce the live working surface of appendix-heavy and run-heavy artifacts."
+    - "Preserve existing config and document references during cleanup."
+    - "Keep official top-level report outputs separate from bulky execution products."
+
+archived_roots:
+  - source: cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_1_4obj_analysis
+    reason: "Superseded pilot analysis line; retained for audit, not for the locked live surface."
+  - source: cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_2_4obj_analysis
+    reason: "Superseded pilot analysis line; retained for audit, not for the locked live surface."
+  - source: cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_3_4obj_analysis
+    reason: "Superseded pilot analysis line; retained for audit, not for the locked live surface."
+  - source: cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_4_4obj_analysis
+    reason: "Large appendix-first semantic-safety analysis tree; kept accessible but archived physically."
+  - source: cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_4obj_analysis
+    reason: "Older semantic-safety candidate line retained for provenance."
+  - source: cmorl_cyborg/outputs/paper_appendix/semantic_repair_analysis
+    reason: "Appendix analysis tree with replay-heavy internals; archived to reduce live clutter."
+  - source: cmorl_cyborg/outputs/paper_appendix/semantic_repair_traces
+    reason: "Trace-only companion tree; natural archive target."
+
+archived_run_products:
+  scope: cmorl_cyborg/outputs/paper_table_a
+  reason: "Nested run directories are execution products, not the preferred long-lived report surface."
+  moved_patterns:
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0007/run_bbf48037
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0007/run_ddb937f9
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0011/run_3006e442
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0011/run_49d86a97
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0019/run_05e9f8d6
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0019/run_edb27c55
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0023/run_99754924
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0029/run_543d538f
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2_deployability/seed_0007/run_6c10796a
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2_deployability_v2/seed_0007/run_afd914e3
+    - cmorl_cyborg/outputs/paper_table_a/ours_stage2_deployability_v3/seed_0007/run_1cf494e3
+    - cmorl_cyborg/outputs/paper_table_a/preference_conditioned_ppo/seed_0007/run_35333574
+    - cmorl_cyborg/outputs/paper_table_a/preference_conditioned_ppo/seed_0011/run_09933e87
+    - cmorl_cyborg/outputs/paper_table_a/preference_conditioned_ppo/seed_0019/run_b346c6d9
+    - cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0007/run_8220ece2
+    - cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0011/run_23d89ef4
+    - cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0019/run_188c47a0
+    - cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0023/run_7c68d97f
+    - cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0029/run_4e8d2b46
+
+post_archive_expectations:
+  - "Existing configs that point at old run paths should continue to resolve."
+  - "Old paper-appendix paths should remain readable from the original locations."
+  - "Future cleanup can remove symlink-compatible entry points only after all configs and docs stop relying on them."

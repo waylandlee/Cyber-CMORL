@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import math
 import os
-import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -19,14 +18,10 @@ import numpy as np
 
 OUTPUT_ROOT = REPO_ROOT / "paper" / "images"
 PAPER_4OBJ_ROOT = REPO_ROOT / "cmorl_cyborg" / "outputs" / "paper_4obj"
-APPENDIX_ROOT = (
-    REPO_ROOT
-    / "cmorl_cyborg"
-    / "outputs"
-    / "paper_appendix"
-    / "critical_safe_v2_4_4obj_analysis"
-    / "pilot"
-)
+RQ3_ROOT = PAPER_4OBJ_ROOT / "rq3_symmetric"
+RQ3_SEMANTIC_ROOT = RQ3_ROOT / "semantic_comparison"
+RQ3_PHASE_ROOT = RQ3_ROOT / "phase_analysis"
+RQ3_PAIRED_ROOT = RQ3_ROOT / "paired_casebooks"
 
 
 def _load_json(path: Path) -> dict:
@@ -55,12 +50,14 @@ def _save_figure(fig: plt.Figure, filename: str) -> None:
 
 def build_semantic_risk_summary() -> None:
     aggregate = _load_json(
-        PAPER_4OBJ_ROOT / "semantic_risk" / "semantic_risk_aggregate.json"
+        RQ3_SEMANTIC_ROOT / "semantic_comparison_aggregate.json"
     )
-    selected = aggregate["selected"]
-    baseline = aggregate["baseline"]
+    left = aggregate["left"]
+    right = aggregate["right"]
+    left_label = aggregate["left_display_name"]
+    right_label = aggregate["right_display_name"]
 
-    colors = {"Baseline": "#9b2226", "V2.4": "#0a9396"}
+    colors = {right_label: "#9b2226", left_label: "#0a9396"}
     fig, axes = plt.subplots(1, 3, figsize=(16, 4.8))
 
     rate_metrics = [
@@ -75,17 +72,17 @@ def build_semantic_risk_summary() -> None:
     width = 0.38
     axes[0].bar(
         x - width / 2,
-        [baseline[k] for _, k in rate_metrics],
+        [right[k] for _, k in rate_metrics],
         width=width,
-        color=colors["Baseline"],
-        label="Baseline",
+        color=colors[right_label],
+        label=right_label,
     )
     axes[0].bar(
         x + width / 2,
-        [selected[k] for _, k in rate_metrics],
+        [left[k] for _, k in rate_metrics],
         width=width,
-        color=colors["V2.4"],
-        label="V2.4",
+        color=colors[left_label],
+        label=left_label,
     )
     axes[0].set_xticks(x)
     axes[0].set_xticklabels([label for label, _ in rate_metrics], fontsize=9)
@@ -114,23 +111,23 @@ def build_semantic_risk_summary() -> None:
     for label, key, color in zip(tier_labels, tier_keys, tier_colors):
         axes[1].bar(
             tier_x[0],
-            baseline[key],
+            right[key],
             bottom=baseline_bottom,
             color=color,
             width=0.5,
         )
         axes[1].bar(
             tier_x[1],
-            selected[key],
+            left[key],
             bottom=selected_bottom,
             color=color,
             width=0.5,
             label=label,
         )
-        baseline_bottom += baseline[key]
-        selected_bottom += selected[key]
+        baseline_bottom += right[key]
+        selected_bottom += left[key]
     axes[1].set_xticks(tier_x)
-    axes[1].set_xticklabels(["Baseline", "V2.4"])
+    axes[1].set_xticklabels([right_label, left_label])
     axes[1].set_ylim(0, 1.05)
     axes[1].set_ylabel("Fraction of env-runs")
     axes[1].set_title("Modeled Risk Tiers")
@@ -149,17 +146,17 @@ def build_semantic_risk_summary() -> None:
     bx = np.arange(len(behavior_labels))
     axes[2].bar(
         bx - width / 2,
-        [baseline[k] for k in behavior_keys],
+        [right[k] for k in behavior_keys],
         width=width,
-        color=colors["Baseline"],
-        label="Baseline",
+        color=colors[right_label],
+        label=right_label,
     )
     axes[2].bar(
         bx + width / 2,
-        [selected[k] for k in behavior_keys],
+        [left[k] for k in behavior_keys],
         width=width,
-        color=colors["V2.4"],
-        label="V2.4",
+        color=colors[left_label],
+        label=left_label,
     )
     axes[2].set_xticks(bx)
     axes[2].set_xticklabels(behavior_labels, fontsize=9)
@@ -169,10 +166,261 @@ def build_semantic_risk_summary() -> None:
     axes[2].grid(axis="y", alpha=0.25)
 
     fig.suptitle(
-        "Semantic Safety of Selected Policies: Baseline vs. Four-Objective V2.4",
+        "Semantic Safety of Selected Policies: Constraint-Aware vs. Unconstrained Stage-2",
         fontsize=14,
     )
     _save_figure(fig, "semantic_risk_4obj_summary.png")
+
+
+def build_phase_conditioned_action_summary() -> None:
+    aggregate = _load_json(RQ3_PHASE_ROOT / "phase_comparison.json")
+    methods = ["ours_stage2_v2_4", "no_constraint_stage2_4obj"]
+    method_labels = [aggregate[method]["display_name"] for method in methods]
+    method_colors = {
+        methods[0]: "#0a9396",
+        methods[1]: "#9b2226",
+    }
+    foothold_action_metrics = [
+        ("Decoy", "action_rate.decoy"),
+        ("Analyse", "action_rate.analyse"),
+        ("Sleep", "action_rate.sleep"),
+        ("Other", "action_rate.other"),
+    ]
+    foothold_target_metrics = [
+        ("Critical-path\nhost", "target_rate.critical_path_host"),
+        ("User\nhost", "target_rate.user_host"),
+        ("No target /\nother", "target_rate.no_target_or_other"),
+    ]
+
+    def _panel_values(
+        phase_key: str,
+        metrics: list[tuple[str, str]],
+    ) -> dict[str, list[float]]:
+        values: dict[str, list[float]] = {}
+        for method_name in methods:
+            phase_payload = aggregate[method_name]["phases"][phase_key]
+            values[method_name] = [
+                float(phase_payload[metric_key]) for _, metric_key in metrics
+            ]
+        return values
+
+    def _draw_grouped_bars(
+        ax: plt.Axes,
+        *,
+        metrics: list[tuple[str, str]],
+        values_by_method: dict[str, list[float]],
+        ymax: float,
+    ) -> None:
+        x = np.arange(len(metrics), dtype=float)
+        width = 0.34
+        for method_offset, method_name in enumerate(methods):
+            offsets = x + (method_offset - 0.5) * width
+            values = values_by_method[method_name]
+            bars = ax.bar(
+                offsets,
+                values,
+                width=width,
+                color=method_colors[method_name],
+                label=aggregate[method_name]["display_name"],
+            )
+            ax.bar_label(
+                bars,
+                labels=[f"{value:.2f}" for value in values],
+                padding=2,
+                fontsize=8,
+            )
+        ax.set_xticks(x)
+        ax.set_xticklabels([label for label, _ in metrics], fontsize=9)
+        ax.set_ylim(0.0, ymax)
+        ax.set_ylabel("Rate")
+        ax.grid(axis="y", alpha=0.25)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.8, 4.1))
+    ax_action, ax_target = axes
+
+    _draw_grouped_bars(
+        ax_action,
+        metrics=foothold_action_metrics,
+        values_by_method=_panel_values("foothold", foothold_action_metrics),
+        ymax=0.78,
+    )
+    _draw_grouped_bars(
+        ax_target,
+        metrics=foothold_target_metrics,
+        values_by_method=_panel_values("foothold", foothold_target_metrics),
+        ymax=0.82,
+    )
+
+    method_handles = [
+        plt.Rectangle((0, 0), 1, 1, color=method_colors[method], label=label)
+        for method, label in zip(methods, method_labels)
+    ]
+    fig.legend(
+        handles=method_handles,
+        frameon=False,
+        loc="upper center",
+        ncol=2,
+        bbox_to_anchor=(0.5, 0.98),
+    )
+    fig.subplots_adjust(left=0.07, right=0.98, bottom=0.14, top=0.78, wspace=0.25)
+    _save_figure(fig, "phase_conditioned_action_semantics.png")
+
+
+def build_phase_conditioned_action_dumbbell() -> None:
+    aggregate = _load_json(RQ3_PHASE_ROOT / "phase_comparison.json")
+    methods = ["ours_stage2_v2_4", "no_constraint_stage2_4obj"]
+    labels = {method: aggregate[method]["display_name"] for method in methods}
+    colors = {
+        methods[0]: "#0a9396",
+        methods[1]: "#9b2226",
+    }
+    foothold = {
+        method: aggregate[method]["phases"]["foothold"] for method in methods
+    }
+    metrics = [
+        (
+            "Foothold decoy share",
+            float(foothold[methods[0]]["action_rate.decoy"]),
+            float(foothold[methods[1]]["action_rate.decoy"]),
+        ),
+        (
+            "Foothold monitoring /\nlow-disruption share",
+            float(
+                foothold[methods[0]]["action_rate.analyse"]
+                + foothold[methods[0]]["action_rate.sleep"]
+                + foothold[methods[0]]["action_rate.other"]
+            ),
+            float(
+                foothold[methods[1]]["action_rate.analyse"]
+                + foothold[methods[1]]["action_rate.sleep"]
+                + foothold[methods[1]]["action_rate.other"]
+            ),
+        ),
+        (
+            "Foothold critical-path focus",
+            float(foothold[methods[0]]["target_rate.critical_path_host"]),
+            float(foothold[methods[1]]["target_rate.critical_path_host"]),
+        ),
+        (
+            "Foothold user-host focus",
+            float(foothold[methods[0]]["target_rate.user_host"]),
+            float(foothold[methods[1]]["target_rate.user_host"]),
+        ),
+    ]
+    precritical = {
+        method: aggregate[method]["phases"]["precritical"] for method in methods
+    }
+
+    fig = plt.figure(figsize=(10.6, 5.6))
+    gs = fig.add_gridspec(1, 2, width_ratios=[3.4, 1.5], wspace=0.16)
+    ax = fig.add_subplot(gs[0, 0])
+    ax_note = fig.add_subplot(gs[0, 1])
+
+    y = np.arange(len(metrics), dtype=float)[::-1]
+    for idx, (metric_label, left_value, right_value) in enumerate(metrics):
+        y_pos = y[idx]
+        ax.plot(
+            [left_value, right_value],
+            [y_pos, y_pos],
+            color="#b0b8c0",
+            linewidth=2.2,
+            solid_capstyle="round",
+            zorder=1,
+        )
+        ax.scatter(
+            left_value,
+            y_pos,
+            s=130,
+            color=colors[methods[0]],
+            edgecolors="white",
+            linewidth=1.0,
+            zorder=3,
+        )
+        ax.scatter(
+            right_value,
+            y_pos,
+            s=130,
+            color=colors[methods[1]],
+            edgecolors="white",
+            linewidth=1.0,
+            zorder=3,
+        )
+        ax.text(
+            left_value - 0.035,
+            y_pos + 0.12,
+            f"{left_value:.2f}",
+            ha="right",
+            va="center",
+            fontsize=9,
+            color=colors[methods[0]],
+        )
+        ax.text(
+            right_value + 0.035,
+            y_pos - 0.12,
+            f"{right_value:.2f}",
+            ha="left",
+            va="center",
+            fontsize=9,
+            color=colors[methods[1]],
+        )
+
+    ax.set_yticks(y)
+    ax.set_yticklabels([label for label, _, _ in metrics], fontsize=10)
+    ax.set_xlim(0.0, 1.05)
+    ax.set_xticks(np.linspace(0.0, 1.0, 6))
+    ax.set_xlabel("Rate")
+    ax.set_title("Foothold-Phase Semantic Gaps")
+    ax.grid(axis="x", alpha=0.25)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    legend_handles = [
+        plt.Line2D(
+            [0],
+            [0],
+            marker="o",
+            color="w",
+            markerfacecolor=colors[method],
+            markeredgecolor="white",
+            markeredgewidth=1.0,
+            markersize=10,
+            label=labels[method],
+        )
+        for method in methods
+    ]
+    ax.legend(handles=legend_handles, frameon=False, loc="lower right")
+
+    ax_note.axis("off")
+    ax_note.text(
+        0.02,
+        0.95,
+        "How to read this view\n\n"
+        "Each row is one foothold-phase semantic indicator.\n"
+        "The horizontal gap shows how far the two selected policies diverge.\n\n"
+        f"Pre-critical convergence:\n"
+        f"• Restore share = {precritical[methods[0]]['action_rate.restore']:.2f} vs {precritical[methods[1]]['action_rate.restore']:.2f}\n"
+        f"• Critical-path focus = {precritical[methods[0]]['target_rate.critical_path_host']:.2f} vs {precritical[methods[1]]['target_rate.critical_path_host']:.2f}\n\n"
+        "Critical-present is omitted because both selected policies have 0.00 mass there on the main three-seed replay.",
+        transform=ax_note.transAxes,
+        ha="left",
+        va="top",
+        fontsize=9.5,
+        bbox={
+            "boxstyle": "round,pad=0.45",
+            "facecolor": "#f6f7f9",
+            "edgecolor": "#d0d7de",
+        },
+    )
+
+    fig.suptitle(
+        "Selected-Policy Foothold Semantics: Dumbbell Comparison",
+        fontsize=14,
+        y=0.98,
+    )
+    fig.subplots_adjust(left=0.22, right=0.97, bottom=0.12, top=0.88)
+    _save_figure(fig, "phase_conditioned_action_semantics_dumbbell.png")
 
 
 def _normalize(values: list[float]) -> list[float]:
@@ -257,11 +505,19 @@ def build_candidate_set_parallel_coordinates() -> None:
 def _load_candidate_points() -> dict[str, list[dict]]:
     summary = _load_json(PAPER_4OBJ_ROOT / "table_a" / "table_a_summary.json")
     points_by_method: dict[str, list[dict]] = {}
+    allowed_methods = {"ours_stage2_v2_4", "stage1_only_4obj", "weighted_sum_4obj"}
     for method in summary["method_summary"]:
+        if method["method_name"] not in allowed_methods:
+            continue
         points: list[dict] = []
         for run in method["runs"]:
             buffer_data = _load_json(Path(run["artifact_path"]))
-            for record in buffer_data["pareto_front"]:
+            records = buffer_data.get("pareto_front")
+            if records is None:
+                records = buffer_data.get("records")
+            if records is None:
+                continue
+            for record in records:
                 obj = record["objective_vector"]
                 points.append(
                     {
@@ -422,108 +678,116 @@ def build_candidate_set_pairwise_matrix() -> None:
     _save_figure(fig, "candidate_set_4obj_pairwise_matrix.png")
 
 
-def _extract_casebook_seed_summary(seed: str) -> dict:
-    casebook = next(
-        (APPENDIX_ROOT / f"seed_{seed}").rglob("critical_casebook.md")
-    ).read_text()
-    step5_match = re.search(r"step 5:.*new=(Enterprise[01])", casebook)
-    step6_match = re.search(r"step 6: Blue `Restore` -> `(Enterprise[01])`", casebook)
-    enterprise_step_match = re.search(r"enterprise_foothold_step=(\\d+|None)", casebook)
-    response_step_match = re.search(r"first_relevant_blue_response=(\\d+|None)", casebook)
-    initial_blue_match = re.search(r"step 0: Blue `([^`]+)`", casebook)
-    top_actions = re.findall(r"- `Restore -> (Enterprise[01])`: `(\\d+)` containment steps", casebook)
-    return {
-        "seed": seed,
-        "initial_blue": initial_blue_match.group(1) if initial_blue_match else "Blue Action",
-        "enterprise_host": step5_match.group(1) if step5_match else "Enterprise0",
-        "restored_host": step6_match.group(1) if step6_match else "Enterprise0",
-        "enterprise_step": int(enterprise_step_match.group(1))
-        if enterprise_step_match and enterprise_step_match.group(1) != "None"
-        else 5,
-        "response_step": int(response_step_match.group(1))
-        if response_step_match and response_step_match.group(1) != "None"
-        else 6,
-        "top_actions": top_actions,
-    }
+def _paired_seed_summary(seed: str) -> dict:
+    return _load_json(RQ3_PAIRED_ROOT / f"seed_{seed}_summary.json")
 
 
 def build_attack_defense_timeline() -> None:
-    seeds = ["0007", "0011", "0019"]
-    summaries = [_extract_casebook_seed_summary(seed) for seed in seeds]
+    seed_summary = _paired_seed_summary("0011")
+    summaries = [
+        seed_summary["methods"]["ours_stage2_v2_4"],
+        seed_summary["methods"]["no_constraint_stage2_4obj"],
+    ]
 
-    fig, ax = plt.subplots(figsize=(11, 4.8))
+    fig, ax = plt.subplots(figsize=(6.2, 5.4))
     y_positions = np.arange(len(summaries))[::-1]
     colors = {
         "recon": "#94d2bd",
         "foothold": "#ee9b00",
         "restore": "#0a9396",
+        "critical": "#9b2226",
         "safe": "#005f73",
     }
 
     for y, summary in zip(y_positions, summaries):
-        ax.hlines(y, 0, 10, color="#c9d1d9", linewidth=6, alpha=0.55)
-        ax.scatter(2, y, s=90, color=colors["recon"], zorder=3)
-        ax.scatter(summary["enterprise_step"], y, s=140, color=colors["foothold"], zorder=3)
-        ax.scatter(summary["response_step"], y, s=150, color=colors["restore"], zorder=3)
-        ax.annotate(
-            f"Enterprise foothold on {summary['enterprise_host']}",
-            (summary["enterprise_step"], y),
-            textcoords="offset points",
-            xytext=(0, 14),
-            ha="center",
-            fontsize=9,
+        enterprise_step = summary.get("mode_enterprise_foothold_step")
+        response_step = summary.get("mode_response_step")
+        critical_step = summary.get("mode_first_critical_hit_step")
+        line_end = max(
+            [value for value in (enterprise_step, response_step, critical_step, 10) if value is not None]
         )
+        ax.hlines(y, 0, line_end + 1, color="#c9d1d9", linewidth=6, alpha=0.55)
+        ax.scatter(2, y, s=80, color=colors["recon"], zorder=3)
+        if enterprise_step is not None:
+            ax.scatter(enterprise_step, y, s=120, color=colors["foothold"], zorder=3)
+            ax.annotate(
+                f"Foothold\n{summary.get('mode_enterprise_host') or 'Enterprise host'}",
+                (enterprise_step, y),
+                textcoords="offset points",
+                xytext=(0, 16),
+                ha="center",
+                fontsize=8,
+                bbox={
+                    "boxstyle": "round,pad=0.22",
+                    "facecolor": "white",
+                    "edgecolor": "#d0d7de",
+                },
+            )
+        if response_step is not None:
+            ax.scatter(response_step, y, s=130, color=colors["restore"], zorder=3)
+            ax.annotate(
+                f"{summary.get('mode_response_action_name') or 'Response'}\n{summary.get('mode_response_target') or 'critical-path host'}",
+                (response_step, y),
+                textcoords="offset points",
+                xytext=(0, -30),
+                ha="center",
+                fontsize=8,
+                color=colors["restore"],
+                bbox={
+                    "boxstyle": "round,pad=0.22",
+                    "facecolor": "white",
+                    "edgecolor": "#d0d7de",
+                },
+            )
+        if critical_step is not None:
+            ax.scatter(critical_step, y, s=130, color=colors["critical"], zorder=3)
         ax.annotate(
-            f"Restore {summary['restored_host']}",
-            (summary["response_step"], y),
+            summary["outcome_label"],
+            ((critical_step if critical_step is not None else line_end), y),
             textcoords="offset points",
-            xytext=(0, -24),
+            xytext=(0, 11),
             ha="center",
-            fontsize=9,
-            color=colors["restore"],
-        )
-        ax.annotate(
-            "No critical breach through episode end",
-            (9.3, y),
-            textcoords="offset points",
-            xytext=(0, 8),
-            ha="right",
-            fontsize=9,
-            color=colors["safe"],
+            fontsize=8,
+            color=colors["critical"] if critical_step is not None else colors["safe"],
         )
         ax.text(
-            -0.35,
+            -0.58,
             y,
-            f"Seed {summary['seed']}\nidle={summary['initial_blue']}",
+            f"{summary['display_name']}\npolicy={summary['policy_id']}",
             ha="right",
             va="center",
-            fontsize=9,
+            fontsize=8.5,
         )
 
-    ax.set_xlim(-0.8, 10.5)
+    ax.set_xlim(-1.0, 12.4)
     ax.set_ylim(-0.7, len(summaries) - 0.3)
     ax.set_yticks([])
-    ax.set_xticks([0, 2, 5, 6, 10])
+    ax.set_xticks([0, 2, 5, 6, 9, 12])
     ax.set_xticklabels(
         [
-            "Step 0\nstart",
-            "Step 2\nuser compromise",
-            "Step 5\nenterprise foothold",
-            "Step 6\ncontainment",
-            "Step 10+\nno critical breach",
+            "0\nStart",
+            "2\nUser",
+            "5\nFoothold",
+            "6\nResponse",
+            "9\nCritical",
+            "12+\nOutcome",
         ]
     )
-    ax.set_title("Representative Attack-Defense Timelines for V2.4 Selected Policies")
+    ax.tick_params(axis="x", labelsize=8)
+    ax.set_title("Seed 0011 Paired Timeline", fontsize=11)
     ax.spines["left"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
 
     legend_handles = [
-        plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=colors["recon"], markersize=10, label="Early attack progress"),
-        plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=colors["foothold"], markersize=10, label="Enterprise foothold"),
-        plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=colors["restore"], markersize=10, label="Blue restore containment"),
+        plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=colors["recon"], markersize=8, label="Early attack progress"),
+        plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=colors["foothold"], markersize=8, label="Enterprise foothold"),
+        plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=colors["restore"], markersize=8, label="Blue response"),
+        plt.Line2D([0], [0], marker="o", color="w", markerfacecolor=colors["critical"], markersize=8, label="Critical hit"),
     ]
-    ax.legend(handles=legend_handles, frameon=False, loc="upper left")
+    ax.legend(handles=legend_handles, frameon=False, loc="upper center", ncol=2, fontsize=8)
+
+    fig.subplots_adjust(left=0.26, right=0.97, top=0.86, bottom=0.16)
 
     _save_figure(fig, "attack_defense_case_study_timeline.png")
 
@@ -531,6 +795,8 @@ def build_attack_defense_timeline() -> None:
 def main() -> None:
     _ensure_output_dir()
     build_semantic_risk_summary()
+    build_phase_conditioned_action_summary()
+    build_phase_conditioned_action_dumbbell()
     build_candidate_set_parallel_coordinates()
     build_candidate_set_3d_projection()
     build_candidate_set_pairwise_matrix()

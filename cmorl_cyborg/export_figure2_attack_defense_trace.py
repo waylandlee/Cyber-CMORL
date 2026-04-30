@@ -22,10 +22,11 @@ from .topology import topology_snapshot
 
 
 FIGURE2_CONTEXT = "Figure 2 tight fair-compare"
-TRACE_SCHEMA_VERSION = "figure2_attack_defense_trace.v1"
+TRACE_SCHEMA_VERSION = "figure2_attack_defense_trace.v2"
 DEFAULT_METHODS = ("ours_stage2_fair", "no_constraint_stage2_fair")
 DEFAULT_SEEDS = (7, 11, 19)
 DEFAULT_EVAL_EPISODES = 3
+DEFAULT_SELECTION_MODE = "default"
 DEFAULT_TIGHT_THRESHOLDS = {
     "d_business": -125.0,
     "d_cost": -22.0,
@@ -143,7 +144,12 @@ def select_figure2_replay_candidates(
     method_name: str,
     tight_summary: dict[str, Any],
     reevaluated_summary: dict[str, Any],
+    *,
+    selection_mode: str = DEFAULT_SELECTION_MODE,
 ) -> list[Figure2ReplayCandidate]:
+    if selection_mode not in {"default", "selected_only"}:
+        raise ValueError(f"Unsupported selection_mode: {selection_mode}")
+
     requested: list[tuple[str, str]] = []
 
     def add_candidate(label: str, policy_id: Any) -> None:
@@ -152,6 +158,22 @@ def select_figure2_replay_candidates(
         requested.append((label, str(policy_id)))
 
     add_candidate("selected", tight_summary.get("selected_policy_id"))
+    if selection_mode == "selected_only":
+        deduped_selected: list[Figure2ReplayCandidate] = []
+        seen_selected: set[str] = set()
+        for label, policy_id in requested:
+            if policy_id in seen_selected:
+                continue
+            seen_selected.add(policy_id)
+            deduped_selected.append(
+                Figure2ReplayCandidate(
+                    policy_id=policy_id,
+                    candidate_label=label,
+                    candidate_aliases=(label,),
+                )
+            )
+        return deduped_selected
+
     add_candidate("closest_candidate", reevaluated_summary.get("closest_candidate_policy_id"))
 
     if method_name == "no_constraint_stage2_fair":
@@ -534,6 +556,7 @@ def export_figure2_attack_defense_traces(
     seeds: Iterable[int] = DEFAULT_SEEDS,
     output_root: str | Path = default_output_root(),
     eval_episodes: int = DEFAULT_EVAL_EPISODES,
+    selection_mode: str = DEFAULT_SELECTION_MODE,
 ) -> list[Path]:
     exported_dirs: list[Path] = []
     for method_name in methods:
@@ -549,6 +572,7 @@ def export_figure2_attack_defense_traces(
                 method_name,
                 tight_summary,
                 reevaluated_summary,
+                selection_mode=selection_mode,
             )
             for candidate in candidates:
                 if candidate.policy_id not in record_lookup:
@@ -579,6 +603,12 @@ def main() -> None:
     parser.add_argument("--seeds", nargs="+", type=int, default=list(DEFAULT_SEEDS))
     parser.add_argument("--eval-episodes", type=int, default=DEFAULT_EVAL_EPISODES)
     parser.add_argument("--output-root", default=str(default_output_root()))
+    parser.add_argument(
+        "--selection-mode",
+        choices=("default", "selected_only"),
+        default=DEFAULT_SELECTION_MODE,
+        help="Choose whether to export the default shortlist or only the shared-threshold selected policy.",
+    )
     args = parser.parse_args()
 
     exported = export_figure2_attack_defense_traces(
@@ -586,6 +616,7 @@ def main() -> None:
         seeds=args.seeds,
         output_root=args.output_root,
         eval_episodes=args.eval_episodes,
+        selection_mode=args.selection_mode,
     )
     print(f"Exported {len(exported)} candidate trace directories to {Path(args.output_root)}")
 

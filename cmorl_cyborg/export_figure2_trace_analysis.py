@@ -39,6 +39,14 @@ DEFAULT_OUTPUT_ROOT = (
 )
 
 
+def _method_display_name(method_name: str) -> str:
+    mapping = {
+        "ours_stage2_fair": "Constraint-Aware Stage-2",
+        "no_constraint_stage2_fair": "Unconstrained Stage-2",
+    }
+    return mapping.get(method_name, method_name)
+
+
 def _load_json(path: str | Path) -> dict[str, Any]:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
@@ -356,6 +364,18 @@ def _plot_seed_heatmap(
     )
     compromise_image = None
     defense_image = None
+    method_names = sorted(
+        {
+            str(payload.get("method_name", ""))
+            for payload in candidate_payloads
+            if str(payload.get("method_name", ""))
+        }
+    )
+    title_prefix = (
+        _method_display_name(method_names[0])
+        if len(method_names) == 1
+        else " / ".join(_method_display_name(name) for name in method_names)
+    )
     for col, payload in enumerate(candidate_payloads):
         compromise, defense, ordered_hosts = _candidate_heatmap_arrays(payload["rows"], snapshot)
         ax_comp = axes[0][col]
@@ -411,7 +431,7 @@ def _plot_seed_heatmap(
                         va="bottom",
                         fontsize=8,
                     )
-    fig.suptitle(f"{DEFAULT_METHOD_NAME} seed {seed:04d} host-level attack-defense heatmap")
+    fig.suptitle(f"{title_prefix} seed {seed:04d} host-level attack-defense heatmap")
     if compromise_image is not None:
         fig.colorbar(compromise_image, ax=axes[0, :].tolist(), shrink=0.85, label="compromised rate")
     if defense_image is not None:
@@ -471,6 +491,7 @@ def export_figure2_trace_analysis(
             )
             candidate_payloads.append(
                 {
+                    "method_name": str(manifest.get("method_name", "")),
                     "candidate_label": candidate_label,
                     "policy_id": policy_id,
                     "rows": rows,

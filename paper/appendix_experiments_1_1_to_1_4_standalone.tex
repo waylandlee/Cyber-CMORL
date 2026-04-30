@@ -1,233 +1,2944 @@
-% Standalone copy-paste appendix fragment for Experiments 1.1--1.4.
-% Requires the same table packages as main.tex, in particular booktabs and graphicx.
-% This file intentionally inlines all table bodies and does not load external table files.
+% ACM CCS 2026-oriented rewrite
+% Main changes: security-first title/abstract/introduction, explicit threat model,
+% deployment-first results narrative, mandatory CCS 2026 appendices.
+\documentclass[sigconf,review,anonymous]{acmart}
+
+
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+% =========================
+% Packages
+% =========================
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amssymb}
+
+
+% =========================
+% Rights / Conference info
+% Keep ACM metadata for CCS-style submission.
+% Replace DOI / ISBN placeholders with camera-ready values after acceptance.
+% =========================
+\setcopyright{acmlicensed}
+\copyrightyear{2026}
+\acmYear{2026}
+\acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\acmISBN{978-x-xxxx-xxxx-x/2026/11}
+\acmConference[CCS '26]{2026 ACM SIGSAC Conference on Computer and Communications Security}{November 15--19, 2026}{The Hague, The Netherlands}
+\acmBooktitle{2026 ACM SIGSAC Conference on Computer and Communications Security (CCS '26), November 15--19, 2026, The Hague, The Netherlands}
+\acmPrice{15.00}
+
+% =========================
+% Title
+% =========================
+\title{Can Autonomous Cyber Defense Yield Both Effective and Deployable Guarantees? A Constrained Multi-Objective DRL Approach}
+% 真实受限的条件下，ACD是否可以实现可靠的防御 
+% Yielding Deployable Guarantees for Autonomous Cyber Defense: A Constraints Multi-Objective DRL Approach
+
+%最新的题目，有陈述句和疑问句两个版本
+%Learning Critical-Asset-Aware Policy Sets for Autonomous Cyber Defense under Operational Constraints
+%Can Autonomous Cyber Defense Be Both Effective and Deployable? A Constrained Multi-Objective Policy-Set Approach
+
+% 20260422 题目
+% Can Autonomous Cyber Defense Yield Both Effective and Deployable Guarantees? A Constrained Multi-Objective DRL Approach
+
+% =========================
+% Authors
+% =========================
+\author{Anonymous Author(s)}
+\affiliation{%
+  \institution{Anonymous Institution}
+  \country{}}
+\renewcommand{\shortauthors}{Anonymous Author(s)}
+
+% =========================
+% Abstract
+% 这是一版“能直接用来继续改”的 starter abstract
+% 20260419
+% 1.开头还是没把背景带出来。智能化攻防对抗导致ACD需要快速地针对攻击动作计算序贯决策，特别是在xxx、xxx等现实场景的防御部署中。
+% 2.实验结果有没有亮眼的数据，比如具体提升了%多少，或者有没有一些比较反直觉的结果？
+% 3.摘要里面部分用词不是很准确（business impact、operational constraints），这个能不能参考一下
+% =========================
+\begin{abstract}
+% Autonomous Cyber Defense(ACD) requires sequential decision-making under competing defensive objectives. 
+% Defenders must confront attackers while preserving continuity, limiting cost, and decreasing disruption, making the problem inherently constrained and multi-objective. 
+% However, most existing learning-based approaches optimize a scalarized objective or produce a single deployable policy. 
+% In this paper, we formulate an autonomous defender as a constrained multi-objective reinforcement learning problem with three objectives: security effect, business impact, and defense cost. 
+% We adopt a two-stage Pareto-oriented learning framework that first-phase learns an initial set of preference-diverse defense policies and then expands the policy set under operational constraints to improve the Pareto-frontier quality and deployment flexibility. 
+% We evaluate both candidate-set quality and final deployment quality in CybORG++ using Pareto metrics, preference-conditioned utility, and cyber-semantic outcomes. 
+% Experiment results show that our approach yields higher-quality policy sets, broader preference coverage, and stronger feasible deployment choices under strict operational constraints than scalarization-based and conditioned-policy baselines.
+
+% %按照上述要求，新修改的摘要
+% AI-enabled attack--defense interaction makes autonomous cyber defense a time-sensitive sequential decision problem: in lateral-movement containment and ransomware-style response, defenders must suppress attacker progress without disrupting critical services or exhausting response capacity. 
+% Existing learning-based defenses typically collapse these trade-offs into a scalarized reward or a single operating point, which poorly matches organizations with heterogeneous tolerances for residual risk, service disruption, and response overhead. 
+
+% We formulate blue-team defense in CybORG++ as a constrained multi-objective reinforcement learning problem with three deployment objectives: security effectiveness, service continuity, and response overhead. We learn deployable defense policy sets through a two-stage Pareto-oriented framework that initializes preference-diverse policies and expands them via constraint-aware Pareto optimization. 
+% Under a common constrained protocol, our method improves hyper-volume by 62.2\% over weighted-sum scalarization, increases expected utility by 36.3 points, and reduces mean constraint violation by 38.8\% while maintaining competitive security performance. 
+% These results suggest that autonomous cyber defense is better framed as constrained trade-off management over deployable policy sets than as single-policy reward maximization.
+
+% %  20260420 熊改
+% LLM-enabled cyber-attacks have posed a realistic threat in cyber-space. The autonomous cyber defense (ACD) is a promising technology in confronting AI-enabled attacks. 
+% However, the deep reinforcement learning (DRL) based decision-making of ACD in preventing lateral-movement and responding ransomware in IT\&OT scenarios is a time-sensitive sequential decision problem. 
+% Existing methods typically collapsed the problem into a scalarized reward or a single operating point, which ignored the disruptions of critical services or exhausting defending resource in hindering sophisticated attackers.
+
+% This paper presents a constrained multi-objective DRL method for ACD agents by formulating the defender with 3 deployable objectives: security effectiveness, service continuity, and response overhead. 
+% %括一句，细写一下自己的修改，添加了基于环境中的实际语义，多加一点
+% We propose a two-stage Pareto-oriented framework that initializes preference-diverse policies and expands them via the constraint-awared Pareto optimization to yield deployable policy sets in ACD.
+% % 因为摘要后面可能不能修改了，所以现在里面的实验结果最好确认好，别修改后对不上
+% By implemented in the CybORG++ simulators, our method improves hyper-volume by 62.2\% over weighted-sum scalarization, increases expected utility by 36.3 points, and reduces mean constraint violation by 38.8\% while maintaining competitive security performance. 
+% These experiments show that a constrained trade-off management over multi-objective policy sets can enable the ACD agent with more deployable guarantees than straightforward single-policy reward maximization.
+% %最后进行升华，升华到一类的领域问题
+
+
+% %20260422在上面基础上最新修改的摘要
+% LLM-enabled cyber attacks pose a realistic threat in cyberspace, and the autonomous cyber defense (ACD) is a promising technology for confronting AI-enabled attacks.
+% However, deep reinforcement learning (DRL)-based decision-making for ACD in preventing lateral-movement and responding ransomware in IT\&OT scenarios is a time-sensitive sequential decision problem.
+% Existing methods typically collapse the problem into a scalarized reward or a single operating point, which ignored the disruptions of critical services, exhausting defending resource, and rising critical risks in hindering sophisticated attackers.
+
+% This paper presents a constrained multi-objective DRL method for ACD agents by formulating the defender with four deployment objectives: \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}.
+% Instead of learning a single reward-maximizing policy, our method constructs a deployable policy set through cyber-semantic objective design and constraint-aware Pareto expansion, so that different operational preferences can be served without retraining.
+% We propose a two-stage Pareto-oriented framework that initializes preference-diverse policies and expands them via constraint-aware Pareto optimization to yield deployable policy sets for ACD.
+
+% In enterprise cyber-range evaluations with partial observability, lateral movement, and critical assets, our method achieves $3.9\times$ higher hypervolume than weighted-sum scalarization, raises expected utility from $-161.57$ to $-41.92$, increases feasible deployment rate from $0.00$ to $0.64$, and reduces mean constraint violation from $93.54$ to $0.09$, with zero final critical compromised hosts and zero critical-impact events.
+% These experiments show that constrained trade-off management over multi-objective policy sets can provide ACD agents with stronger deployment viability than straightforward single-policy reward maximization.
+% More broadly, our results suggest that safety-critical autonomous response problems are better framed as deployment-aware constrained policy selection, rather than as single-policy scalar reward maximization.
+
+% 20260422-熊改
+% 今天再修改的话，在这个版本基础上进行，并且修改最好采用注释的方法，保留被修改内容。
+LLM-enabled cyber attacks pose a realistic threat in cyberspace, and the autonomous cyber defense (ACD) is a promising technology for confronting AI-enabled attacks.
+However, deep reinforcement learning (DRL)-based decision-making for ACD in preventing lateral-movement and responding ransomware in IT\&OT scenarios is a time-sensitive sequential decision problem.
+Existing methods typically collapse the problem into a scalarized reward or a single operating point, which ignored the disruptions of critical services, exhaustion of defending resource, and rising critical risks in hindering sophisticated attackers.
+
+This paper presents a constrained multi-objective DRL method for ACD agents by formulating the defender with four deployable objectives: \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}.
+Instead of maximizing a single reward policy, our method constructs a deployable policy set through cyber-semantic objectives and constraint-aware Pareto expansion, which different operational preferences can be realized without re-training.
+We propose a two-stage Pareto-oriented framework that initializes preference-diverse policies and expands them via constraint-aware Pareto optimization to yield a deployable policy set for ACD.
+By implemented in the CybORG++ simulators, our method achieves \textbf{$3.9\times$} higher hypervolume than weighted-sum scalarization, raises expected utility from $-161.57$ to $-41.92$, increases feasible deployment rate to $0.64$, and reduces mean constraint violation from $93.54$ to $0.09$, without critical compromised hosts and critical-impact events.
+These experiments show that a constrained trade-off management over multi-objective policy sets can enable the ACD agent with more deployable guarantees than straightforward single-policy reward maximization.
+
+\end{abstract}
+
+    %Network Security track
+%This paper is best suited for the Network Security track. It addresses autonomous cyber defense (ACD) for enterprise networks, where a blue-team agent must respond to lateral movement, service-impacting attack behavior, and attempts to reach critical assets under partial observability. The core security question is not the security or privacy of an ML model, but whether an autonomous network defender can provide deployable response choices that suppress attacker progress while respecting operational constraints. We therefore use DRL as a mechanism for ACD, not as the object of study. The paper formulates blue-team defense as a constrained four-objective problem—Security Effectiveness, Business Continuity, Defense Cost, and Critical-Asset Safety—and learns a Pareto policy set selected at deployment time under different organizational preferences. The threat model and evaluation are grounded in a controlled CybORG++ enterprise cyber-range setting with partial observations, standardized red-team behavior, lateral-movement paths, and critical hosts. The actionable insight is that scalarized single-policy defenses can hide unacceptable service disruption or critical-asset risk, while constrained policy sets expose deployable trade-offs and support critical-asset-aware containment decisions under operational constraints.
+
+% 20260422 Track Justification Statement 熊改
+% 参考下面的内容，不要用大模型直接生成或者翻译，好多用词都不准确。
+% This paper is best suited for the track of Network Security. It addresses Autonomous Cyber Defense (ACD) for typical enterprise scenarios, where a defense agent must respond to APT attacks, such as exploitation of vulnerability, lateral movement, service-impacting, and attempts to reach critical assets, under partial observability. The core security question is not the security or privacy of an ML model, but whether an ACD agent can yield deployable response choices that interrupt attacking progress while complying with operational constraints. Therefore, we employ Deep Reinforcement Learning (DRL) as the decision-making mechanism for ACD. The paper formulates the ACD agent as a constrained multi-objective problem with 4 diverse metrics—Security Effectiveness, Business Continuity, Defense Cost, and Critical-Asset Safety—and generates a Pareto policy set selected at deployment time under different preferences. Experiments and evaluations are implemented in the CybORG++ simulator. The insight is that existing DRL methods with scalarized single-policy can hide unacceptable service disruption or critical-asset risk, while constrained policy sets reach deployable trade-offs and support critical-asset-aware decisions under operational constraints.
+
+% =========================
+% CCS Concepts
+% =========================
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>10002978.10002991.10002994</concept_id>
+  <concept_desc>Security and privacy~Intrusion/anomaly detection and malware mitigation</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10010147.10010257.10010293.10010294</concept_id>
+  <concept_desc>Computing methodologies~Reinforcement learning</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Security and privacy~Intrusion/anomaly detection and malware mitigation}
+\ccsdesc[500]{Computing methodologies~Reinforcement learning}
+
+% =========================
+% Keywords
+% =========================
+\keywords{autonomous cyber defense,
+constrained multi-objective optimization,
+deep reinforcement learning}
+% 关键词中不要有blue-team automation
+% 20260426 看一下其他文章怎么写关键词的，细节的内容不要，把大的方法总结出来
+
+
+\begin{document}
+
+\maketitle
+
+% 正文里面除了最后实验的CybORG++的内容，也不要出现blue-team这个词，可以用ACD agent替换，因为我们是研究的一个大类的问题。而且正文里面除了最后实验也不要出现CybORG++和CybORG++的描述和内容，我们只是最后在CybORG++里面做了一个实现，整个问题不是去研究CybORG++的环境是什么样的，而是从典型场景下的问题出发，归纳总结出方法与技术，最后在CybORG++中进行了实验与评估。
+
+
+%给方法起了一个名字DA-CPSL: Defense-Aware Constrained Policy-Set Learning
+
+% 20260426 现在正文里面的用词为什么没有和摘要里面的用词对应？好多用词还是不准确。dwell， operational setting， replay-level semantic audit， evaluation protocol，这都不对
+
+\section{Introduction}
+\label{sec:introduction}
+
+The modern enterprise network often suffers from APT attacks, in which attackers with an initial foothold conduct discovery, execute compromises, make lateral movements, and eventually disrupt business or operational processes.
+AI-driven ATP attacks pose a realistic threat with the raising reasoning capabilities of LLMs.
+Autonomous cyber defense (ACD), as an AI-powered defense technology, is increasingly being studied as a way to shorten defenders' response loops confronting sophisticated attacks.
+Prior works on ACD have emphasized deep reinforcement learning (DRL) as the decision-making mechanism in a partially observable simulator for training an agent ~\cite{vyas2023automated,palmer2023drlsurvey,standen2021cyborg}.
+However, an ACD agent requires effective and deployable guarantees in enterprise networks with critical IT and OT services.
+Defensive actions are operational interventions that disrupt services, consume resources, or create unacceptable exposure around critical assets.
+In IT/OT-adjacent environments, this distinction is especially important because operational technology security must account for performance, reliability, and safety requirements in addition to ordinary cybersecurity objectives~\cite{nist_sp80082r3}.
+
+% This paper proposes a constrained multi-objective model for ACD rather than a single scalar-reward maximization problem.
+% First, real response actions induce competing objectives: containment, business continuity, response burden, and critical-asset protection cannot always be improved simultaneously. 
+% Second, security and operational preferences are not fixed. 
+% A defender needs a continuity-preserving policy in an incident phase and a more aggressive containment policy in another. 
+% Third, strict limits cannot be reduced to preference weights: a policy that has high average utility may still be unacceptable if it causes excessive disruption or allows critical-asset compromise.
+% Although, existing DRL-based ACD methods have demonstrated useful progress in cyber ranges and reward shaping~\cite{applebaum2022bridging,foley2022autonomous,bates2023reward}, they commonly focus on learning a single operating point or improving average return, leaving less support for policy-set selection under explicit operational limits.
+% % 20260426 引用多一些顶刊顶会
+
+% By formulating the ACD as a constrained multi-objective decision-making problem, the defender operates under partial observability and selects host-level actions from defender-visible information. 
+% The APT attacker is modeled in the ATT\&CK framework with several phases to compromise an enterprise network. 
+% The multiple objectives include 4 operational metrics: \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}. 
+% And the output of strategies becomes an archive of candidate policies with an assignment rule that selects only among policies satisfying strict operational limits.
+% 20260426 introduction里面具体方法的过程和实验结果不需要写这么多，而是要把为什么要用这个算法的原因和怎么去设计这个算法说清楚，具体怎么做的要在后面详细说明。
+% 第一句，传统经典方法为什么不行，有什么问题，所以要考虑从2个阶段来求解策略集合
+% 第二句，整体说一下2个阶段是什么，之间是什么关系，分别完成了什么工作
+% 第三句，这个算法怎么和ACD问题适配的
+% 下面的三段内容重新梳理，合成一段话
+
+Existing learning-based ACD methods are not well aligned with this deployment requirement.
+Scalarized DRL reduces security effectiveness, service continuity, response overhead, and critical-asset risk into a single reward, which can hide unacceptable behavior behind a high average return.
+Preference-conditioned MORL methods can adapt to different objective weights, but they still tend to represent deployment preferences as soft trade-offs rather than strict operational limits~\cite{vanmoffaert2013scalarized,yang2019generalized,basaklar2022pdmorl,lu2023morl,roijers2013survey,hayes2022practical}.
+Constrained RL provides mechanisms for optimizing under safety or cost constraints, but standard constrained formulations usually return one operating policy for one specified constraint setting~\cite{altman2021cmdp,achiam2017cpo,liu2020ipo,paternain2019duality}.
+For ACD, these limitations are consequential. Different phases may require different trade-offs between effectiveness and deployments, and strict limits on business disruption, defense cost, or critical-asset compromise must reject unacceptable policies regardless of scalar utility.
+Therefore, ACD requires not only multi-objective optimization, but also constrained learning methods and policy assignment under explicit operational limits.
+
+We formulate ACD as a constrained multi-objective decision-making problem.
+The defender operates under partial observability and selects defensive responses, while the attacker is modeled in the ATT\&CK framework.
+The ACD agent is optimized over 4 objectives: \emph{Security Effectiveness}, \emph{Business Continuity}, \emph{Defense Cost}, and \emph{Critical-Asset Safety}.
+The strategy is not the optimal defense policy, but an evaluated candidate defense policies with a constrained assignment rule.
+% In this formulation, preferences specify how to rank acceptable trade-offs, whereas strict operational limits specify behavior that must be rejected regardless of scalar utility.
+% Given an operational preference, the agent selects a policy only from the acceptable Pareto set. if no candidate satisfies the specified limits, the assignment is marked infeasible rather than forcing a high-utility but unacceptable policy.
+
+Inspired by policy-set multi-objective reinforcement learning, including recent two-stage Pareto-front discovery methods~\cite{roijers2013survey,hayes2022practical,liu2025cmorl}, we propose \emph{Defense-Aware Constrained Policy-Set Learning} (DA-CPSL). 
+DA-CPSL learns constrained multi-objective strategies in two stages. 
+Stage~1 trains preference-diverse initial policies over diverse objectives. 
+Stage~2 extends selected candidate policies toward individual objective directions while preserving other objectives and enforcing operational constraints. 
+Each candidate is evaluated not only by objective returns, but also by operational violations and semantic filters. In assignments, DA-CPSL selects a policy from the acceptable Pareto set under a preference. 
+If no candidate satisfies the specified limits, the assignment is marked infeasible rather than forcing a high-utility but unacceptable policy. 
+
+% We evaluate DA-CPSL in a controlled enterprise cyber-range
+% instantiation. The evaluation uses CybORG++ Scenario2, which builds on
+% the CybORG line of environments for autonomous cyber agents and provides
+% partial observations, post-compromise attacker progression, host-level
+% defensive actions, and critical-asset compromise semantics
+% ~\cite{standen2021cyborg,emerson2024cyborgpp}. We use the cyber range as
+% an experimental realization of the threat model, not as the source of
+% the problem definition. Our evaluation separates three forms of evidence:
+% objective-space archive quality, operational assignment under shared
+% strict limits, and replay-level critical-risk semantics.
+
+% Across three seeds, DA-CPSL produces the strongest four-objective
+% policy archive among the evaluated methods. Compared with weighted-sum
+% scalarization, it achieves \(3.9\times\) higher hypervolume, improves
+% expected utility from \(-161.57\) to \(-41.92\), increases the
+% feasible-assignment rate to \(0.64\), and reduces mean constraint
+% violation from \(93.54\) to \(0.09\). Replay-level semantic audit shows
+% no observed critical breach or persistent critical breach for the
+% selected DA-CPSL policy under the fixed replay protocol, while
+% near-miss trajectories remain visible. These results support a bounded
+% claim: DA-CPSL improves pre-critical containment under the evaluated
+% threat model and cyber-range protocol, but it does not provide formal
+% safety guarantees, production-readiness guarantees, or elimination of
+% all cyber risk.
+
+% 部分用词要参照修改
+The main contributions are as follows:
+\begin{itemize}
+    \item Formulating the ACD as a constrained multi-objective problem, the model separates trade-offs of objective, constraints of acceptance, and assignments of preference-conditioned to yield deployable guarantees.
+    \item Introducing semantics of security as the first-class objective for critical-asset
+     in ACD deploying in the enterprise network, we define it to describe how a sophisticated attack can break into the critical system.
+    \item Proposing the DA-CPSL algorithm to calculate the Pareto-front, we generate a defense-aware constrained policy-set from DRL training that constructs an evaluated archive, extends policies through acceptance-aware Pareto extension, and assigns policies only from the acceptable Pareto set.
+\end{itemize}
+% 20260426 加一段本文后续章节的安排
+
+
+The remainder of this paper is organized as follows.
+Section~\ref{sec:problem-threat} introduces the problem setting and threat model.
+Section~\ref{sec:formulation} formalizes constrained multi-objective ACD with operational objectives, strict limits, and Critical-Asset Safety.
+Section~\ref{sec:learning} presents the DA-CPSL learning framework.
+Sections~\ref{sec:evaluation-setup} and~\ref{sec:evaluation-results} describe the experimental setup and evaluation results.
+Section~\ref{sec:related-work} discusses related work, and Section~\ref{sec:conclusion} concludes the paper.
+
+
+
+\section{Problem Setting and Threat Model}
+\label{sec:problem-threat}
+
+% 20260426 啥叫Operational Setting?
+\subsection{Problem Setting}
+\label{subsec:operational-setting}
+
+The Stuxnet and cyber-attacks on the Ukrainian power grid have shown that confrontations in cyberspace are becoming more.
+Deploying ACD for a typical enterprise network with IT/OT zones shown in Figure~\ref{fig:cyborg-topology}, we model the scenario including ordinary clients, business-relevant servers, and high-value OT assets, where adversarial actions will make unacceptable impact~\cite{nist_sp80082r3}. 
+Therefore, we mainly focus on the cyber-defend in the IT/OT environment rather than physical-process control.
+
+This setting is inherently multi-objective. A defensive response that improves security may interrupt a business service, consume scarce response capacity, or introduce operational side effects if applied too aggressively.
+Conversely, delaying intervention may preserve short-term continuity and reduce immediate response burden, but it may allow long-term persistence and exploitation to critical assets.
+Therefore, the defender cannot be characterized by average rewards simply, it must manage diverse competing objectives under strict constraints with operational acceptance.
+
+The main problem is the decision-making for ACD in the typical enterprise network with constrained multi-objectives. 
+The ACD agent can precept partial-observable information and generate optimal strategies under diverse preferences and strict limits. 
+% The system boundary is the decision layer of autonomous defense: the defender selects response actions from defender-visible observations, and the learned archive supports policy selection under operational preferences and strict limits. We do not design enterprise monitoring or security-orchestration infrastructure, nor do we model physical-process control.
+
+% 说了多少次了，除了实验部分不要说CybORG！！！！
+% 这个图不要直接用CybORG的，自己画一下，划分3个区域，把攻防过程也体现出来
+% \begin{figure}[t]
+%     \centering
+%     \includegraphics[width=\columnwidth]{images/Cyber-range_topology.pdf}
+%     \caption{\textbf{Topology of typical enterprise networks.}
+%     Red arrows summarize the attacking process from the initial foothold to the critical operational server. The blue dashed denotes the defender's partial observation and host-level response scope. The highlighted server is the critical asset used for Critical-Asset Safety and semantic audit.}
+%     \label{fig:cyborg-topology}
+% \end{figure}
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[width=\columnwidth]{images/Cyber-range_topology.pdf}
+    \caption{\textbf{Topology of typical enterprise networks.}
+    Red arrows summarize the attacking process from the initial foothold to the critical operational server. Blue dashed arrows denote autonomous defense actions from an ACD agent with partial observability. The highlighted server represents the critical asset.}
+    \label{fig:cyborg-topology}
+\end{figure}
+
+% % 这段按照后面修改后的图进行梳理，主要是按图说话。
+% Figure~\ref{fig:cyborg-topology} visualizes the topology of typical enterprise networks and attack-defense confrontations in this work. 
+% The topology contains user, enterprise, and operational subnets separated by routing and firewall/ACL components. 
+% The red path abstracts the post-compromise progression of the baseline attacker from an initial user-side foothold, through the enterprise subnet, toward the critical operational server.
+% The blue defender operates under partial observability and issues host-level response actions based on defender-visible telemetry.
+% The figure is intended to clarify the threat-model semantics; the formal decision process and objective definitions are given below.
+% As shown in Figure~\ref{fig:cyborg-topology}, a generic topology of enterprise network can be divided into 3 subnets including user-zone, enterprise-zone, and operational-zone, with firewalls to limit direct connections between zones.
+% The red trajectory depicts a sophisticated attacker that starts from a user-side endpoint to establish foothold and attempts to compromise a critical operational server.
+% The ACD agent detects partial traces of adversaries and yields response, such as analysis, deception, removal, and restoration, to protect a selected asset.
+
+\subsection{Threat Model}
+\label{subsec:threat-model}
+
+\paragraph{Adversary.}
+The adversary is modeled by the ATT\&CK framework, which obtains an initial foothold in the enterprise network and attempts to compromise high-value or critical assets in IT/OT subnets.~\cite{vyas2023automated,palmer2023drlsurvey}.
+% 20260427 三个阶段的名字修改完毕了，暂时先用这3个名字
+We model the whole attacking process into 3 phases. 
+In the \emph{foothold-establishing} phase, the attacker has compromised non-critical assets in the user-subnet to support further lateral movements.
+In the \emph{pre-critical compromising} phase, some assets in the enterprise subnet have been compromised, and the compromising process creates exposures of critical-asset in the operation-subnet.
+In the \emph{critical-breaching} phase, at least one critical asset in the operational subnet is compromised.
+
+% 20260427 下面这一段内容不清楚要说什么，建议简化一下，只突出我们关注的（CybORG里面有的）。现在写的感觉文中的模型很简单，建议看一下CybORG的文章，把里面对攻击过程的描述复用一下。结合拓扑图说明的的内容，要从具体的流程角度说的清楚一些，看一下ATT&CK框架里面怎么说的，把哪些专有名词放过来，比如建立立足点可以通过phishing，后面通过漏洞利用和横向移动最好也找一个具体的TTP名称，这样看着模型是比较真实。
+% We focus on post-compromise progression rather than the full intrusion lifecycle.
+% We do not model initial access, phishing, exploit generation, supply-chain compromise, physical sabotage, or an online adaptive attacker that observes and co-learns against the current defense policy.
+% These exclusions keep the threat model centered on operational response to attacker progression.
+
+% The red trajectory in Figure~\ref{fig:cyborg-topology} summarizes the attacker progression used throughout the paper: an initial foothold in the user-facing part of the network can develop into enterprise foothold, then pre-critical exposure, and finally realized compromise of the critical operational server.
+% We use this abstraction to define critical-risk semantics, not to model the full intrusion lifecycle.
+The establishment of a foothold can be interpreted as the outcome of an upstream \emph{Initial Access} (TA0001) technique such as \emph{Phishing} (T1566).
+Then an attacker performs \emph{Remote System Discovery} (T1018) and \emph{Network Service Discovery} (T1046) to identify reachable hosts and exposed vulnerable services, uses \emph{Exploitation of Remote Services} (T1210) and \emph{Privilege Escalation} (TA0004) to expand control, pivots from the user subnet into enterprise servers, and attempts to reach the operational subnet by \emph{Lateral Movement} (TA0008).
+The ultimate goal is conducting \emph{Exfiltration} (TA0010) and \emph{Impact} (TA0040) to highly confidential data and high-value asset~\cite{mitre_attack_enterprise}.
+% 这里就写攻击者，把ATT&CK框架里面TA00xx那一层写出来就行
+% Accordingly, the defender is evaluated on whether host-level analysis, deception, removal, and restoration can contain this lateral progression before enterprise compromise develops into pre-critical exposure or a realized critical-asset breach.
+
+\paragraph{Defender.}
+In the AICA framework~\cite{kott2023aica}, the ACD is an agent that repeatedly perceives the environment, identifies the current situation, selects a response action, executes actions through available interfaces, and updates its knowledge for future decisions~\cite{kott2023aica}. 
+
+At time \(t\), the ACD agent perceives a partial observation \(o_t\) derived from alerts, logs, and other security-relevant information. 
+The ACD agent cannot observe the whole status of environments, including the true compromise status of every host, the current privilege level, the attacking plan, or future exploitations. 
+Therefore, the defender can be modeled as a finite-horizon partially observable Markov decision process (POMDP), where a strategy maps an observation history \(h_t=(o_0,a_0,\ldots,o_t)\) to a defensive action \(a_t\)~\cite{standen2021cyborg,kiely2023cage2}. 
+
+In Figure~\ref{fig:cyborg-topology}, blue dashed lines denotes the ACD agent's observations and actions across subnet.  
+As the red trajectory progresses from a user-side foothold toward enterprise servers and the critical operational asset, the ACD agent can select different interventions, such as monitoring or analyzing a suspicious host, deploying decoy services as honeypots, removing malicious code, restoring a compromised host or server from a clean backup, or enforcing containment by updating firewall rules at subnet boundaries. 
+These choices are sequential decisions rather than independent responses. 
+For example, analyzing a host preserves service continuity but delays remediation; deploying a decoy can slow exploitation and lateral movement but consumes hardware resources; adding firewall rules can protect the operational subnet but may interrupt legitimate business traffic; and restoration can clear a deeply compromised host but causes stronger service disruption. 
+Thus, different defense policies correspond to different ways of trading containment speed, operational disruption, response burden, and critical-asset protection along the same attacker progression.
+
+\paragraph{Critical assets and security semantics.}
+
+In an enterprise network with IT/OT-converged operators, critical assets include systems that support remote access, engineering workflows, historical data, and other high-value services. And these systems use cyber entities, such as PCs, servers, PDAs, and other digital platforms, to provide services, which contains potential cybersecurity vulnerabilities.
+
+Let \(\mathcal{E}\) denotes the set of cyber entities, \(\mathcal{K}\subseteq\mathcal{E}\) denotes the set of critical-asset set, and \(C_t\subseteq\mathcal{E}\) denotes the set of compromised entities at time \(t\). Then the indicator of critical-breaches can be denoted as:
+\begin{equation}
+b_t^{\mathrm{crit}}
+:=
+\begin{cases}
+1, & \text{if } C_t\cap\mathcal{K}\neq\varnothing,\\
+0, & \text{otherwise}.
+\end{cases}
+\label{eq:threat-critical-breach}
+\end{equation}
+For compactness, we use \(\mathbf{1}[\cdot]\) to denote the indicator function in the following definitions. 
+Similarly, we define the pre-critical exposure indicator as
+\begin{equation}
+b_t^{\mathrm{pre}}
+=
+\mathbf{1}\!\left[
+C_t\cap\mathcal{K}=\varnothing
+\;\land\;
+\rho(C_t,\mathcal{K})>0
+\right],
+\label{eq:threat-precritical}
+\end{equation}
+The condition \(\rho(C_t,\mathcal K)>0\) indicates that at least one currently compromised non-critical entity creates a potential exposure to a critical asset. 
+Thus, \(b_t^{\mathrm{pre}}=1\) denotes a current pre-critical exposure state, whereas \(b_t^{\mathrm{crit}}=1\) denotes an already realized critical-asset compromise. 
+The condition \(C_t\cap\mathcal K=\varnothing\) ensures that the two indicators are mutually exclusive at each time step.
+
+These indicators are not additional observations used for decision-making. 
+Meanwhile, they are used to define security semantics for generalized safety of critical assets under cyber-attacks, and evaluate whether a strategy with high-score in average rewards can exhibit unacceptable risks in critical assets. Detailed definitions are formalized in Section~\ref{sec:formulation} and Appendix~\ref{app:critical-audit}.
+
+% \subsection{Operational Preferences and Scope}
+% \label{subsec:operational-preferences-scope}
+
+% Organizations differ in how they trade off containment, service
+% continuity, response burden, and critical-asset protection. We represent
+% these differences through operational preferences over four objectives:
+% \emph{Security Effectiveness}, \emph{Business Continuity},
+% \emph{Defense Cost}, and \emph{Critical-Asset Safety}. Preferences,
+% however, are not strict limits. A preference specifies how an organization
+% ranks acceptable trade-offs, whereas a strict operational limit specifies
+% behavior that must be rejected regardless of scalar utility.
+
+% Under this threat model, the research object is not a universally
+% optimal autonomous defender. It is a finite archive of candidate defense
+% policies whose members expose different trade-offs among containment,
+% continuity, response cost, and Critical-Asset Safety, together with a
+% constrained selection rule that chooses an acceptable policy under
+% operator-specified preferences and strict operational limits. If \(\Pi_{\mathrm P}^{\mathrm{dep}}(\Pi,\boldsymbol{\delta})=\varnothing\), the assignment is marked as archive-level infeasible: under the current evaluated policy archive and the specified operational limits, no deployable learned policy is available. 
+
+
+
+\section{Formal Model of Constrained Multi-Objective ACD}
+\label{sec:formulation}
+
+
+
+% We model autonomous defense as a finite-horizon partially observable multi-objective decision process:
+As described in Section~\ref{sec:problem-threat}, the model can be formalized as a finite-horizon, partially observable, constrained multi-objective decision-making problem of ACD. 
+By separated objective trade-offs, strict constraints, and preference-conditioned policy, this model can transform a single scalar reward into a constrained multi-objective DRL-based ACD~\cite{roijers2013survey,hayes2022practical,altman2021cmdp}.
+And we formulated the model by a constrained multi-objective partially observable Markov decision process (CMO-POMDP) in a typical enterprise network, and can be denoted as:
+% 
+\begin{equation}
+\mathcal{M}
+=
+\langle
+\mathcal{S},
+\mathcal{O},
+\mathcal{A},
+\mathcal{\Pi},
+P,
+Z,
+\mu_0,
+\mathcal{R},
+\gamma,
+T
+\rangle .
+\label{eq:defense-process}
+\end{equation}
+% where, \(s_t\in\mathcal{S}\) is the state, \(o_t\in\mathcal{O}\) is the observation and \(a_t\in\mathcal{A}\) is the action, \(\pi \in \mathcal{\Pi}\) is the strategy.
+% \(Z(o_t\mid s_t)\) is the observation function, \(\mu_0\) is the distribution of initial states, and the transition function \(P(s_{t+1}\mid s_t,a_t)\) captures interactions and evolutions in the process.
+% \( \mathbf{r} \in \mathcal{R}\) is the reward vector.
+
+where \(s_t\in\mathcal{S}\) denotes the underlying cyber state,  \(o_t\in\mathcal{O}\) denotes the defender's partial observation, and \(a_t\in\mathcal{A}\) denotes the defense action. 
+The strategy \(\pi\in\mathcal{\Pi}\) maps observations or observation histories to defensive actions.
+The transition kernel \(P(s_{t+1}\mid s_t,a_t)\) captures the stochastic evolution of the cyber environment under defense actions, including attacker progression, host compromise, recovery effects, service-state changes, and other system dynamics. 
+The observation function \(Z(o_t\mid s_t)\) maps the underlying state to the defender-visible observation, reflecting partial observability in cyber defense. 
+The initial-state distribution \(\mu_0\) specifies how each episode starts. 
+The vector-valued reward function \(\mathcal{R}\) produces \(\mathbf{r}_t\in\mathcal{R}^m\), where each dimension corresponds to a deployment objective. 
+Finally, \(\gamma\) is the discount factor and \(T\) is the finite horizon. Operational
+constraints are defined separately through trajectory-level violation
+functions in Section~\ref{subsec:constraints}.
+% The defense policy acts on observation histories rather than on the latent cyber state. We write the policy as:
+% \begin{equation}
+% a_t \sim \pi(\cdot\mid h_t),
+% \qquad
+% h_t=(o_0,a_0,o_1,a_1,\ldots,o_t),
+% \label{eq:history-policy}
+% \end{equation}
+% where \(h_t\) may be represented explicitly or by a recurrent policy state. The policy is not given privileged access to the full latent state, the attacker's internal plan, future attacker actions, or trajectory-level audit variables.
+
+% For a strategy \(\pi\), we denote the induced trajectory distribution as:
+% \begin{equation}
+% \tau \sim \mathbb{P}_{\mathcal{M}}^\pi .
+% \label{eq:trajectory-distribution}
+% \end{equation}
+% Audit variables derived from latent compromise state are used for reward construction, diagnostics, and evaluation, but they are not exposed as policy inputs.
+
+\subsection{Multiple Deployable Objectives}
+\label{subsec:objectives}
+To ensure both effectiveness and deployment, the single reward function is decomposed into 4 deployable objectives:
+\begin{itemize}
+    \item \emph{Security Effectiveness} describes the generalized ability to protect the system from adversaries.
+    \item \emph{Business Continuity} captures the preservation of services under defensive interventions. 
+    \item \emph{Defense Cost} records the burden made by costly or disruptive actions. 
+    \item \emph{Critical-Asset Safety} demonstrates the risky behavior around the critical-assets, which focuses on initial contacts, long-term persistence, and fatal impacts.
+\end{itemize}
+
+At each time step \(t=0,\ldots,T-1\), we define the reward \(\mathbf{r}_{t}\) as a 4-dimensional vector to include those objectives, which can be denoted as:
+\begin{equation}
+\mathbf{r}_t
+=
+\left[
+r_t^{\mathrm{sec}},
+r_t^{\mathrm{bus}},
+r_t^{\mathrm{cost}},
+r_t^{\mathrm{crit}}
+\right]^\top ,
+\label{eq:reward-vector}
+\end{equation}
+where \(r_t^{\mathrm{sec}}\), \(r_t^{\mathrm{bus}}\),
+\(r_t^{\mathrm{cost}}\), and \(r_t^{\mathrm{crit}}\) correspond to
+Security Effectiveness, Business Continuity, Defense Cost, and
+Critical-Asset Safety, respectively. For a strategy \(\pi\), the
+objective-return vector is defined as:
+\begin{equation}
+\mathbf{J}(\pi)
+=
+\mathbb{E}_{\tau\sim\mathbb{P}_{\mathcal{M}}^\pi}
+\left[
+\sum_{t=0}^{T-1}
+\gamma^t
+\mathbf{r}_t
+\right]
+=
+\left[
+J^{\mathrm{sec}}(\pi),
+J^{\mathrm{bus}}(\pi),
+J^{\mathrm{cost}}(\pi),
+J^{\mathrm{crit}}(\pi)
+\right]^\top .
+\label{eq:return-vector}
+\end{equation}
+where, all four objectives \(J^{\mathrm{*}}(\pi)\) are maximization in generations of optimal strategies. In particular, \(J^{\mathrm{cost}}\) is a reformatted \emph{Defense Cost objective}, where high-rewards correspond to a lower response burden.
+
+Using the critical-breach indicator \(b_t^{\mathrm{crit}}\) and the
+pre-critical exposure indicator \(b_t^{\mathrm{pre}}\) defined in
+Section~\ref{subsec:threat-model}, we introduce two additional
+step-level indicators for Critical-Asset Safety. The first-hit indicator is defined as:
+\begin{equation}
+f_t^{\mathrm{crit}}
+=
+\mathbf{1}\!\left[
+b_t^{\mathrm{crit}}=1
+\;\wedge\;
+\sum_{k=0}^{t-1} b_k^{\mathrm{crit}}=0
+\label{eq:first-critical-hit}
+\right].
+\end{equation}
+%第一次出现 indicator 时已使用 cases 解释清楚；后面在350行用 1[⋅]进行了定义，后面统一使用避免冗余
+% 20260428 好的，已看到，这样挺简洁的。另外，注意4个indicator的名称要统一到第一次出现的名称
+At \(t=0\), the \(\sum_{k=0}^{t-1} b_k^{\mathrm{crit}}\) is set to \emph{0} to make the  definition valid.
+For a persistence horizon \(L\), the indicator of long-term persistence is defined as:
+\begin{equation}
+p_{t,L}^{\mathrm{crit}}
+=
+\mathbf{1}\!\left[
+t\geq L-1
+\;\wedge\;
+\sum_{k=t-L+1}^{t}
+b_k^{\mathrm{crit}}
+=
+L
+\right].
+\label{eq:persistent-step}
+\end{equation}
+
+Then the reward of \emph{Critical-Asset Safety} at each step can be revised as:
+\begin{equation}
+r_t^{\mathrm{crit}}
+=
+-
+\lambda_{\mathrm{pre}} b_t^{\mathrm{pre}}
+-
+\lambda_{\mathrm{hit}} f_t^{\mathrm{crit}}
+-
+\lambda_{\mathrm{dwell}} b_t^{\mathrm{crit}}
+-
+\lambda_{\mathrm{persist}} p_{t,L}^{\mathrm{crit}},
+\label{eq:crit-reward}
+\end{equation}
+where all coefficients \(\lambda_{\mathrm{*}} \geq 0\). And this objective encourages ACD agents to execute protective actions in the pre-critical window before fatal compromise occurred.
+For trajectory-level analysis, we define the statistical indicator denoted as:
+\begin{equation}
+B_{\mathrm{crit}}(\tau)
+=
+\mathbb{1}
+\!\left[
+\sum_{t=0}^{T-1}
+b_t^{\mathrm{crit}}>0
+\right],
+\qquad
+D_{\mathrm{crit}}(\tau)
+=
+\sum_{t=0}^{T-1}
+b_t^{\mathrm{crit}},
+\label{eq:crit-audit-summary}
+\end{equation}
+% where indicate whether a critical breach ever occurs and how long critical compromise persists.
+% Additional audit summaries, including first critical-hit time and persistent breach rate, are defined in Appendix~\ref{app:critical-audit} and reported in the experimental protocol.
+% These trajectory-level variables are used for semantic audit and event-style constraints, not as privileged policy inputs.
+Here, \(B_{\mathrm{crit}}(\tau)\) indicates whether a critical breach
+ever occurs, and \(D_{\mathrm{crit}}(\tau)\) records the duration of
+critical compromise. Additional semantic critical-risk analysis variables,
+including first critical-hit time and persistent breach rate, are defined
+in Appendix~\ref{app:critical-audit} and reported in the experimental
+protocol. These trajectory-level variables are used for semantic
+critical-risk analysis and event-style constraints, not as privileged
+policy inputs.
+
+\subsection{Operational Constraints}
+\label{subsec:constraints}
+
+In a typical enterprise network, the operational preferences are different from strict constraints.
+A preference specifies how an ACD agent ranks trade-offs among multiple objectives, whereas a strict constraint specifies behaviors that must be rejected regardless of utility.
+
+Let \(\Pi_{\mathrm{cad}} \subseteq \mathcal{\Pi}\) denote a finite set of candidate strategies. 
+For a strategy \(\pi\in\Pi_{\mathrm{cad}}\), we define the \(m\)-th operational violation as:
+\begin{equation}
+g_m(\pi)
+=
+\mathbb{E}_{\tau\sim\mathbb{P}_{\mathcal{M}}^\pi}
+\left[
+c_m(\tau)
+\right],
+\qquad
+m=1,\ldots,M ,
+\label{eq:constraint-expectation}
+\end{equation}
+where \(c_m(\tau)\geq 0\) is a trajectory-level violation function. 
+For constraints calculated by the number of events, \(c_m(\tau)\) can be described as an indicator \(B_{\mathrm{crit}}(\tau)\), then \(g_m(\pi)\) is ratio of events occurred. 
+Other constraints can be calculated by summarizing the disruption of services, excessive response burdens, or costly interventions.
+
+For operational constraints \(\boldsymbol{\delta}=[\delta_1,\ldots,\delta_M]^\top\), we define the deployable
+candidate set as:
+\begin{equation}
+\Pi_{\mathrm{dep}}(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+=
+\left\{
+\pi \in \Pi_{\mathrm{cad}}:
+g_m(\pi)\leq \delta_m,
+\; m=1,\ldots,M
+\right\}.
+\label{eq:acceptable-archive}
+\end{equation}
+Also, the mean constraint violation can be denoted as:
+\begin{equation}
+V(\pi;\boldsymbol{\delta})
+=
+\frac{1}{M}
+\sum_{m=1}^{M}
+\left[
+g_m(\pi)-\delta_m
+\right]_+ ,
+\label{eq:mean-violation}
+\end{equation}
+where \([x]_+=\max(x,0)\).
+
+With operational constraints, a strategy achieved high-reward will still be rejected if violates limits by exhibiting unacceptable behaviors.
+
+\subsection{Pareto Optimality and Constrained Assignment}
+\label{subsec:acceptable-pareto-assignment}
+
+In CMO-POMDP, a strategy that simultaneously optimizes all objectives does not exist. This holds whenever either of the two objectives is not fully parallel to each other. 
+In our model, those 4 objectives have conflicts, and a strategy of ACD agent can not be optimized under all operational regimes.
+We use Pareto dominance to describe objective-space trade-offs~\cite{roijers2013survey,hayes2022practical}.
+Let
+\[
+\mathcal I=
+\{
+\mathrm{sec},
+\mathrm{bus},
+\mathrm{cost},
+\mathrm{crit}
+\}
+\]
+denote the objective index set. For two policies \(\pi_a\) and
+\(\pi_b\), policy \(\pi_a\) dominates \(\pi_b\) in objective returns,
+denoted by \(\pi_a\succ_J\pi_b\), if:
+\begin{equation}
+\pi_a \succ_J \pi_b
+\iff
+\left\{
+\begin{aligned}
+&J^{i}(\pi_a)\ge J^{i}(\pi_b),
+&& \forall i\in\mathcal I,\\
+&J^{j}(\pi_a)>J^{j}(\pi_b),
+&& \exists j\in\mathcal I .
+\end{aligned}
+\right.
+\label{eq:pareto-dominance}
+\end{equation}
+and the inequality is strict for at least one objective.
+Since all objectives are in maximization form, this dominance relation has a consistent direction.
+
+We define the raw Pareto set induced by \(\Pi_{\mathrm{cad}}\) as:
+\begin{equation}
+\Pi_P=\left\{\pi \in \Pi_{\mathrm{cad}}: \nexists\,\pi' \in \Pi_{\mathrm{cad}} \setminus\{\pi\}
+\ \text{such that}\ \pi'\succ_J \pi\right\}.
+\label{eq:raw-pareto-set}
+\end{equation}
+Raw Pareto optimality is not sufficient for operational deployment. A
+non-dominated strategy may still violate service-disruption,
+response-burden, or critical-risk limits.
+
+The deployable Pareto set is obtained by applying non-dominated filtering
+within the deployable candidate set:
+% \begin{equation}
+% \Pi_{\mathrm{P}}^{\mathrm{dep}}
+% (\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+% =
+% \left\{
+% \pi\in
+% \Pi_{\mathrm{dep}}(\Pi_{\mathrm{cad}},\boldsymbol{\delta}):
+% \nexists\,
+% \pi'\in
+% \Pi_{\mathrm{dep}}(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+% \setminus\{\pi\}
+% \text{ such that }
+% \pi'\succ_J \pi
+% \right\}.
+% \label{eq:acceptable-pareto-set}
+% \end{equation}
+\begin{equation}
+\begin{aligned}
+\Pi_{\mathrm{P}}^{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+=
+\bigl\{
+\pi\in
+\Pi_{\mathrm{dep}}(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+:\;&
+\nexists\,
+\pi'\in
+\Pi_{\mathrm{dep}}(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+\setminus\{\pi\}
+\\
+&\mathrm{s.t.}\ 
+\pi'\succ_J \pi
+\bigr\}.
+\end{aligned}
+\label{eq:acceptable-pareto-set}
+\end{equation}
+The deployability filter is applied before the Pareto filter. 
+
+Let
+\begin{equation}
+\mathbf{w}
+=
+\left[
+w_{\mathrm{sec}},
+w_{\mathrm{bus}},
+w_{\mathrm{cost}},
+w_{\mathrm{crit}}
+\right]^{\top}
+\in \Delta_4=
+\left\{
+\mathbf{w}\in\mathbb{R}_{\geq 0}^{4}:
+\sum_{i=1}^{4} w_i=1
+\right\}
+\label{eq:preference-simplex}
+\end{equation}
+denote an operator preference over the four objectives. The preference
+ranks candidate strategies by scalar utility over the objective-return
+vector:
+\begin{equation}
+U_{\mathbf{w}}(\pi)
+=
+\mathbf{w}^{\top}
+\mathbf{J}(\pi).
+\label{eq:calibrated-objective}
+%\label{eq:preference-utility}
+\end{equation}
+
+Given \(\mathbf{w}\), \(\boldsymbol{\delta}\), and
+\(\Pi_{\mathrm{cad}}\), the constrained assignment rule is
+\begin{equation}
+\operatorname{Assign}
+(\mathbf{w},\boldsymbol{\delta};\Pi_{\mathrm{cad}})
+=
+\begin{cases}
+\bot,
+&
+\Pi_{\mathrm{P}}^{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+=
+\emptyset,
+\\[4pt]
+\operatorname*{arg\,max}\limits_{\pi\in
+\Pi_{\mathrm{P}}^{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})}
+\mathbf{w}^{\top}\mathbf{J}(\pi),
+&
+\text{otherwise}.
+\end{cases}
+\label{eq:constrained-assignment}
+\end{equation}
+Here, \(\bot\) denotes infeasibility under the current candidate set and
+the specified operational limits.
+
+This constrained assignment is an operational counterpart of policy-set assignment in multi-objective reinforcement learning~\cite{vanmoffaert2014sets,zahavy2021policies,liu2025cmorl}.
+Preferences make selecting strategies among deployable sets, while strict constraints determine which strategy is deployable in the first place.
+
+
+\section{DA-CPSL: Learning Constrained Defense Policy Sets}
+\label{sec:learning}
+
+As formulated in Section~\ref{sec:formulation}, the calculation of Pareto optimality can be solved by a learning procedure that builds a policy set rather than optimizing a single policy under a scalarized reward. 
+We propose the \emph{Defense-Aware Constrained Policy-Set Learning} (DA-CPSL) method, which generates a set of candidate strategies and assigns a strategy through the constrained assignment rule with deployable preference.
+
+% DA-CPSL follows a two-stage structure inspired by policy-set MORL~\cite{vanmoffaert2014sets,hayes2022practical}, and C-MORL~\cite{liu2025cmorl}. In this structure, diverse initial policies are first trained and selected policies are extended along different objective directions. Each candidate is evaluated by its objective returns, operational violations, and semantic critical-risk analysis. The final assignment is then restricted to the deployable Pareto set. The workflow of DA-CPSL is shown in Figure~\ref{fig:dacpsl-overview}.
+% We adapt this structure to autonomous cyber defense rather than using it as a generic MORL routine.
+% Each candidate is evaluated by its objective returns, operational
+% violation summaries, and semantic critical-risk analysis variables. The
+% final assignment is restricted to the deployable Pareto set.
+
+DA-CPSL follows a two-stage policy-set learning pattern inspired by
+policy-set MORL~\cite{vanmoffaert2014sets,hayes2022practical}, and in
+particular by C-MORL~\cite{liu2025cmorl}. In this pattern, diverse
+initial policies are first trained, and selected policies are then
+extended along different objective directions. We adapt this structure to
+autonomous cyber defense rather than using it as a generic MORL routine.
+Each candidate is evaluated by its objective returns, operational
+violation summaries, and semantic critical-risk analysis variables. The
+final assignment is restricted to the deployable Pareto set.
+
+
+% 图里不要说CybORG
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{images/Overview_of_DA-CPSL.pdf}
+    \caption{\textbf{Overview of DA-CPSL.}
+    DA-CPSL builds a candidate policy set together with an evaluated
+    record set rather than a single scalar-reward policy. The ACD
+    environment produces trajectories that are evaluated along four
+    deployable objectives: Security Effectiveness, Business Continuity,
+    Defense Cost, and Critical-Asset Safety. Stage~1 initializes the
+    candidate set by training policies under sampled objective
+    preferences. Stage~2 performs acceptance-aware Pareto extension:
+    parent policies are selected, updated toward a target objective while
+    preserving the remaining objectives and operational limits, and then
+    analyzed for post-extension semantic critical risk. The resulting
+    record contains the policy, objective-return estimates, violation
+    summaries, and semantic analysis variables. Deployment-time
+    assignment takes an operator preference and operational constraints as
+    inputs, selects a policy from the deployable Pareto set by utility,
+    and reports infeasibility when the set is empty.}
+    \label{fig:dacpsl-overview}
+\end{figure*}
+As shown in Figure~\ref{fig:dacpsl-overview},the left part shows the ACD environment and the four deployable objectives
+used to evaluate each policy. Stage~1 trains an initial candidate set
+from sampled objective preferences. Stage~2 selects parent policies from
+the deployable Pareto set, or from the raw Pareto set
+otherwise, and extends them toward individual objective directions under
+return-preservation and operational constraints. Each newly generated
+policy is evaluated and stored as a record with objective returns,
+violation summaries, and semantic critical-risk analysis variables. The
+candidate-set views are then updated for the next extension round. At
+deployment time, the operator provides a preference vector and operational
+limits. DA-CPSL performs utility-based selection over the deployable
+Pareto set and returns infeasible when no candidate satisfies the limits.
+
+
+%20260429
+%Archive 在这里可以翻译成 档案库 / 存档库 / 候选解库。在算法论文里，它通常不是普通意义上的“档案”，而是指一个在训练或搜索过程中持续维护的集合，用来保存已经发现并评估过的候选解、策略、模型或非支配解。
+%archive 是“存储库”，Pareto set 是“从存储库中筛出来的非支配策略集合”
+%在 ICML 2020 的 PG-MORL 里，作者明确使用了 external Pareto archive，并说明在整个 evolutionary stage 中维护一个 external Pareto archive，用来保存所有 non-dominated intermediate policies，最后输出为 approximated Pareto set。在 NeurIPS 2023 的 Policy Diffusion / QD-RL 论文 中，作者也反复使用 archive。
+%说明Archive这个词可以精准的使用
+
+\subsection{Candidate Policy Set and Evaluated Records}
+\label{subsec:dacpsl-overview}
+
+% DA-CPSL maintains an evaluated archive of candidate defense strategies. 
+% Let \( \Pi_{\mathrm{cad}}=\{\pi_1,\ldots,\pi_{K_\Pi}\} \)
+% denote the current finite candidate set. For each
+% \(\pi\in\Pi_{\mathrm{cad}}\), the archive stores the following record:
+% \begin{equation}
+% x(\pi)
+% =
+% \left(
+% \pi,
+% \widehat{\mathbf{J}}(\pi),
+% \widehat{\mathbf{g}}(\pi),
+% \widehat{\boldsymbol{\psi}}(\pi)
+% \right),
+% \label{eq:dacpsl-record}
+% \end{equation}
+% where \(\widehat{\mathbf{J}}(\pi)\) is the empirical four-objective return vector, \(\widehat{\mathbf{g}}(\pi)\) summarizes operational violations, and \(\widehat{\boldsymbol{\psi}}(\pi)\) records trajectory-level semantic analysis variables. These analysis variables include critical breaches, persistent critical breaches, first critical-hit time, and duration of critical-compromise.
+DA-CPSL maintains a finite candidate policy set
+\[
+\Pi_{\mathrm{cad}}
+=
+\{\pi_1,\ldots,\pi_{K_\Pi}\}.
+\]
+For each candidate policy \(\pi\in\Pi_{\mathrm{cad}}\), DA-CPSL stores
+an evaluated record:
+\begin{equation}
+x(\pi)
+=
+\left(
+\pi,
+\widehat{\mathbf{J}}(\pi),
+\widehat{\mathbf{g}}(\pi),
+\widehat{\boldsymbol{\psi}}(\pi)
+\right),
+\label{eq:dacpsl-record}
+\end{equation}
+where \(\widehat{\mathbf{J}}(\pi)\) is the empirical objective-return
+vector, \(\widehat{\mathbf{g}}(\pi)\) summarizes operational violations,
+and \(\widehat{\boldsymbol{\psi}}(\pi)\) records semantic critical-risk
+analysis variables. These variables include critical breach, persistent
+critical breach, first critical-hit time, and critical-compromise
+duration.
+
+Let
+\begin{equation}
+\mathcal{X}
+=
+\left\{
+x(\pi):
+\pi\in\Pi_{\mathrm{cad}}
+\right\}
+\label{eq:evaluated-record-set}
+\end{equation}
+denote the evaluated record set. The record set separates policy
+execution from deployment checking. The policy \(\pi\) acts on the
+defender's observation history. The violation summaries and semantic
+analysis variables are computed after complete trajectories, and are used
+for parent selection, acceptance filtering, and deployment-time
+assignment. 
+
+
+DA-CPSL recomputes several views from the evaluated record set. The raw
+candidate set contains all policies in \(\Pi_{\mathrm{cad}}\). The raw
+Pareto set is obtained by applying the dominance relation in
+Eq.~\ref{eq:pareto-dominance} to empirical objective-return estimates.
+The deployable candidate set contains policies that pass the operational
+filter under the specified limits. The deployable Pareto set is then
+computed by applying non-dominated filtering within the deployable
+candidate set. This ordering is important: a policy that is dominated in
+the raw candidate set may still be Pareto-efficient in the deployable
+set if the policies that dominate it violate the operational limits.
+Operational assignment is performed only on the deployable Pareto set
+through Eq.~\ref{eq:constrained-assignment}.
+
+
+\subsection{Stage 1: Preference-Diverse Initialization}
+\label{subsec:dacpsl-stage1}
+
+Stage~1 constructs an initial policy set for Pareto extension.
+Let \( \mathcal{W}_{\mathrm{init}}\subset\Delta_4 \)
+denote the sampled preference set over the four deployable objectives: Security Effectiveness, Business Continuity, Defense Cost, and Critical-Asset Safety. 
+For each \(\mathbf{w}\in\mathcal{W}_{\mathrm{init}}\), DA-CPSL trains one policy \(\pi_{\mathbf{w}}\) by maximizing the scalarized return \cite{vanmoffaert2013scalarized,yang2019generalized}:
+\begin{equation}
+J_{\mathbf{w}}(\pi)
+=
+\mathbb{E}_{\tau\sim\mathbb{P}_{\mathcal{M}}^\pi}
+\left[
+\sum_{t=0}^{T-1}
+\gamma^t
+\mathbf{w}^{\top}\mathbf{r}_t
+\right].
+\label{eq:stage1-scalarized-return}
+\end{equation}
+
+The sampled preference is used to guide the initialization. 
+It is not a deployment-time condition and is not associated with the trained policy.
+After training, \(\pi_{\mathbf{w}}\) is treated as a preference-independent candidate and can be evaluated under any subsequent operator preference. 
+Each initial policy is evaluated according to a fixed evaluation protocol to estimate \(\widehat{\mathbf{J}}(\pi_{\mathbf{w}})\), \(\widehat{\mathbf{g}}(\pi_{\mathbf{w}})\), and
+\(\widehat{\boldsymbol{\psi}}(\pi_{\mathbf{w}})\), and is stored as the record \(x(\pi_{\mathbf{w}})\). The result of the initial policy set can be denoted as:
+\[
+\Pi_{\mathrm{init}}
+=
+\left\{
+\pi_{\mathbf{w}}:
+\mathbf{w}\in\mathcal{W}_{\mathrm{init}}
+\right\}.
+\]
+
+This initialization provides diverse starting points for the second stage.
+A policy trained under a sampled preference may still violate service-disruption, response-burden, or critical-risk limits. It becomes eligible for operational assignment only after passing the acceptance filter.
+
+\subsection{Stage 2: Acceptance-Aware Pareto Extension}
+\label{subsec:dacpsl-stage2}
+
+Stage~2 extends the candidate policy set from selected parent policies.
+Let
+\[
+\mathcal{I}
+=
+\{
+\mathrm{sec},
+\mathrm{bus},
+\mathrm{cost},
+\mathrm{crit}
+\}
+\]
+denote the objective index set. Given a parent policy \(\pi_r\) and a
+target objective \(\ell\in\mathcal{I}\), DA-CPSL updates the parent
+toward objective \(\ell\), while constraining the remaining objectives
+and the operational limits. This follows the Pareto-extension principle
+of optimizing one objective without seriously hampering the other
+objectives, but makes both parent selection and post-extension acceptance
+depend on deployability.
+
+\subsubsection{Parent Policy Selection}
+\label{subsubsec:parent-policy-selection}
+
+At the beginning of each extension round, DA-CPSL recomputes the raw and deployable Pareto sets from the current archive.
+We denote \(\Pi_{\mathrm{P}}(\Pi)\) for the raw Pareto set and \(\Pi_{\mathrm{P}}^{\mathrm{dep}}(\Pi,\boldsymbol{\delta})\) for the deployable Pareto set under operational limits \(\boldsymbol{\delta}\).
+The parent source set is defined as:
+\begin{equation}
+\Pi_{\mathrm{src}}
+=
+\begin{cases}
+\widehat{\Pi}_{\mathrm{P}}^{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta}),
+&
+\widehat{\Pi}_{\mathrm{P}}^{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+\neq
+\emptyset,
+\\
+\widehat{\Pi}_{\mathrm{P}}(\Pi_{\mathrm{cad}}),
+&
+\text{otherwise}.
+\end{cases}
+\label{eq:parent-source-set}
+\end{equation}
+Thus, DA-CPSL first attempts to extend policies that are already deployable and Pareto-efficient.
+If no such policy exists, which may happen in early training, the method falls back to the raw Pareto set to continue exploration.
+This fallback only provides training parents and it does not make the selected policy eligible for operational assignment.
+
+% Within \(\Pi_{\mathrm{src}}\), DA-CPSL selects parent policies to improve coverage of the calibrated objective space.
+% Extreme candidates for each objective are retained when available.
+% The remaining slots are assigned according to a crowd-distance score, so that policies in sparse regions of the current Pareto set are more likely to be extended \cite{deb2002nsga2,liu2025cmorl}.
+% When candidates have comparable coverage scores, DA-CPSL prefers lower empirical violation \(V(\pi;\boldsymbol{\delta})\) and lower critical-risk analysis summaries.
+% The detailed scoring rule is given in Appendix~\ref{app:parent-selection}.
+Within \(\Pi_{\mathrm{src}}\), DA-CPSL selects parent policies to improve
+coverage in the objective-return space. Extreme candidates for each
+objective are retained when available. The remaining slots are assigned
+according to a crowd-distance-style score, so that policies in sparse
+regions of the current Pareto set are more likely to be extended
+\cite{deb2002nsga2,liu2025cmorl}. The crowding-distance score applies
+per-objective range normalization internally. When candidates have
+comparable coverage scores, DA-CPSL prefers lower empirical violation
+\(V(\pi;\boldsymbol{\delta})\) and lower semantic critical-risk analysis
+summaries. The detailed scoring rule is given in
+Appendix~\ref{app:parent-selection}.
+
+\subsubsection{Constrained Pareto Extension}
+\label{subsubsec:constrained-pareto-extension}
+
+
+For a parent policy \(\pi_r\) and a target objective \(\ell\), DA-CPSL sets parent-relative preservation
+thresholds for non-target objectives:
+\begin{equation}
+d_i(\pi_r;\eta_i)
+=
+\eta_i
+J_i(\pi_r),
+\qquad
+i\in\mathcal{I},\; i\neq \ell ,
+\label{eq:parent-relative-threshold}
+\end{equation}
+
+where \(\eta_i>0\) is a return-preservation coefficient. In
+implementation, \(J_i(\pi_r)\) is replaced by the empirical estimate
+\(\widehat{J}_i(\pi_r)\). The threshold is set on the same stored return
+scale as the objective-return vectors used for Pareto filtering and
+assignment. Since cyber-defense objectives are stored as signed returns,
+\(\eta_i\) should be interpreted as a threshold coefficient rather than a
+universal percentage-loss parameter.
+
+The idealized extension problem can be formulated as follows:
+\begin{align}
+\pi_{\ell}^{+}
+\in
+\arg\max_{\pi\in\mathcal{\Pi}}
+&\quad
+J_{\ell}(\pi)
+\label{eq:ideal-extension}
+\\
+\mathrm{s.t.}
+&\quad
+J_{i}(\pi)
+\geq
+d_i(\pi_r;\eta_i),
+\qquad
+i\in\mathcal{I},\; i\neq \ell ,
+\nonumber\\
+&\quad
+g_m(\pi)
+\leq
+\delta_m,
+\qquad
+m=1,\ldots,M .
+\nonumber
+\end{align}
+The first constraint prevents the target objective from being improved by collapsing the remaining objectives.
+The second constraint prevents the deployable policy from exceeding the specified operational limits.
+
+In practice, Eq.~\ref{eq:ideal-extension} is optimized with a PPO-style surrogate that combines target-objective improvement, return-preservation terms, and violation-penalty terms \cite{schulman2017ppo,achiam2017cpo,liu2020ipo}.
+The surrogate is used to generate a candidate policy, and does not certify deployability.
+
+After the update, the child policy is evaluated under the fixed
+evaluation protocol to obtain \(\widehat{\mathbf{J}}\),
+\(\widehat{\mathbf{g}}\), and \(\widehat{\boldsymbol{\psi}}\). The
+post-update record is then passed to the acceptance filter and
+candidate-set set update in Section~\ref{subsec:dacpsl-archive-update}.
+
+The complete surrogate objective and workflow are given in Appendix~\ref{app:dacpsl-details}.
+
+\subsubsection{Post-extension Evaluation and Acceptance Filtering}
+\label{subsec:dacpsl-archive-update}
+
+The extension surrogate only produces a child candidate. A candidate is
+not certified for deployment merely because it improves a target
+objective or enriches the raw Pareto set. After each extension update,
+DA-CPSL evaluates the child policy \(\pi_{\ell}^{+}\) under the fixed
+evaluation protocol and computes objective returns, operational violation
+summaries, and semantic critical-risk analysis variables:
+\begin{equation}
+x(\pi_{\ell}^{+})
+=
+\left(
+\pi_{\ell}^{+},
+\widehat{\mathbf{J}}(\pi_{\ell}^{+}),
+\widehat{\mathbf{g}}(\pi_{\ell}^{+}),
+\widehat{\boldsymbol{\psi}}(\pi_{\ell}^{+})
+\right).
+\label{eq:child-record}
+\end{equation}
+The candidate policy set and the evaluated record set are then updated as:
+\begin{equation}
+\Pi_{\mathrm{cad}}
+\leftarrow
+\Pi_{\mathrm{cad}}
+\cup
+\{\pi_{\ell}^{+}\},
+\qquad
+\mathcal{X}
+\leftarrow
+\mathcal{X}
+\cup
+\{x(\pi_{\ell}^{+})\}.
+\label{eq:archive-update}
+\end{equation}
+
+Then, DA-CPSL recomputes candidate-set views from the updated record set.
+The raw candidate set contains all evaluated candidates in
+\(\Pi_{\mathrm{cad}}\). The raw Pareto set is obtained by applying the
+dominance relation in Eq.~\ref{eq:pareto-dominance} to this full
+candidate set using empirical objective-return estimates. This set is
+used to monitor the quality and coverage of the learned candidate set,
+and it also preserves policies for subsequent extensions.
+
+The deployable set is computed separately by the empirical counterpart in Eq.~\ref{eq:acceptable-archive} as follows:
+\begin{equation}
+\widehat{\Pi}_{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+=
+\left\{
+\pi\in\Pi_{\mathrm{cad}}:
+\widehat{g}_m(\pi)\leq \delta_m,
+\; m=1,\ldots,M
+\right\}.
+\label{eq:empirical-deployable-set}
+\end{equation}
+The deployable Pareto set is then obtained by applying non-dominated filtering within this deployable set.
+% \begin{equation}
+% \widehat{\Pi}_{\mathrm{P}}^{\mathrm{dep}}
+% (\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+% =
+% \left\{
+% \pi\in
+% \widehat{\Pi}_{\mathrm{dep}}
+% (\Pi_{\mathrm{cad}},\boldsymbol{\delta}):
+% \nexists\,
+% \pi'\in
+% \widehat{\Pi}_{\mathrm{dep}}
+% (\Pi_{\mathrm{cad}},\boldsymbol{\delta})\setminus\{\pi\}
+% \text{ such that }
+% \pi'\succ_{\widehat{J}}\pi
+% \right\},
+% \label{eq:empirical-deployable-pareto-set}
+% \end{equation}
+\begin{equation}
+\begin{aligned}
+\widehat{\Pi}_{\mathrm{P}}^{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+=
+\bigl\{
+\pi\in
+\widehat{\Pi}_{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+:\;&
+\nexists\,
+\pi'\in
+\widehat{\Pi}_{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+\setminus\{\pi\}
+\\
+&\mathrm{s.t.}\
+\pi'\succ_{\widehat{J}}\pi
+\bigr\}.
+\end{aligned}
+\label{eq:empirical-deployable-pareto-set}
+\end{equation}
+% where \(\succ_{\widehat{J}}\) denotes the dominance relation computed by empirical objective estimates.
+% This ordering is important: a policy that is dominated in the raw archive may still become Pareto-efficient
+% within the deployable set if the policy that dominates it violates the operational limits.
+where \(\succ_{\widehat{J}}\) denotes Pareto dominance computed from the
+empirical objective-return estimates. Since deployability is checked
+before non-dominated filtering, a policy dominated in the raw candidate
+view may still belong to the deployable Pareto view when the policies
+dominating it violate the operational limits.
+
+The semantic critical-risk analysis is stored in \(\widehat{\boldsymbol{\psi}}(\pi)\).
+These variables identify unsafe trajectories that may not be visible from average rewards.
+They are used by the acceptance filter and tie-breaking of parent-selection, while operational assignment is restricted to the deployable Pareto set.
+If this set is empty, DA-CPSL reports infeasibility rather than assigning a policy that violates the specified limits.
+
+\subsection{Deployment-time Policy Assignment}
+\label{subsec:dacpsl-operational-assignment}
+
+After the candidate policy set has been constructed, DA-CPSL applies the
+constrained assignment rule in Eq.~\ref{eq:constrained-assignment} to the
+learned finite set. Given an operator preference
+\(\mathbf{w}\in\Delta_4\) and operational limits
+\(\boldsymbol{\delta}\), DA-CPSL first recomputes the deployable Pareto
+set
+\[
+\widehat{\Pi}_{\mathrm{P}}^{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+\]
+from the stored objective-return estimates, violation summaries, and
+semantic critical-risk analysis variables.
+
+% Given an operator preference \(\mathbf{w}\in\Delta_4\) and operational limits \(\boldsymbol{\delta}\), DA-CPSL first applies the operational filter and recomputes the deployable Pareto set
+% \(
+% \widehat{\Pi}_{\mathrm{P}}^{\mathrm{dep}}
+% (\Pi_{\mathrm{cad}},\boldsymbol{\delta}).
+% \)
+% % The Pareto filter is applied after the deployability filter. Therefore, a candidate that is dominated in the raw archive can still be selected for assignment if the policies dominating it violate the operational limits.
+% The Pareto filter is applied after the deployability filter. Therefore, a candidate
+% that is dominated in the raw candidate set can still be selected for
+% assignment if the policies dominating it violate the operational limits.
+
+% If the deployable Pareto set is empty, DA-CPSL does not force a policy to be chosen. DA-CPSL assigns the policy with the largest calibrated utility within the deployable Pareto set:
+% \begin{equation}
+% \Pi^\star(\mathbf{w},\delta;\Pi_P)
+% =
+% \operatorname*{arg\,max}_{\pi\in \Pi_P^{\mathrm{dep}}(\Pi_P,\delta)}
+% \mathbf{w}^{\top}\tilde{\mathbf{J}}(\pi).
+% \label{eq:constrained-assignment}
+% \end{equation}
+If the deployable Pareto set is empty, DA-CPSL does not force a policy
+choice:
+\begin{equation}
+\operatorname{Assign}_{\mathrm{DA\mbox{-}CPSL}}
+(\mathbf{w},\boldsymbol{\delta})
+=
+\bot,
+\qquad
+\text{if }
+\widehat{\Pi}_{\mathrm{P}}^{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})
+=
+\emptyset .
+\label{eq:dacpsl-infeasible-assignment}
+\end{equation}
+Here, \(\bot\) denotes infeasibility under the learned candidate set and
+the specified operational limits.
+
+Otherwise, DA-CPSL assigns a policy with the largest empirical utility in
+the deployable Pareto set:
+\begin{equation}
+\pi_{\mathrm{DA\mbox{-}CPSL}}^{\star}
+(\mathbf{w},\boldsymbol{\delta})
+\in
+\operatorname*{arg\,max}_{\pi\in
+\widehat{\Pi}_{\mathrm{P}}^{\mathrm{dep}}
+(\Pi_{\mathrm{cad}},\boldsymbol{\delta})}
+\mathbf{w}^{\top}
+\widehat{J}(\pi).
+\label{eq:dacpsl-operational-assignment}
+\end{equation}
+
+The assignment step does not require retraining or online policy adaptation.
+Changing \(\mathbf{w}\) only changes the utility ranking in Eq.~\ref{eq:dacpsl-operational-assignment}. Changing \(\boldsymbol{\delta}\) only recomputes the deployability filter from the stored violation summaries and semantic critical-risk analysis variables.
+Thus, the learned archive can support different operator preferences and operational limits while preventing high-utility but non-deployable policies from being assigned.
+
+
+\section{Experimental Setup and Evaluation Protocol}
+\label{sec:evaluation-setup}
+
+This section evaluates our method in a controlled cyber-range simulator
+for ACD agents. The goal of the evaluation is not to show that an
+autonomous defender is ready for unsupervised production operation.
+Instead, we test whether DA-CPSL constructs a stronger candidate policy
+set, whether its selected policies satisfy shared operational limits, and
+whether the selected policies exhibit safer replay-level critical-risk
+behavior under the evaluated protocol.
+
+\subsection{Evaluation Questions}
+\label{subsec:eval-questions}
+
+We organize the evaluation around four research questions.
+
+\paragraph{RQ1: Candidate-set quality.}
+Does DA-CPSL construct a stronger four-objective candidate policy set
+than scalarized or non-acceptance-aware alternatives? This question
+evaluates objective-space candidate-set quality using policy-set metrics
+such as hypervolume, expected utility, coverage ratio, and the number of
+distinct assigned policies.
+
+\paragraph{RQ2: Operational deployability.}
+Does DA-CPSL produce more deployable selected policies under shared
+operational limits? This question evaluates feasible rate, mean
+constraint violation, and the realized security, business,
+response-burden, and critical-asset outcomes of selected policies.
+
+\paragraph{RQ3: Replay-level cyber semantics.}
+Do selected DA-CPSL policies contain attacker progression before it
+crosses from pre-critical exposure into realized critical breach? This
+question evaluates trajectory-level semantic analysis metrics, including
+ever-critical-breach rate, persistent-critical-breach rate, critical
+dwell, first critical-hit time, and pre-critical response behavior.
+
+\paragraph{RQ4: Component necessity.}
+Which components are necessary for the observed behavior?
+This question tests whether Stage~2 extension, acceptance-aware shaping,
+and Critical-Asset Safety are required for both candidate-set quality and
+operational deployability.
+
+\subsection{Cyber-Range and Objective Instantiation}
+\label{subsec:eval-cyber-range}
+
+We instantiate the threat model in the CybORG++ Scenario2~\cite{standen2021cyborg,emerson2024cyborgpp}
+as illustrated in Figure~\ref{fig:cyborg-topology}. The instantiation
+provides partial observations, host-level response actions,
+post-compromise attacker progression, business-impacting defensive side
+effects, and critical-asset compromise semantics.
+
+Unless otherwise stated, all experiments use the standard fixed baseline
+attacker process, a finite horizon of \(T=100\), vector observations, and
+the same Scenario2 configuration. Choosing the fixed attacker process
+lets us compare different decision-making methods under the same
+attack-defense process. Four objectives in the cyber range correspond to
+the formulation in Section~\ref{subsec:objectives}: Security
+Effectiveness, Business Continuity, Defense Cost, and Critical-Asset
+Safety. Critical-Asset Safety is optimized as the fourth objective and is
+also evaluated through semantic replay analysis summaries. The
+experimental protocol is shown in Table~\ref{tab:eval-protocol}.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Main experimental protocol. Detailed hyperparameters and semantic analysis rules are reported in the appendix.}
+\label{tab:eval-protocol}
+\begin{tabular}{p{0.38\linewidth}p{0.50\linewidth}}
+\toprule
+Item & Setting \\
+\midrule
+Scenario & CybORG++ Scenario2, fixed baseline attacker process \\
+Horizon & \(T=100\) \\
+Seeds & \(7, 11, 19\) \\
+Objectives & \(4\): Security, Continuity, Cost, Critical-Asset Safety \\
+Parallel environments & \(8\) \\
+Policy network hidden size & \(128\) \\
+Stage~1 candidate set & \(6\) initial policies, \(98{,}304\) timesteps/seed \\
+Stage~2 extension & \(6\) parent policies, \(2\) rounds, \(5\) constrained updates \\
+Extension update budget & \(1{,}536\) timesteps/update \\
+Return preservation & Non-target preservation coefficient \(\eta\in[1.002,1.008]\); barrier coefficient \(20.0\)\\
+Operational thresholds & Shared business and cost thresholds for deployment evaluation; critical-risk outcomes are reported by semantic analysis \\
+Candidate-set evaluation & Preference step \(0.1\), \(3\) episodes per policy--preference pair \\
+Deployment evaluation & \(5\) episodes per selected policy \\
+Semantic analysis & \(20\) replay episodes per selected policy \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The coefficient \(\eta\) is used as a parent-relative threshold
+coefficient on the stored return scale. Since the objective returns are
+stored as signed values, \(\eta\) should not be interpreted as a universal
+percentage-loss parameter.
+
+\subsection{Baseline Methods}
+\label{subsec:eval-methods}
+
+We compare DA-CPSL with six baselines and ablations under the
+same four-objective protocol and shared deployment thresholds.
+The compared methods are:
+\emph{Stage-1 Candidate Set},
+\emph{Weighted-Sum PPO},
+\emph{Preference-Conditioned PPO},
+\emph{Lagrangian PPO},
+\emph{Unconstrained Stage~2}, and
+\emph{Three-Objective DA-CPSL}.
+
+These methods isolate different failure modes of deployment-aware
+autonomous defense. Weighted-Sum PPO tests whether separately trained
+scalarized policies are sufficient. Preference-Conditioned PPO tests
+whether one preference-conditioned policy can cover the four-objective
+trade-off surface. Lagrangian PPO tests whether a single constrained
+policy can satisfy shared operational limits. Stage-1 Candidate Set
+isolates the initialization stage. Unconstrained Stage~2 removes
+acceptance-aware shaping from Pareto extension. Three-Objective
+DA-CPSL removes Critical-Asset Safety and tests whether the critical-risk
+objective is necessary.
+
+All methods are evaluated using the same objective definitions,
+deployment thresholds, and replay-level semantic analysis rules whenever
+applicable. Implementation details and baseline-specific protocol notes
+are given in Appendix~\ref{app:baseline-details}.
+
+
+\subsection{Metrics and Assignment Protocol}
+\label{subsec:eval-metrics}
+
+The evaluation follows the three-layer structure of
+Section~\ref{sec:formulation}: objective-space candidate-set quality,
+operational deployability, and replay-level cyber semantics.
+
+For candidate-set quality, we report hypervolume, expected utility,
+coverage ratio, the number of distinct assigned policies, and the number
+of retained Pareto records. Hypervolume and expected utility measure the
+quality of the empirical Pareto front under the shared four-objective
+protocol; they do not by themselves imply operational deployability.
+
+For operational deployability, buffer-based methods first select one
+representative policy from the empirical Pareto front using a
+threshold-aware selector. The selector prefers policies satisfying the
+shared business and cost thresholds, and then breaks ties by smaller
+violation and higher objective returns. We report feasible rate, mean
+constraint violation, selected objective returns, final critical
+compromised hosts, and critical-impact count.
+
+For replay-level semantic analysis, we replay the selected policy under
+the fixed evaluation protocol and report trajectory-level critical-risk
+behavior, including ever-critical breach, persistent critical breach,
+critical dwell, first critical-hit time, near-miss tiers, and
+phase-conditioned response behavior. These semantic metrics are
+diagnostic: zero observed critical breach under the replay protocol is
+interpreted as evidence of pre-critical containment, not as risk
+elimination.
+
+Detailed metric definitions, assignment rules, and finite-sample
+interpretation of zero-observed critical events are provided in
+Appendix~\ref{app:metric-details}.
+
+\subsection{Implementation and Reproducibility}
+\label{subsec:eval-reproducibility}
+
+All main experiments are run with seeds \(7\), \(11\), and \(19\). The
+Stage~2 candidate set is initialized from the corresponding Stage~1
+candidate set for the same seed. Candidate-set evaluation, deployment
+evaluation, and semantic analysis use the same cyber-range
+instantiation.
+
+The implementation stores each candidate as an evaluated record including
+objective estimates, operational violation estimates, and semantic
+analysis summaries; the record structure and artifact contents are
+described in Appendices~\ref{app:candidate-records}
+and~\ref{app:artifact-notes}. Additional implementation details,
+semantic rule definitions, per-seed outputs, and semantic-analysis
+vectors are reported in Appendices~\ref{app:implementation-notes},
+\ref{app:semantic-rules}, \ref{app:per-seed-main-results},
+and~\ref{app:additional-semantic-analysis}.
+
+
+\section{Evaluation Results}
+\label{sec:evaluation-results}
+
+We report the results according to the research questions in
+Section~\ref{sec:evaluation-setup}. The evaluation follows the three
+layers of the formulation: objective-space candidate-set quality,
+operational deployability, and replay-level cyber semantics. Unless
+otherwise noted, all deployability and semantic results are empirical
+under the fixed evaluation protocol.
+
+\subsection{RQ1: Candidate-Set Quality}
+\label{subsec:results-candidate-set-quality}
+\label{subsec:results-archive-quality}
+
+DA-CPSL first improves the object it is designed to learn: the
+four-objective candidate policy set. Table~\ref{tab:set-quality} reports
+candidate-set quality in the objective space under the shared
+four-objective evaluation protocol.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Four-objective candidate-set quality. Hypervolume and expected utility measure objective-space policy-set quality; they do not by themselves imply operational deployability.}
+\label{tab:set-quality}
+\resizebox{\textwidth}{!}{%
+\input{table/set_quality_4obj.tex}
+}
+\end{table*}
+
+The full DA-CPSL candidate set achieves the strongest objective-space
+quality among the compared methods. It attains the highest hypervolume
+(\(2.29\times 10^7\)) and the best expected utility (\(-41.92\)), whereas
+Weighted-Sum PPO reaches \(5.84\times 10^6\) hypervolume and \(-161.57\)
+expected utility, and Preference-Conditioned PPO reaches
+\(3.68\times 10^6\) hypervolume and \(-167.93\) expected utility. This
+difference is not only a benchmark-score improvement: it indicates that
+the learned candidate set provides more useful operating points for
+organizations with heterogeneous preferences over containment,
+continuity, response burden, and Critical-Asset Safety.
+
+The comparison also shows why policy-set quality cannot be inferred from
+the number of candidate policies alone. Preference-Conditioned PPO can
+produce many distinct assignments, but its induced candidate set has
+substantially lower hypervolume and expected utility. DA-CPSL instead
+produces a smaller but more valuable set of candidate defense policies
+that better covers the four-objective trade-off surface.
+
+Figure~\ref{fig:candidate-set-sets} visualizes the geometry of the
+candidate sets. The projections show that DA-CPSL occupies broader and
+more useful regions of the objective space, rather than concentrating
+candidate policies in a narrow scalarized region.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{images/candidate_set_4obj_3d_projection.png}
+\includegraphics[width=0.48\textwidth]{images/candidate_set_4obj_pairwise_matrix.png}
+\caption{Four-objective candidate-set geometry. The left plot shows a
+3D projection, and the right plot shows pairwise objective projections.
+The figures illustrate candidate-set coverage rather than operational
+deployability; the latter is evaluated through the deployment protocol in
+Section~\ref{subsec:results-operational-assignment}.}
+\label{fig:candidate-set-sets}
+\end{figure*}
+
+\subsection{RQ2: Operational Assignment Performance}
+\label{subsec:results-operational-assignment}
+
+Objective-space quality alone is not sufficient for autonomous defense:
+a high-utility policy may still be non-deployable if it violates strict
+limits on business disruption, response burden, or critical-risk
+behavior. Table~\ref{tab:operational-assignment-performance} evaluates
+whether the learned candidate sets provide selected policies that satisfy
+the shared deployment thresholds.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Operational selection performance under shared deployment thresholds. Feasible rate is the fraction of evaluation rollouts in which the selected policy satisfies the business and cost thresholds; violation measures the mean magnitude of threshold violation.}
+\label{tab:operational-assignment-performance}
+\resizebox{\textwidth}{!}{%
+\input{table/constrained_deployment_performance_4obj.tex}
+}
+\end{table*}
+
+DA-CPSL provides the strongest operational-selection behavior under the
+evaluated protocol. It achieves the highest feasible rate (\(0.6417\))
+and the lowest mean violation (\(0.0942\)), while maintaining zero final
+critical compromised hosts and zero observed critical-impact events under
+the evaluated protocol. These results support the main operational claim:
+DA-CPSL does not merely improve objective-space scores; it improves the
+availability of deployable selected policies under shared thresholds.
+
+The single-policy baselines fail to produce deployable selected policies
+under these shared limits. Weighted-Sum PPO and Lagrangian PPO obtain
+feasible rate \(0.0\), with mean violations \(93.54\) and \(95.61\),
+respectively. This suggests that scalarization or single-policy
+constraint penalties are insufficient for supporting heterogeneous
+operational preferences under strict deployment thresholds.
+
+The comparison between Stage~1 and DA-CPSL shows the role of
+candidate-set extension. Stage~2 increases the feasible rate from
+\(0.3083\) to \(0.6417\) and reduces mean violation from \(1.9770\) to
+\(0.0942\). Thus, Stage~2 improves not only candidate-set geometry but
+also the availability of deployable selected policies.
+
+The comparison with Unconstrained Stage~2 further shows why
+acceptance-aware extension is necessary. Unconstrained extension can
+improve raw objective-space behavior, but it produces higher mean
+violation (\(2.1274\)). The action-level semantic analysis in
+Section~\ref{subsec:results-semantic-analysis} further explains how this
+violation is reflected in post-foothold response behavior. This confirms
+the distinction introduced in
+Section~\ref{subsec:acceptable-pareto-assignment}: raw Pareto quality
+does not imply operational deployability.
+
+\subsection{RQ3: Replay-Level Semantic Analysis}
+\label{subsec:results-semantic-analysis}
+\label{subsec:results-semantic-audit}
+
+The preceding tables evaluate candidate-set quality and deployment
+performance. We next inspect whether the selected policies exhibit the
+intended cyber semantics after an attacker obtains an enterprise
+foothold. For each compared Stage~2 method, the policy is fixed before
+replay by the threshold-aware objective selector described in
+Section~\ref{subsec:eval-metrics}. Table~\ref{tab:rq3-semantic-comparison}
+reports replay-level semantic analysis for the selected DA-CPSL policy
+and the selected Unconstrained Stage~2 policy.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Replay-level semantic analysis of selected Stage~2 policies. The table reports critical-breach indicators and post-foothold process diagnostics under the fixed replay protocol.}
+\label{tab:rq3-semantic-comparison}
+\input{table/rq3_semantic_comparison_4obj.tex}
+\end{table*}
+
+Both selected Stage~2 policies show no observed critical breach and no
+observed persistent critical breach under the evaluated protocol. The
+important distinction is therefore not an end-state breach label, but the
+post-foothold response process. DA-CPSL reduces post-foothold drift from
+\(0.3375\) to \(0.0021\) and removes repeated low-value decoy loops
+(\(0.2542\) to \(0.0\)). These differences indicate a more disciplined
+response after enterprise foothold: the selected DA-CPSL policy avoids
+wasting response capacity on repeated low-value actions and reduces
+movement toward critical-risk regions.
+
+Figure~\ref{fig:phase-conditioned-semantics} shows phase-conditioned
+response behavior. Compared with Unconstrained Stage~2, DA-CPSL is less
+deception-heavy immediately after foothold and places less emphasis on
+critical-path-directed actions in the pre-critical phase. Instead, it
+uses lower-disruption monitoring, analysis, or non-targeted response
+patterns when those actions are sufficient to contain the trajectory
+before a realized critical breach.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{images/phase_conditioned_action_semantics.png}
+\caption{Phase-conditioned response semantics for selected policies.
+The analysis compares behavior after enterprise foothold, during
+pre-critical exposure, and near critical-risk states.}
+\label{fig:phase-conditioned-semantics}
+\end{figure}
+
+These findings support a bounded security interpretation. The selected
+DA-CPSL policy is breach-free under the evaluated replay protocol, but
+near-miss trajectories remain visible. We therefore interpret the result
+as evidence of pre-critical containment, not as evidence of risk
+elimination. The finite-sample interpretation and zero-event confidence
+bounds are given in Appendices~\ref{app:empirical-acceptance}
+and~\ref{app:zero-event-confidence-bounds}.
+
+\subsection{RQ4: Component Necessity}
+\label{subsec:results-ablation}
+
+Table~\ref{tab:rq4-ablation-summary} evaluates which components are
+responsible for the observed behavior. The ablation separates three
+mechanisms: Stage~2 candidate-set extension, acceptance-aware shaping,
+and Critical-Asset Safety as a fourth objective.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Ablation summary. The panels isolate the roles of Stage~2 extension, acceptance-aware shaping, and Critical-Asset Safety.}
+\label{tab:rq4-ablation-summary}
+\input{table/rq4_ablation_summary.tex}
+\end{table}
+
+\paragraph{Stage~2 solves a candidate-set discovery problem.}
+Panel A compares Stage~1 with the full Stage~2 method. Stage~2 increases
+hypervolume from \(22.17\times 10^6\) to \(22.91\times 10^6\), improves
+expected utility from \(-44.88\) to \(-41.92\), increases feasible rate
+from \(0.31\) to \(0.64\), and reduces mean violation from \(1.98\) to
+\(0.09\). These results show that Stage~1 provides useful initial
+policies, but Stage~2 is needed to improve both objective-space coverage
+and deployment performance.
+
+\paragraph{Acceptance-aware shaping solves a deployment-filtering problem.}
+Panel B compares DA-CPSL with the Unconstrained Stage~2 ablation.
+Removing acceptance-aware shaping reduces feasible rate and increases
+mean violation. It also increases questionable post-foothold behavior in
+the semantic analysis. This shows that Pareto extension alone is not
+enough: extension must be constrained by operational and critical-risk
+acceptance criteria.
+
+\paragraph{Critical-Asset Safety solves a representation problem.}
+Panel C compares the four-objective formulation with a three-objective
+variant that lacks Critical-Asset Safety. The three-objective variant can
+appear competitive in conventional objective-space terms, but it fails
+under the critical-risk semantics required by the current threat model:
+its selected policies exhibit high ever-critical-breach and persistent
+critical-breach rates, whereas the four-objective formulation keeps these
+indicators near zero under the evaluated protocol. This demonstrates that
+Critical-Asset Safety is not a cosmetic auxiliary term; it changes the
+representation of deployable defense trade-offs.
+
+\subsection{Summary of Findings}
+\label{subsec:results-summary}
+
+The evaluation supports four findings. First, DA-CPSL constructs a
+stronger four-objective candidate policy set than scalarized and
+non-acceptance-aware alternatives. Second, the learned candidate set
+supports more deployable selected policies under shared strict limits.
+Third, semantic replay analysis shows that the selected DA-CPSL policy
+changes the post-foothold response process, reducing drift and low-value
+action loops while keeping observed critical breach at zero under the
+protocol. Fourth, the ablation study shows that Stage~2 extension,
+acceptance-aware shaping, and Critical-Asset Safety each address a
+distinct failure mode: discovery, deployability, and representation.
+
+Taken together, the results support the following bounded claim:
+DA-CPSL provides stronger pre-critical containment under the evaluated
+threat model and cyber-range protocol.
+
+
+
+\section{Related Work}
+\label{sec:related-work}
+
+\subsection{Autonomous Cyber Defense and Cyber Ranges}
+
+Autonomous cyber defense has emerged as a research direction for using
+learning agents to detect, contain, and respond to attacker behavior in
+networked environments. Surveys of automated and reinforcement-learning
+based cyber defense emphasize that the field requires both realistic
+cyber environments and decision-making agents capable of operating under
+partial observability, large action spaces, and adversarial dynamics
+~\cite{vyas2023automated,palmer2023drlsurvey,thompson2024entity,palmer2025egta}. CybORG introduced a gym
+for autonomous cyber agents, and subsequent work has used CybORG and
+CAGE-style challenge settings to study learned network defenders
+~\cite{standen2021cyborg,foley2022autonomous}. CybORG++ extends this
+line with improved tooling and faster experimentation for enterprise
+network defense research~\cite{emerson2024cyborgpp}.
+
+Most cyber-range ACD work evaluates a trained defender by episodic
+reward, action success, or scenario-specific measures. Foundational
+studies have examined tabular learning and deep RL defenders in cyber
+ranges~\cite{applebaum2022bridging,foley2022autonomous}, while reward
+shaping work has shown that the training signal strongly affects learned
+defense behavior~\cite{bates2023reward}. Our work uses the same general
+cyber-range tradition but addresses a different decision problem. Rather
+than training one defense policy for a single scalar reward, DA-CPSL
+learns an evaluated archive of defense policies and performs constrained
+assignment under operational preferences and strict limits.
+
+\subsection{Defensive Trade-offs and Operational Constraints}
+
+Cyber defense actions often have operational side effects. Restoring a
+host may remove attacker presence but disrupt services; deception may
+slow attacker progression but consume response resources; conservative
+response may preserve short-term continuity while increasing exposure
+around critical assets. This motivates treating autonomous defense as a
+decision problem with competing objectives rather than as pure attack
+suppression~\cite{odriscoll2024morlcyber}. In critical-service or IT/OT-adjacent environments, this
+trade-off is particularly important because OT security guidance
+emphasizes safety, reliability, and continuity alongside cybersecurity
+risk reduction~\cite{nist_sp80082r3}.
+
+Existing ACD and cyber-range studies recognize operationally meaningful
+metrics, but they usually do not formalize the defender's decision object
+as a policy archive with strict acceptance constraints. Our formulation
+separates preferences from strict limits: preferences rank acceptable
+trade-offs, while operational constraints reject unacceptable behavior
+regardless of scalar utility. This distinction is central to DA-CPSL and
+to our evaluation, where objective-space quality, operational
+assignment, and replay-level semantic audit are reported separately.
+
+\subsection{Safe, Constrained, and Assured Learning}
+
+Constrained reinforcement learning studies policies that maximize return
+while satisfying expected cost or safety constraints. Constrained MDPs
+provide the classical formulation~\cite{altman2021cmdp,dutta2021constraints}, and policy
+optimization methods such as CPO and interior-point policy optimization
+provide algorithmic mechanisms for constraint-aware learning
+~\cite{schulman2015trpo,achiam2017cpo,liu2020ipo,tessler2018rcpo,xu2021crpo,paternain2019duality}. These methods are closely related to
+our Stage~2 extension problem, where a policy improves one objective
+while preserving other objective values and satisfying operational
+limits.
+
+Our setting differs from conventional constrained RL in two ways. First,
+we do not train a single policy for one constrained objective. DA-CPSL
+constructs a policy archive so that different operator preferences can be
+handled by assignment rather than retraining. Second, our constraints
+include replay-level critical-risk semantics and empirical operational
+acceptance. We therefore do not claim formal safety guarantees. Instead,
+we treat acceptance as an empirical filter under the stated evaluation
+protocol and report semantic audit evidence to expose critical-risk
+behavior that may be hidden by average return.
+
+\subsection{Multi-Objective Reinforcement Learning and Policy-Set Methods}
+
+Multi-objective reinforcement learning addresses settings where multiple
+objectives must be optimized jointly and decision makers may have
+different preferences over those objectives~\cite{roijers2013survey,hayes2022practical,parisi2016pareto,lu2023morl}.
+One common approach trains a single preference-conditioned policy that
+takes the preference vector as input~\cite{yang2019generalized,basaklar2022pdmorl}. Another
+approach trains or maintains a finite set of policies to approximate a
+Pareto set, enabling later policy assignment for a given preference
+~\cite{vanmoffaert2014sets,xu2020prediction,alegre2022optimistic,alegre2023gpi,felten2024morld,ropke2024divide,zahavy2021policies}.
+Policy-set methods are attractive for autonomous defense because they
+allow the defender to adapt to changing operational preferences without
+retraining a new policy for every preference.
+
+C-MORL is particularly relevant because it uses a two-stage policy-set
+learning procedure: preference-diverse initialization followed by
+Pareto-front extension, where one objective is improved while the others
+are constrained~\cite{liu2025cmorl,huang2022constrainedmorl,laumanns2006epsilon}. It then performs policy assignment
+from the learned Pareto set. DA-CPSL adopts this policy-set learning
+philosophy, but changes the problem object and assignment rule for
+autonomous defense. Each candidate policy is evaluated by objective
+returns, operational violation summaries, and semantic audit variables;
+final assignment is performed from the acceptable Pareto set; and the
+assignment may return infeasible when no candidate satisfies the strict
+limits. Thus, DA-CPSL is not only a MORL archive-construction method
+applied to a cyber range. It is a defense-aware, acceptance-aware, and
+audit-aware policy-set learning framework for autonomous cyber defense
+under operational constraints.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper formulated autonomous cyber defense as a constrained multi-objective decision-making problem rather than a single scalar-reward policy-learning problem.
+We argued that deployable defense requires separating objective trade-offs, strict acceptance constraints, and preference-conditioned policy assignment.
+To capture critical-risk behavior around high-value assets, we introduced Critical-Asset Safety as a first-class objective and used replay-level semantic analysis as a diagnostic mechanism.
+
+We proposed DA-CPSL, a defense-aware constrained policy-set learning method that constructs an evaluated archive of candidate defense policies.
+DA-CPSL combines preference-diverse initialization, acceptance-aware Pareto extension, semantic candidate analysis, and constrained assignment over the acceptable Pareto set.
+This design allows operator preferences to select among acceptable policies while preventing preference weights from overriding strict operational limits; when no candidate satisfies the limits, DA-CPSL reports infeasibility rather than forcing an unacceptable policy choice.
+
+Evaluations show that DA-CPSL improves both objective-space archive quality and operational assignment acceptability.
+Across the evaluated seeds, it achieves stronger hypervolume and expected utility than scalarized and non-acceptance-aware alternatives, increases feasible-assignment rate, and substantially reduces mean constraint violation.
+Replay-level semantic analysis further shows no observed critical breach or persistent critical breach for the selected DA-CPSL policy under the fixed evaluation protocol, while near-miss trajectories remain visible.
+These results support a bounded interpretation: DA-CPSL improves pre-critical containment under the evaluated threat model and cyber-range protocol, but it does not eliminate cyber risk.
+
+The ablations further show that Stage~2 extension improves archive discovery, acceptance-aware shaping improves operational acceptability, and Critical-Asset Safety changes the representation of acceptable defense trade-offs.
+These findings suggest that ACD should be evaluated not only by average reward or raw Pareto quality, but also by whether selected policies satisfy operational limits and exhibit acceptable security semantics.
+
+Several limitations remain.
+Our evaluation uses a controlled cyber-range instantiation with a fixed attacker process for fair comparison, so the reported acceptance and breach-free results are empirical under this environment and should not be interpreted as formal safety guarantees or robustness to all attacker variants.
+Future work should extend DA-CPSL-style policy archives to broader attacker variation, richer incident-response workflows, human approval and escalation processes, and complementary formal or runtime assurance mechanisms for learned defense policies.
+
+% =========================
+% Bibliography
+% =========================
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+
+% =========================
+% Appendices required / useful for CCS 2026
+% =========================
+\appendix
+
+\section{Open Science}
+\label{app:open-science}
+
+This paper presents an implementation-driven evaluation of
+deployment-aware autonomous cyber defense in a controlled cyber-range
+environment. The core artifacts needed to evaluate the paper's claims
+include the training code, evaluation scripts, experiment configurations,
+semantic-analysis rules, and result-generation scripts used to produce
+the main tables and figures.
+
+\paragraph{Artifact availability.}
+For double-blind review, we will provide an anonymized artifact package
+at the following URL:
+
+\begin{center}
+\url{https://anonymous.4open.science/r/ACM-CCS-2026-AF4B/}
+\end{center}
+
+The artifact will be hosted using an anonymous artifact service that does
+not reveal author identity or repository history. The same anonymous URL
+will also be provided in the submission system, following the conference
+submission policy.
+
+\paragraph{Artifact contents.}
+The artifact package will include:
+\begin{itemize}
+    \item source code for Stage~1 preference-diverse initialization and
+    Stage~2 acceptance-aware Pareto extension;
+    \item configuration files for all main methods and ablations, including
+    DA-CPSL, Stage-1 Candidate Set, Weighted-Sum PPO,
+    Preference-Conditioned PPO, Lagrangian PPO, Unconstrained Stage~2,
+    and Three-Objective DA-CPSL;
+    \item evaluation scripts for candidate-set quality, operational
+    assignment, threshold sensitivity, and replay-level semantic analysis;
+    \item scripts for computing hypervolume, expected utility, feasible
+    rate, mean violation, critical-impact summaries, and semantic-analysis
+    variables;
+    \item table and figure generation scripts corresponding to the main
+    results and appendix results;
+    \item per-seed result files for the reported seeds \(7\), \(11\), and
+    \(19\);
+    \item semantic replay summaries and casebook-style outputs used to
+    support the replay-level analysis; and
+    \item instructions for reproducing the main tables and figures under
+    the stated cyber-range setup.
+\end{itemize}
+
+\paragraph{Reproducibility scope.}
+The artifact is intended to support reproduction of the empirical results
+reported in this paper under the same controlled cyber-range setting,
+fixed attacker process, training budgets, and evaluation protocol.
+Because the results depend on stochastic deep reinforcement learning and
+finite replay evaluation, small numerical differences may occur across
+hardware platforms or software versions. The artifact therefore reports
+both aggregate metrics and per-seed outputs.
+
+\paragraph{Artifacts not included.}
+The artifact does not contain data from production networks, real user
+traffic, credentials, or private organizational security logs. The
+experiments use a controlled cyber-range environment and synthetic
+scenario state. We also do not include any exploit code intended for use
+against real systems. Any attacker behavior included in the artifact is
+limited to the cyber-range scenario required to reproduce the reported
+experiments.
+
+\paragraph{Anonymity.}
+All artifact paths, repository metadata, documentation, and configuration
+files will be checked before submission to remove author names,
+institution names, private repository URLs, commit metadata, and other
+identifying information. After the review process, the artifact can be
+de-anonymized and released through a persistent public repository if the
+paper is accepted.
+
+\section{Ethical Considerations}
+\label{app:ethical-considerations}
+
+This work studies autonomous cyber defense in a controlled cyber-range
+setting. It does not conduct experiments on production networks, does
+not use real user traffic, and does not collect or process personal data.
+The study is limited to simulated attack--defense interaction and
+replay-level analysis of learned defense policies.
+
+\paragraph{Potential benefits.}
+The intended benefit of this work is to improve the evaluation and
+deployment readiness of autonomous cyber defense agents. In particular,
+the paper argues that learned defenders should not be evaluated only by
+average reward or raw Pareto-front quality. Instead, selected policies
+should also be checked against operational limits and critical-asset
+semantics. This framing can help reduce the risk of deploying learned
+defense policies that appear effective in aggregate metrics but cause
+unacceptable service disruption, response burden, or critical-asset
+exposure.
+
+\paragraph{Dual-use considerations.}
+Autonomous cyber defense research is inherently dual-use because it
+models attacker progression, defender response, and network compromise
+states. To reduce misuse risk, this paper focuses on defensive decision
+making and does not introduce new vulnerability-discovery techniques,
+real exploit chains, credential-stealing procedures, or instructions for
+compromising real systems. The attacker behavior used in the experiments
+is confined to a cyber-range scenario and is described only at the level
+needed to define the threat model and reproduce the evaluation.
+
+\paragraph{Safety of autonomous response.}
+The proposed method is not intended for unsupervised deployment in
+production networks. Defensive actions such as host restoration, decoy
+deployment, or containment can have operational side effects. For this
+reason, the paper treats deployment as constrained policy selection
+rather than unrestricted reward maximization. If no candidate policy
+satisfies the specified operational limits, DA-CPSL reports infeasibility
+instead of forcing an unacceptable action choice. In a real deployment,
+such infeasibility should trigger human review, escalation, or fallback
+to established incident-response procedures.
+
+\paragraph{Limitations of the evidence.}
+The reported results are empirical under a controlled cyber-range
+protocol with finite replay episodes and a fixed attacker process. Zero
+observed critical breach in replay should not be interpreted as a formal
+safety guarantee or as evidence that critical compromise cannot occur.
+The paper explicitly reports finite-sample interpretations and discusses
+attacker-shift limitations to avoid overstating the security claim.
+
+\paragraph{Artifact release.}
+The artifact release will be limited to materials necessary for
+reproducing the controlled experiments. It will not include production
+network data, real incident logs, credentials, or weaponized exploit
+code. Any released attacker scripts or scenario configurations are
+included only to reproduce the cyber-range evaluation and should not be
+used against real systems.
+
+\section{Generative AI Usage}
+\label{app:generative-ai-usage}
+
+The authors used generative AI tools for language polishing, grammar
+checking, and improving the clarity of presentation. The authors reviewed
+and edited all AI-assisted text and remain fully responsible for the
+technical content, claims, experiments, and conclusions of the paper.
+No experimental results, datasets, or evaluation metrics were generated
+by generative AI tools.
+
+
+\section{Formal Definitions and Empirical Acceptance}
+\label{app:formal-acceptance}
+
+This appendix gives the formal definitions, algorithmic details, and
+supplementary experimental evidence used by the main paper. We use
+\emph{archive} to denote the evaluated candidate policy set maintained by
+DA-CPSL. Each archived policy stores objective estimates, operational
+violation estimates, and replay-level semantic analysis summaries.
+
+\subsection{Critical-Risk Analysis Variables}
+\label{app:critical-audit}
+
+Let \(\mathcal{E}\) denote the set of cyber entities, and let
+\(\mathcal{K}\subseteq\mathcal{E}\) denote the set of critical assets.
+For an evaluated trajectory, let \(C_t\subseteq\mathcal{E}\) be the set
+of compromised entities at timestep \(t\). We use bracketed indicator
+notation throughout the appendix, consistent with the main text:
+\(\mathbb{1}[\cdot]\) equals one when the condition inside the brackets
+is true and zero otherwise.
+
+The step-level critical-breach indicator is
+\begin{equation}
+ b_t^{\mathrm{crit}}
+ =
+ \mathbb{1}\!\left[
+ C_t\cap\mathcal{K}\neq\emptyset
+ \right].
+ \label{eq:app-critical-breach}
+\end{equation}
+The enterprise-foothold indicator is
+\begin{equation}
+ b_t^{\mathrm{foot}}
+ =
+ \mathbb{1}\!\left[
+ C_t\setminus\mathcal{K}\neq\emptyset
+ \right].
+ \label{eq:app-enterprise-foothold}
+\end{equation}
+The pre-critical exposure indicator is
+\begin{equation}
+ b_t^{\mathrm{pre}}
+ =
+ \mathbb{1}\!\left[
+ C_t\cap\mathcal{K}=\emptyset
+ \;\wedge\;
+ \rho(C_t,\mathcal{K})>0
+ \right],
+ \label{eq:app-precritical}
+\end{equation}
+where \(\rho(C_t,\mathcal{K})\) is a policy-independent analysis function
+that marks elevated exposure around critical assets. It is used for
+evaluation and replay-level semantic analysis only; it is not a
+privileged input to the defense policy.
+
+The first critical-hit indicator is
+\begin{equation}
+ f_t^{\mathrm{crit}}
+ =
+ \mathbb{1}\!\left[
+ b_t^{\mathrm{crit}}=1
+ \;\wedge\;
+ \sum_{k=0}^{t-1} b_k^{\mathrm{crit}}=0
+ \right].
+ \label{eq:app-first-critical}
+\end{equation}
+We use the convention that an empty sum is zero, so the definition also
+applies at \(t=0\). For a persistence horizon \(L\), the step-level
+persistent critical-compromise indicator is
+\begin{equation}
+ p_{t,L}^{\mathrm{crit}}
+ =
+ \mathbb{1}\!\left[
+ t\geq L-1
+ \;\wedge\;
+ \sum_{k=t-L+1}^{t} b_k^{\mathrm{crit}}=L
+ \right].
+ \label{eq:app-persistent-step}
+\end{equation}
+The special case \(L=2\) corresponds to critical compromise persisting
+for two consecutive timesteps.
+
+For a trajectory \(\tau\), the event-level ever-critical-breach
+indicator is
+\begin{equation}
+ B_{\mathrm{crit}}(\tau)
+ =
+ \mathbb{1}\!\left[
+ \sum_{t=0}^{T-1} b_t^{\mathrm{crit}}>0
+ \right].
+ \label{eq:app-ever-critical}
+\end{equation}
+Critical dwell is
+\begin{equation}
+ D_{\mathrm{crit}}(\tau)
+ =
+ \sum_{t=0}^{T-1} b_t^{\mathrm{crit}}.
+ \label{eq:app-critical-dwell}
+\end{equation}
+The first critical-hit time is
+\begin{equation}
+ T_{\mathrm{crit}}(\tau)
+ =
+ \min\{t:b_t^{\mathrm{crit}}=1\},
+ \qquad
+ T_{\mathrm{crit}}(\tau)=\infty
+ \text{ if no critical breach occurs}.
+ \label{eq:app-first-critical-time}
+\end{equation}
+When a finite mean first critical-hit time is reported, it is computed
+only over trajectories with \(B_{\mathrm{crit}}(\tau)=1\); no-breach
+trajectories are reported separately through \(B_{\mathrm{crit}}\). The
+trajectory-level persistent critical-breach indicator is
+\begin{equation}
+ B_{\mathrm{persist}}^{(L)}(\tau)
+ =
+ \mathbb{1}\!\left[
+ \sum_{t=0}^{T-1} p_{t,L}^{\mathrm{crit}}>0
+ \right].
+ \label{eq:app-persistent-trajectory}
+\end{equation}
+These variables support replay-level semantic analysis, event-style
+constraint summaries, and diagnostic reporting. They are not added as
+extra observations to the defender.
+
+\subsection{Empirical Operational Acceptance}
+\label{app:empirical-acceptance}
+
+The population-level operational quantities are estimated by a fixed
+rollout protocol. For \(N_{\mathrm{eval}}\) evaluation trajectories
+\(\tau_1,\ldots,\tau_{N_{\mathrm{eval}}}\), we estimate the operational
+cost or violation statistic \(g_m(\pi)\) by
+\begin{equation}
+ \widehat{g}_m(\pi)
+ =
+ \frac{1}{N_{\mathrm{eval}}}
+ \sum_{j=1}^{N_{\mathrm{eval}}}
+ c_m(\tau_j),
+ \qquad
+ \tau_j\sim\mathbb{P}_{\mathcal{M}}^\pi .
+ \label{eq:app-empirical-g}
+\end{equation}
+Given operational limits \(\boldsymbol{\delta}\), the empirical mean
+violation is
+\begin{equation}
+ \widehat{V}(\pi;\boldsymbol{\delta})
+ =
+ \frac{1}{M}
+ \sum_{m=1}^{M}
+ \left[\widehat{g}_m(\pi)-\delta_m\right]_+ .
+ \label{eq:app-empirical-violation}
+\end{equation}
+Feasibility and violation in the paper are empirical quantities under
+this evaluation protocol. They should not be interpreted as deployment
+certificates for a production network.
+
+If evaluation trajectories are independent and \(c_m(\tau)\in[0,1]\), a
+one-sided Hoeffding bound gives, for any \(\alpha\in(0,1)\),
+\begin{equation}
+ g_m(\pi)
+ \leq
+ \widehat{g}_m(\pi)
+ +
+ \sqrt{\frac{\log(1/\alpha)}{2N_{\mathrm{eval}}}}
+ \quad
+ \text{with probability at least }1-\alpha .
+ \label{eq:app-hoeffding}
+\end{equation}
+For event-style semantic variables with zero observed events over
+\(N_{\mathrm{event}}\) independent replay runs, the one-sided
+Clopper--Pearson upper bound is
+\begin{equation}
+ p_m
+ \leq
+ 1-\alpha^{1/N_{\mathrm{event}}}
+ \qquad
+ \text{with confidence }1-\alpha .
+ \label{eq:app-zero-event-bound}
+\end{equation}
+Thus, observing no critical breach in finite replay is finite-protocol
+evidence of a low event rate. It is not evidence of zero risk across all
+executions or attacker variants.
+
+\subsection{Candidate Records and Archive Sets}
+\label{app:candidate-records}
+
+DA-CPSL stores each evaluated candidate as
+\begin{equation}
+ x(\pi)
+ =
+ \left(
+ \pi,
+ \widehat{\mathbf{J}}(\pi),
+ \widehat{\mathbf{g}}(\pi),
+ \widehat{\boldsymbol{\psi}}(\pi)
+ \right).
+ \label{eq:app-candidate-record}
+\end{equation}
+Here, \(\widehat{\mathbf{J}}(\pi)\) estimates the optimized objective
+returns, \(\widehat{\mathbf{g}}(\pi)\) estimates operational constraint
+summaries, and \(\widehat{\boldsymbol{\psi}}(\pi)\) records semantic
+analysis variables such as \(B_{\mathrm{crit}}\),
+\(B_{\mathrm{persist}}^{(L)}\), \(T_{\mathrm{crit}}\), and
+\(D_{\mathrm{crit}}\).
+
+Let \(\Pi\) denote the set of archived policy identities. The raw archive
+contains all evaluated candidates. The acceptable archive under limits
+\(\boldsymbol{\delta}\) contains candidates satisfying the empirical
+operational acceptance rule. The raw Pareto set and acceptable Pareto set
+are therefore different subsets of the same evaluated archive. This
+distinction is important because a policy dominated in raw objective
+space can still be useful when the policies that dominate it fail
+operational acceptance.
+
+\subsection{Baseline Implementation Details}
+\label{app:baseline-details}
+
+This subsection provides the baseline details summarized in
+Section~\ref{subsec:eval-methods}. All baselines are evaluated under the
+same cyber-range instantiation, objective definitions, deployment
+thresholds, and semantic analysis rules whenever applicable.
+
+\paragraph{Stage-1 Candidate Set.}
+This ablation evaluates the preference-diverse initialization stage
+without Stage~2 Pareto extension. It tests whether the initial candidate
+policy set alone is sufficient to support deployable selected policies.
+Each Stage~1 policy is trained under a sampled preference vector and is
+then treated as a preference-independent candidate during evaluation.
+
+\paragraph{Weighted-Sum PPO.}
+This scalarized baseline trains independent PPO policies under fixed
+explicit preference vectors over the four objectives. It tests whether a
+set of separately trained scalarized policies can substitute for an
+evaluated candidate policy set. During evaluation, the learned policies
+are treated as candidate policies and are assigned under the same
+preference grid and deployment thresholds used for DA-CPSL.
+
+\paragraph{Preference-Conditioned PPO.}
+This baseline trains a single policy conditioned on the preference vector.
+It tests whether direct preference conditioning can cover the
+four-objective trade-off surface without maintaining a separate evaluated
+record set. For candidate-set evaluation, the preference-conditioned
+policy is executed over the same evaluation preference grid, and the
+resulting evaluated policies or returns are used to compute
+objective-space metrics.
+
+\paragraph{Lagrangian PPO.}
+This constrained single-policy baseline augments scalarized PPO training
+with Lagrangian penalties for operational constraint violations. It tests
+whether a single constrained policy can satisfy shared operational
+limits under heterogeneous preferences. The learned policy is evaluated
+under the same deployment thresholds as DA-CPSL.
+
+\paragraph{Unconstrained Stage~2.}
+This ablation uses the same Stage~2 Pareto-extension structure as
+DA-CPSL, but removes acceptance-aware constraint shaping. It tests
+whether raw Pareto extension alone is sufficient for operationally
+deployable defense. The comparison with DA-CPSL isolates the role of
+acceptance-aware shaping during extension.
+
+\paragraph{Three-Objective DA-CPSL.}
+This ablation removes Critical-Asset Safety from the objective vector
+while keeping the remaining protocol matched. It tests whether the
+critical-risk objective is necessary to represent deployable defense
+trade-offs. The resulting policies are still evaluated with critical-risk
+semantic analysis, so failures hidden by the three-objective training
+signal can be observed during replay.
+
+We do not mix older baselines that were not rerun under the unified
+four-objective protocol into the main tables. Such comparisons would
+conflate differences in objectives, thresholds, and semantic-analysis
+rules.
+
+\subsection{Metric Definitions and Assignment Protocol}
+\label{app:metric-details}
+
+This subsection gives the metric and assignment details summarized in
+Section~\ref{subsec:eval-metrics}. The evaluation separates
+objective-space candidate-set quality, operational deployability, and
+replay-level cyber semantics.
+
+\paragraph{Objective-space candidate-set metrics.}
+We evaluate candidate-set quality with hypervolume, expected utility,
+coverage ratio, the number of distinct assigned policies, and the number
+of retained Pareto records. Hypervolume is computed on the empirical
+Pareto front using a shared reference point fixed across methods.
+Expected utility averages assignment utility over the evaluation
+preference grid. The coverage ratio is the fraction of retained Pareto
+records selected by at least one preference in the assignment grid.
+These metrics describe objective-space quality; they do not imply
+operational deployability.
+
+\paragraph{Operational selection metrics.}
+For deployment evaluation, buffer-based methods first select one
+representative policy from the empirical Pareto front. The selector is
+threshold-aware. Policies satisfying the shared business and cost
+thresholds are preferred. Ties are broken by smaller total violation,
+larger security return, and larger business-plus-cost return. We report
+feasible rate, mean constraint violation, selected objective returns,
+final critical compromised hosts, and critical-impact count.
+
+\paragraph{Replay-level semantic analysis metrics.}
+For selected policies, we perform replay-level semantic analysis using
+the fixed replay protocol. The analysis reports ever-critical-breach
+rate, persistent-critical-breach rate, critical dwell, first critical-hit
+time, near-miss tiers, and phase-conditioned response behavior. Zero
+observed critical breach is interpreted together with near-miss behavior
+as evidence of pre-critical containment, not as evidence of risk
+elimination.
+
+\paragraph{Finite-sample interpretation of zero observed events.}
+Let \(N\) be the number of replay episodes and suppose a critical event
+is observed zero times. The one-sided Clopper--Pearson upper confidence
+bound at confidence level \(1-\alpha\) is
+\[
+1-\alpha^{1/N}.
+\]
+In our main semantic analysis, the pooled replay count is
+\(N=3\times 20=60\). Therefore, observing \(0/60\) events gives a
+95\% one-sided upper bound of \(1-0.05^{1/60}\approx4.87\%\). This bound
+does not prove that the event cannot occur. It only states that, under
+the evaluated replay protocol, the event rate compatible with zero
+observations is bounded at the reported confidence level.
+
+\section{DA-CPSL Algorithmic Details}
+\label{app:dacpsl-details}
+
+\subsection{Acceptance-Aware Parent Selection}
+\label{app:parent-selection}
+
+At each extension round, DA-CPSL selects parent policies from the current
+archive. If the acceptable Pareto set is non-empty, the parent source set
+is
+\begin{equation}
+ \Pi_{\mathrm{src}}
+ =
+ \Pi_{\mathrm{P}}^{\mathrm{dep}}(\Pi,\boldsymbol{\delta}).
+ \label{eq:app-parent-source-acceptable}
+\end{equation}
+If no acceptable Pareto candidate exists early in training, the parent
+source set may fall back to the raw Pareto set,
+\begin{equation}
+ \Pi_{\mathrm{src}}
+ =
+ \Pi_{\mathrm{P}}(\Pi).
+ \label{eq:app-parent-source-raw}
+\end{equation}
+This fallback is used only to continue exploration. A candidate selected
+from the raw Pareto set is not eligible for deployment unless it later
+passes operational acceptance.
+
+Within \(\Pi_{\mathrm{src}}\), we use objective-space diversity to avoid
+repeatedly extending crowded regions of the archive. Extreme candidates
+for each objective are retained, and the remaining parents are ranked by
+a crowd-distance-style score. When two candidates have comparable
+coverage value, we prefer the one with smaller empirical violation and
+lower critical-risk summary. The parent-selection rule therefore promotes
+both objective diversity and operationally safer extension starting
+points.
+
+\subsection{Extension Surrogate}
+\label{app:extension-surrogate}
+
+Given a parent policy \(\pi_r\) and a target objective
+\(\ell\in\mathcal{I}\), Stage~2 trains a child policy that improves
+objective \(\ell\) while preserving non-target objectives and discouraging
+operationally unacceptable behavior. Let
+\begin{equation}
+ s_i(\pi;\pi_r)
+ =
+ \widehat{J}_i(\pi)-\eta_i\widehat{J}_i(\pi_r),
+ \qquad i\neq \ell,
+ \label{eq:app-preservation-slack}
+\end{equation}
+where \(\eta_i\) is the parent-relative preservation coefficient used on
+the stored return scale. A representative extension objective is
+\begin{equation}
+\begin{aligned}
+ \mathcal{L}_{\mathrm{ext}}(\theta)
+ ={}&
+ \mathcal{L}^{\mathrm{clip}}_{\ell}(\theta)
+ +
+ \lambda_{\mathrm{bar}}
+ \sum_{i\neq\ell}
+ \log\!\left(s_i(\pi_\theta;\pi_r)+\epsilon\right)
+ \\
+ &-
+ \lambda_{\mathrm{op}}
+ \sum_m
+ \left[\widehat{g}_m(\pi_\theta)-\delta_m\right]_+
+ -
+ \lambda_{\mathrm{crit}}
+ \widehat{\psi}_{\mathrm{crit}}(\pi_\theta).
+\end{aligned}
+\label{eq:app-extension-surrogate}
+\end{equation}
+Here, \(\mathcal{L}^{\mathrm{clip}}_{\ell}\) is the PPO-style clipped
+surrogate for the target objective, the log barrier discourages degrading
+non-target objectives below parent-relative thresholds, and the penalty
+terms discourage operational violation and critical-risk behavior. This
+surrogate is a training device. Final deployment eligibility is still
+determined by post-update evaluation and acceptance filtering.
+
+\subsection{Full DA-CPSL Workflow}
+\label{app:full-workflow}
+
+The full workflow is as follows.
+
+\begin{enumerate}
+\item \textbf{Preference-diverse initialization.} Sample a small set of
+preference vectors \(\{\mathbf{w}_q\}_{q=1}^{Q}\). For each preference,
+train a policy with scalarized PPO and evaluate the resulting policy
+under the shared evaluation protocol. Store each evaluated record in the
+archive \(\Pi\).
+
+\item \textbf{Acceptance-aware Pareto extension.} For each extension
+round: compute the raw Pareto set and the acceptable Pareto set; select
+parent policies using Appendix~\ref{app:parent-selection}; train child
+policies with Eq.~\ref{eq:app-extension-surrogate}; re-evaluate each
+child policy; and insert the resulting evaluated record into \(\Pi\).
+
+\item \textbf{Deployment-time assignment.} Given a preference vector
+\(\mathbf{w}\) and limits \(\boldsymbol{\delta}\), compute
+\(\Pi_{\mathrm{P}}^{\mathrm{dep}}(\Pi,\boldsymbol{\delta})\). If this set
+is empty, return \emph{infeasible}; otherwise return
+\begin{equation}
+\begin{aligned}
+ \pi^\star(\mathbf{w},\boldsymbol{\delta})
+ \in
+ \operatorname*{arg\,max}_{\pi\in
+ \Pi_{\mathrm{P}}^{\mathrm{dep}}(\Pi,\boldsymbol{\delta})}
+ \mathbf{w}^{\top}\widetilde{\mathbf{J}}(\pi).
+\end{aligned}
+\label{eq:app-assignment}
+\end{equation}
+\end{enumerate}
+
+\section{Relationship to C-MORL}
+\label{app:cmorl-relation}
+
+DA-CPSL uses the two-stage policy-set learning pattern of C-MORL as an
+archive-construction template: preference-diverse policies are first
+trained, and selected policies are then extended along objective
+directions under preservation constraints. DA-CPSL changes the deployment
+semantics by adding operational acceptance, critical-asset semantic
+analysis, and constrained assignment from an acceptable Pareto set.
+
+\begin{table}[!htbp]
+\centering
+\caption{Compact relationship between C-MORL and DA-CPSL.}
+\label{tab:app-cmorl-relation}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}p{0.25\columnwidth}p{0.68\columnwidth}@{}}
+\toprule
+Component & DA-CPSL adaptation of C-MORL \\
+\midrule
+Setting & From generic MORL tasks to partially observable ACD with operational side effects. \\
+Record & From policy-return pairs to records with returns, violations, and semantic summaries. \\
+Parent choice & Keeps objective diversity but prioritizes acceptable and lower-risk parents. \\
+Extension & Preserves non-target objectives and penalizes operational or critical-risk violations. \\
+Assignment & Selects from the acceptable Pareto set; may return infeasible. \\
+Evaluation & Adds feasible rate, violation, and semantic analysis to HV/EU-style metrics. \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
+
+We do not claim that DA-CPSL inherits all C-MORL guarantees unchanged.
+C-MORL provides the policy-set learning backbone; the defense-specific
+contribution is the acceptance-aware and analysis-aware adaptation.
+
+\section{Idealized Properties}
+\label{app:idealized-properties}
+
+This section records basic properties of the idealized formulation. They
+are mathematical properties of the definitions used in the paper, not
+formal guarantees of production-network safety.
+
+\paragraph{Proposition D.1: Monotone calibration preserves dominance.}
+Suppose the calibration map \(\mathcal{C}\) is coordinate-wise monotone.
+If \(\pi_a\succ_J \pi_b\), then
+\(\mathcal{C}(\mathbf{J}(\pi_a))\) weakly dominates
+\(\mathcal{C}(\mathbf{J}(\pi_b))\), with strict improvement in at least
+one coordinate whenever \(\mathcal{C}\) is strictly monotone on that
+coordinate.
+
+\emph{Proof sketch.} Pareto dominance requires
+\(J_i(\pi_a)\geq J_i(\pi_b)\) for every objective \(i\), with strict
+inequality for at least one objective. Coordinate-wise monotonicity
+preserves the weak inequalities. Strict monotonicity on a strictly
+improved coordinate preserves strict improvement.
+
+\paragraph{Proposition D.2: Assignment optimality within the acceptable Pareto set.}
+If \(\Pi_{\mathrm{P}}^{\mathrm{dep}}(\Pi,\boldsymbol{\delta})\neq\emptyset\),
+then the assignment rule in Eq.~\ref{eq:app-assignment} returns a policy
+that maximizes calibrated linear utility over the acceptable Pareto set.
+
+\emph{Proof sketch.} The result follows from the definition of
+\(\pi^\star(\mathbf{w},\boldsymbol{\delta})\) as the maximizer of
+\(\mathbf{w}^{\top}\widetilde{\mathbf{J}}(\pi)\) over
+\(\Pi_{\mathrm{P}}^{\mathrm{dep}}(\Pi,\boldsymbol{\delta})\). If the set
+is empty, DA-CPSL returns \emph{infeasible} by definition.
+
+\paragraph{Proposition D.3: Acceptance filtering enforces the specified empirical constraints.}
+For any policy \(\pi\) in the empirical acceptable archive,
+\(\widehat{g}_m(\pi)\leq\delta_m\) for all operational constraint indices
+\(m\).
+
+\emph{Proof sketch.} This follows from the definition of the acceptable
+archive. The statement is empirical because the archive uses
+\(\widehat{g}_m\) estimated under the evaluation protocol. Population-level
+constraint satisfaction would require additional statistical assumptions
+and confidence analysis.
+
+\section{Additional Experimental Protocol Details}
+\label{app:experimental-details}
+\label{app:protocol-details}
+
+The main text reports the core experimental setup and the RQ1--RQ4
+results. This appendix keeps only the additional details needed for
+interpretation and reproduction: objective-to-signal mapping,
+baseline-control notes, semantic-analysis rule families, and expanded
+result breakdowns.
+
+\subsection{Objective Signal Mapping}
+\label{app:objective-signal-mapping}
+
+\begin{table}[!htbp]
+\centering
+\caption{Objective-to-signal mapping.}
+\label{tab:app-objective-signal-map}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}p{0.29\columnwidth}p{0.64\columnwidth}@{}}
+\toprule
+Objective & Representative signals and role \\
+\midrule
+Security Effectiveness & Attacker suppression, compromise reduction, and host recovery; used for objective return and assignment utility. \\
+Business Continuity & Service preservation and disruption induced by defensive intervention; used for objective return and operational acceptance. \\
+Defense Cost & Response burden and high-disruption action usage; maximized after utility transformation and used for acceptance. \\
+Critical-Asset Safety & Critical breach, persistent compromise, first hit, and critical dwell; used for objective return, acceptance, and semantic analysis. \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
+
+The mapping separates optimized objectives from replay-level diagnostic
+variables. Critical-Asset Safety is optimized as a first-class objective,
+while semantic-analysis variables diagnose whether selected policies
+still exhibit unacceptable tail-risk behavior around critical assets.
+
+\subsection{Implementation and Baseline-Control Notes}
+\label{app:implementation-notes}
+
+All compared methods use the same cyber-range instantiation, objective
+signals, preference grid, seeds, and deployment thresholds as the main
+experimental protocol. Policy-set methods are evaluated both at the
+archive level and at the selected-policy level. Single-policy baselines
+are evaluated under the same four-objective return and deployment rules.
+We do not mix older runs produced under different objectives, thresholds,
+or semantic-analysis definitions into the main tables.
+
+The Stage~2 archive is initialized from the Stage~1 archive with the same
+seed. After every child-policy update, the resulting policy is evaluated
+again before it can enter the archive. This post-update evaluation
+provides the objective vector, violation vector, and semantic summaries
+used for Pareto filtering and assignment. Training penalties in
+Eq.~\ref{eq:app-extension-surrogate} influence candidate generation; the
+acceptance filter determines deployment eligibility.
+
+\subsection{Semantic-Analysis Rule Families}
+\label{app:semantic-rules}
+
+The semantic analysis reports two kinds of evidence. The first is strict
+critical-risk evidence: whether replay reaches critical breach, whether
+critical compromise persists, and how long compromise lasts. The second
+is process-level evidence: whether the policy exhibits questionable
+response behavior after enterprise foothold or in the pre-critical
+window.
+
+\begin{table}[!htbp]
+\centering
+\caption{Semantic-analysis rule families.}
+\label{tab:app-semantic-rule-families}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}p{0.36\columnwidth}p{0.57\columnwidth}@{}}
+\toprule
+Rule family & Diagnostic role \\
+\midrule
+Critical-breach indicators & Whether any critical asset is compromised. \\
+Persistence and dwell & Whether critical compromise persists and how long it lasts. \\
+Near-miss tiers & Breach-free but exposed trajectories, preventing a zero-risk interpretation. \\
+Post-foothold response & Whether the policy contains lateral movement early. \\
+Pre-critical action summary & Action families used before critical breach. \\
+Low-value loop rules & Repeated low-value deception or non-progressing response patterns. \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
+
+\section{Additional Main-Result Breakdowns}
+\label{app:additional-main-results}
+
+This section gives compact result breakdowns that support the main RQ1
+and RQ2 findings without repeating the full main-result tables.
 
 \subsection{Per-Seed Main Results}
 \label{app:per-seed-main-results}
 
-Because the main experiments use three seeds, we additionally report the
-primary archive-quality and operational-assignment metrics at the
-per-seed level. These appendix tables are intended to test whether the
-main improvements are driven by a single favorable run or instead remain
-directionally consistent across seeds.
+Because the main experiments use three seeds, we report the primary
+archive-quality and operational-assignment metrics at the per-seed level.
+The purpose is to test whether the main trend is driven by a single
+favorable seed.
 
-\begin{table*}[t]
+\begin{table}[!htbp]
 \centering
-\small
-\caption{Per-seed archive-quality breakdown for the three main seeds.
-The table reports hypervolume and expected utility under the shared
-four-objective evaluation protocol.}
+\caption{Per-seed archive-quality breakdown. HV is reported in \(\times 10^6\).}
 \label{tab:app-per-seed-archive-quality}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}llrr@{}}
-\toprule
-Seed & Method & Hypervolume ($\times 10^6$) & Expected Utility \\
-\midrule
-0007 & Constraint-Aware Stage-2 & 17.147 & -46.785 \\
-0007 & Stage-1 Archive & 16.903 & -46.809 \\
-0007 & Weighted-Sum & 6.705 & -136.944 \\
-0007 & Preference-Conditioned PPO & 2.467 & -154.838 \\
-0011 & Constraint-Aware Stage-2 & 27.255 & -36.658 \\
-0011 & Stage-1 Archive & 25.894 & -42.718 \\
-0011 & Weighted-Sum & 5.156 & -171.152 \\
-0011 & Preference-Conditioned PPO & 5.314 & -175.946 \\
-0019 & Constraint-Aware Stage-2 & 24.327 & -42.315 \\
-0019 & Stage-1 Archive & 23.718 & -45.113 \\
-0019 & Weighted-Sum & 5.654 & -176.605 \\
-0019 & Preference-Conditioned PPO & 3.258 & -173.017 \\
-\bottomrule
-\end{tabular}
-}
-\end{table*}
-
-\begin{table*}[t]
-\centering
+\begingroup
 \small
-\caption{Per-seed operational-assignment breakdown for the three main
-seeds. The table reports feasible-assignment rate, mean violation, final
-critical compromised hosts, and critical-impact count under the shared
-acceptance protocol.}
-\label{tab:app-per-seed-operational-assignment}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}llrrrr@{}}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}llrr@{}}
 \toprule
-Seed & Method & Feasible Rate & Violation & Final Critical Hosts & Critical Impacts \\
+Seed & Method & HV & EU \\
 \midrule
-0007 & Constraint-Aware Stage-2 & 0.025 & 0.278 & 0.000 & 0.000 \\
-0007 & Stage-1 Archive & 0.000 & 0.321 & 0.000 & 0.000 \\
-0007 & Weighted-Sum & 0.000 & 91.092 & 0.625 & 6.050 \\
-0007 & Lagrangian PPO & 0.000 & 91.866 & 0.775 & 4.350 \\
-0007 & Unconstrained Stage-2 & 0.350 & 1.816 & 0.000 & 0.000 \\
-0011 & Constraint-Aware Stage-2 & 0.925 & 0.004 & 0.000 & 0.000 \\
-0011 & Stage-1 Archive & 0.350 & 3.754 & 0.000 & 0.000 \\
-0011 & Weighted-Sum & 0.000 & 102.630 & 0.875 & 4.925 \\
-0011 & Lagrangian PPO & 0.000 & 103.041 & 0.900 & 1.000 \\
-0011 & Unconstrained Stage-2 & 0.525 & 2.600 & 0.000 & 0.000 \\
-0019 & Constraint-Aware Stage-2 & 0.975 & 0.000 & 0.000 & 0.000 \\
-0019 & Stage-1 Archive & 0.575 & 1.856 & 0.000 & 0.000 \\
-0019 & Weighted-Sum & 0.000 & 86.909 & 0.975 & 1.000 \\
-0019 & Lagrangian PPO & 0.000 & 91.916 & 0.975 & 1.125 \\
-0019 & Unconstrained Stage-2 & 0.500 & 1.967 & 0.000 & 0.000 \\
+0007 & DA-CPSL & 17.147 & -46.785 \\
+     & Stage~1 & 16.903 & -46.809 \\
+     & WSum & 6.705 & -136.944 \\
+     & PC-PPO & 2.467 & -154.838 \\
+\addlinespace[1pt]
+0011 & DA-CPSL & 27.255 & -36.658 \\
+     & Stage~1 & 25.894 & -42.718 \\
+     & WSum & 5.156 & -171.152 \\
+     & PC-PPO & 5.314 & -175.946 \\
+\addlinespace[1pt]
+0019 & DA-CPSL & 24.327 & -42.315 \\
+     & Stage~1 & 23.718 & -45.113 \\
+     & WSum & 5.654 & -176.605 \\
+     & PC-PPO & 3.258 & -173.017 \\
 \bottomrule
-\end{tabular}
-}
-\end{table*}
+\end{tabular*}
+\endgroup
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Per-seed operational-assignment breakdown. FR is feasible rate; Viol. is mean violation.}
+\label{tab:app-per-seed-operational-assignment}
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2.3pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}llrrrr@{}}
+\toprule
+Seed & Method & FR & Viol. & \shortstack{Crit.\\hosts} & Impacts \\
+\midrule
+0007 & DA-CPSL & 0.025 & 0.278 & 0.000 & 0.000 \\
+0007 & Stage~1 & 0.000 & 0.321 & 0.000 & 0.000 \\
+0007 & WSum & 0.000 & 91.092 & 0.625 & 6.050 \\
+0007 & Lag-PPO & 0.000 & 91.866 & 0.775 & 4.350 \\
+0007 & Unconstr. S2 & 0.350 & 1.816 & 0.000 & 0.000 \\
+\addlinespace[1pt]
+0011 & DA-CPSL & 0.925 & 0.004 & 0.000 & 0.000 \\
+0011 & Stage~1 & 0.350 & 3.754 & 0.000 & 0.000 \\
+0011 & WSum & 0.000 & 102.630 & 0.875 & 4.925 \\
+0011 & Lag-PPO & 0.000 & 103.041 & 0.900 & 1.000 \\
+0011 & Unconstr. S2 & 0.525 & 2.600 & 0.000 & 0.000 \\
+\addlinespace[1pt]
+0019 & DA-CPSL & 0.975 & 0.000 & 0.000 & 0.000 \\
+0019 & Stage~1 & 0.575 & 1.856 & 0.000 & 0.000 \\
+0019 & WSum & 0.000 & 86.909 & 0.975 & 1.000 \\
+0019 & Lag-PPO & 0.000 & 91.916 & 0.975 & 1.125 \\
+0019 & Unconstr. S2 & 0.500 & 1.967 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
 
 Across all three seeds, DA-CPSL remains the strongest or near-strongest
-archive-quality method, showing that the main-table gains are not driven
-by a single run. Per-seed deployment metrics likewise show that
-DA-CPSL's feasible-assignment advantage and violation reduction persist
-across seeds, rather than emerging from one unusually favorable seed.
-The purpose of these tables is to confirm directional stability, not to
-claim that all seeds produce identical magnitudes. The per-seed results
-therefore strengthen the interpretation that the aggregate gains reflect
-a repeatable trend under the stated protocol.
+archive-quality method. The operational metrics show that the magnitude
+of feasible-rate improvement varies by seed, but the aggregate trend is
+not driven by a single favorable run.
 
 \subsection{Raw Pareto Assignment vs. Acceptable Pareto Assignment}
 \label{app:raw-vs-acceptable-assignment}
 
-\begin{table*}[t]
+\begin{table}[!htbp]
 \centering
-\small
-\caption{Raw Pareto assignment versus acceptable Pareto assignment on the DA-CPSL Stage~2 archive. Feasible-assignment rate is measured over preference-grid assignments; violation and critical-risk audit metrics are assignment-weighted over selected policies.}
+\caption{Raw versus acceptable Pareto assignment on the same DA-CPSL Stage~2 archive.}
 \label{tab:app-raw-vs-acceptable-assignment}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}lrrrrr@{}}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrr@{}}
 \toprule
-Assignment Rule & Expected Utility & Feasible Assign. Rate & Mean Violation & Final Critical Hosts & Critical Impact Count \\
+Rule & EU & FR & Viol. \\
 \midrule
-Raw Pareto Assignment & -41.919 & 0.679 & 1.189 & 0.000 & 0.000 \\
-Acceptable Pareto Assignment & -43.706 & 1.000 & 0.000 & 0.000 & 0.000 \\
+Raw Pareto & -41.919 & 0.679 & 1.189 \\
+Acceptable Pareto & -43.706 & 1.000 & 0.000 \\
 \bottomrule
-\end{tabular}%
-}
-\end{table*}
+\end{tabular*}
+\endgroup
+\end{table}
 
-This mechanism ablation uses the same DA-CPSL Stage~2 archive, the same
-four-objective preference grid, and the same operational thresholds as
-the main evaluation. The only change is the assignment rule: Raw Pareto
-Assignment selects directly from the objective-space Pareto set, whereas
-Acceptable Pareto Assignment first applies the operational acceptance
-filter and then assigns from the acceptable Pareto set.
-
-The raw rule preserves the highest preference utility, but it can assign
-policies that are Pareto-optimal only in objective space while violating
-the hard business or cost limits. In contrast, the acceptable rule
-raises the feasible-assignment rate from \(0.679\) to \(1.000\) and
-reduces mean violation from \(1.189\) to \(0.000\), at the cost of a
-small reduction in expected utility. This appendix-only comparison does
-not introduce a new training result and does not replace
-Table~\ref{tab:operational-assignment-performance}; it isolates the
-assignment-rule mechanism and directly supports the design motivation in
-Section~\ref{subsec:acceptable-pareto-assignment}.
+Raw Pareto assignment selects directly from the objective-space Pareto
+set. Acceptable Pareto assignment first filters out policies violating
+the business or cost limits and then selects from the acceptable Pareto
+set. The raw rule keeps slightly higher expected utility, but it can
+select non-deployable policies.
 
 \subsection{Operational-Threshold Sensitivity}
 \label{app:threshold-sensitivity}
 
-\begin{table*}[t]
+\begin{table}[!htbp]
 \centering
-\small
-\caption{Operational-threshold sensitivity under looser, default, and stricter business/cost limits. Feasible-assignment rate and mean violation are computed over preference-grid assignments from each method's raw Pareto candidates.}
+\caption{Threshold sensitivity. Each cell reports feasible rate / mean violation.}
 \label{tab:app-threshold-sensitivity}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}llrr@{}}
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcccc@{}}
 \toprule
-Threshold Profile & Method & Feasible Assign. Rate & Mean Violation \\
+Profile & DA-CPSL & Stage~1 & Unc.~S2 & Single-pol. \\
 \midrule
-Looser & Constraint-Aware Stage-2 & 0.719 & 0.849 \\
-Looser & Stage-1 Archive & 0.716 & 0.859 \\
-Looser & Weighted-Sum & 0.000 & 101.242 \\
-Looser & Lagrangian PPO & 0.000 & 95.034 \\
-Looser & Unconstrained Stage-2 & 0.746 & 0.768 \\
-\addlinespace
-Default & Constraint-Aware Stage-2 & 0.679 & 1.189 \\
-Default & Stage-1 Archive & 0.667 & 1.214 \\
-Default & Weighted-Sum & 0.000 & 102.086 \\
-Default & Lagrangian PPO & 0.000 & 95.825 \\
-Default & Unconstrained Stage-2 & 0.746 & 1.069 \\
-\addlinespace
-Stricter & Constraint-Aware Stage-2 & 0.642 & 1.700 \\
-Stricter & Stage-1 Archive & 0.304 & 2.217 \\
-Stricter & Weighted-Sum & 0.000 & 104.273 \\
-Stricter & Lagrangian PPO & 0.000 & 97.625 \\
-Stricter & Unconstrained Stage-2 & 0.692 & 1.509 \\
+Looser & 0.719/0.849 & 0.716/0.859 & 0.746/0.768 & 0.000/>95 \\
+Default & 0.679/1.189 & 0.667/1.214 & 0.746/1.069 & 0.000/>95 \\
+Stricter & 0.642/1.700 & 0.304/2.217 & 0.692/1.509 & 0.000/>95 \\
 \bottomrule
-\end{tabular}%
-}
-\end{table*}
-
-We also test whether the operational-assignment conclusion depends on a
-single hand-picked threshold profile. Using the same official
-four-objective artifacts, seeds, and preference grid, we evaluate three
-business/cost profiles derived from the Table~B calibration set:
-looser \(q=0.10\), default \(q=0.25\), and stricter \(q=0.50\); the
-default profile exactly matches the shared thresholds used in the main
-evaluation. For each profile, the assignment rule first selects from
-each method's raw Pareto candidates by preference utility and then
-audits whether the selected objective vector satisfies the corresponding
-business and cost limits.
+\end{tabular*}
+\endgroup
+\end{table}
 
 As expected, tighter thresholds reduce feasible-assignment rates and
-increase mean violation for every method. DA-CPSL moves from
-\((0.719, 0.849)\) under the looser profile to \((0.679, 1.189)\) at
-the default profile and \((0.642, 1.700)\) under the stricter profile,
-showing gradual degradation rather than a collapse at one operating
-point. Stage-1 Only is more sensitive to tightening, dropping from
-\(0.716\) feasible-assignment rate under the looser profile to
-\(0.304\) under the stricter profile, while Unconstrained Stage~2
-retains slightly higher feasibility but also accumulates more violation
-as the limits tighten, from \((0.746, 0.768)\) to \((0.692, 1.509)\).
-Weighted-Sum and Lagrangian PPO remain infeasible across all three
-profiles, with mean violation above \(95\), so the appendix conclusion
-is robustness of the relative deployment trend rather than a new
-training or replay result. It isolates threshold sensitivity at the
-candidate/objective assignment level.
+increase mean violation. DA-CPSL shows gradual degradation rather than a
+collapse at the default profile. The single-policy baselines remain
+infeasible across all threshold profiles.
 
 \subsection{Zero-Observed Critical-Event Confidence Bounds}
 \label{app:zero-event-confidence-bounds}
 
-\begin{table*}[t]
+\begin{table}[!htbp]
 \centering
-\small
-\caption{Zero-observed critical-event confidence bounds under the finite semantic replay protocol. Bounds are one-sided Clopper--Pearson upper bounds at 95\% confidence and do not imply zero risk.}
+\caption{Zero-observed critical-event confidence bounds.}
 \label{tab:app-zero-event-confidence-bounds}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}llrrr@{}}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrr@{}}
 \toprule
-Event & Method & Observed Events / Episodes & Observed Rate & 95\% CP Upper Bound \\
+Method & Events & 95\% upper \\
 \midrule
-Ever Critical Breach & Constraint-Aware Stage-2 & 0/120 & 0.00\% & 2.47\% \\
-Persistent Critical Breach & Constraint-Aware Stage-2 & 0/120 & 0.00\% & 2.47\% \\
-Any Critical Impact & Constraint-Aware Stage-2 & 0/120 & 0.00\% & 2.47\% \\
-Any Final Critical Host Compromised & Constraint-Aware Stage-2 & 0/120 & 0.00\% & 2.47\% \\
-Ever Critical Breach & Stage-1 Archive & 0/120 & 0.00\% & 2.47\% \\
-Persistent Critical Breach & Stage-1 Archive & 0/120 & 0.00\% & 2.47\% \\
-Any Critical Impact & Stage-1 Archive & 0/120 & 0.00\% & 2.47\% \\
-Any Final Critical Host Compromised & Stage-1 Archive & 0/120 & 0.00\% & 2.47\% \\
-Ever Critical Breach & Unconstrained Stage-2 & 0/120 & 0.00\% & 2.47\% \\
-Persistent Critical Breach & Unconstrained Stage-2 & 0/120 & 0.00\% & 2.47\% \\
-Any Critical Impact & Unconstrained Stage-2 & 0/120 & 0.00\% & 2.47\% \\
-Any Final Critical Host Compromised & Unconstrained Stage-2 & 0/120 & 0.00\% & 2.47\% \\
+DA-CPSL & 0/60 & 4.87\% \\
+Stage~1 & 0/60 & 4.87\% \\
+Unconstr. S2 & 0/60 & 4.87\% \\
 \bottomrule
-\end{tabular}%
-}
-\end{table*}
+\end{tabular*}
+\endgroup
+\end{table}
 
-The zero critical-event entries in the main audit are finite-protocol
-observations, not formal guarantees of zero risk. We therefore report
-one-sided Clopper--Pearson upper confidence bounds for event-style
-semantic replay outcomes with zero observed events. For each method and
-event, the analysis pools the three official seeds, giving
-\(3\times 40=120\) semantic replay episodes under the same Table~B
-protocol.
+The zero critical-event entries in the main semantic analysis are
+finite-protocol observations, not formal guarantees of zero risk. With
+zero observed events over \(N_{\mathrm{event}}=60\), the one-sided
+95\% Clopper--Pearson upper bound is \(1-0.05^{1/60}=4.87\%\).
 
-For DA-CPSL, zero observed ever-critical breaches, persistent critical
-breaches, critical-impact events, and final critical compromised hosts
-yield a \(95\%\) upper bound of \(2.47\%\) on the corresponding
-per-episode event rate under this replay protocol. Stage-1 Only and
-Unconstrained Stage~2 have the same zero-observed-event bound for these
-audit events, whereas Weighted-Sum and Lagrangian PPO show nonzero
-critical-event counts and are therefore retained only in the
-machine-readable audit outputs for this analysis. This supports the
-interpretation ``breach-free under the replay protocol, but not
-risk-free.''
+\section{Additional Replay-Level Semantic Analysis}
+\label{app:additional-semantic-analysis}
+
+\subsection{Selected Stage~2 Policies}
+\label{app:selected-stage2-semantic-analysis}
+
+\begin{table}[!htbp]
+\centering
+\caption{Critical-risk semantic analysis for selected Stage~2 policies.}
+\label{tab:app-rq3-semantic-full-analysis}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcc@{}}
+\toprule
+Metric & DA-CPSL & Unc.~S2 \\
+\midrule
+Ever critical breach & 0.000 & 0.000 \\
+Persistent breach & 0.000 & 0.000 \\
+Mean critical dwell & 0.000 & 0.000 \\
+High-conf. risk & 0.000 & 0.000 \\
+Tier~1 near-miss & 1.000 & 1.000 \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
+
+Both selected policies are breach-free under the replay protocol. The
+near-miss row shows why zero breach should not be interpreted as zero
+risk.
+
+\begin{table}[!htbp]
+\centering
+\caption{Process-level semantic analysis for selected Stage~2 policies.}
+\label{tab:app-rq3-process-analysis}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcc@{}}
+\toprule
+Metric & DA-CPSL & Unc.~S2 \\
+\midrule
+Post-foothold drift & 0.002 & 0.338 \\
+Low-value deception loop & 0.000 & 0.254 \\
+Pre-critical restoration & 1.000 & 1.000 \\
+Pre-critical deception & 0.000 & 0.000 \\
+Critical-path focus & 1.000 & 1.000 \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
+
+The selected DA-CPSL and Unconstrained Stage~2 policies are both
+breach-free under the replay protocol. The important difference lies in
+the post-foothold response process: DA-CPSL reduces drift after enterprise
+foothold and removes repeated low-value deception loops.
+
+\subsection{Per-Seed Paired Casebooks}
+\label{app:per-seed-casebooks}
+
+\paragraph{Seed 0007.}
+The selected DA-CPSL policy shows early restoration-oriented response
+after enterprise foothold and no observed critical breach. The selected
+Unconstrained Stage~2 policy is also breach-free at the endpoint level,
+but shows higher post-foothold drift and occasional low-value response
+loops.
+
+\paragraph{Seed 0011.}
+The selected DA-CPSL policy restores the compromised enterprise host
+shortly after foothold and avoids critical compromise. The selected
+Unconstrained Stage~2 policy uses an early deception-oriented response
+before recovery becomes dominant.
+
+\paragraph{Seed 0019.}
+The selected DA-CPSL policy remains restoration-oriented and shows no
+post-foothold drift or repeated low-value loops. The selected
+Unconstrained Stage~2 policy is breach-free but exhibits decoy-first
+behavior and elevated post-foothold drift.
+
+Endpoint breach labels alone are insufficient for evaluating autonomous
+defense. Two selected policies can both be breach-free while differing in
+response timing, target focus, and post-foothold discipline.
+
+\section{Component Ablations and Robustness Boundaries}
+\label{app:ablation-robustness}
+
+\subsection{Three-Objective vs. Four-Objective DA-CPSL}
+\label{app:objective-ablation}
+
+We compare a three-objective Stage~2 variant with the four-objective
+formulation used by DA-CPSL. Because the objective counts differ, the
+set-level comparison first projects both methods into the shared
+three-dimensional space over Security Effectiveness, Business Continuity,
+and Defense Cost. Operational assignment and semantic analysis are then
+evaluated under the current four-objective protocol.
+
+\begin{table}[!htbp]
+\centering
+\caption{Projected archive-quality summary for the objective-level ablation.}
+\label{tab:app-rq4-objective-projected-set}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcc@{}}
+\toprule
+Metric & 3-Obj.~S2 & 4-Obj.~S2 \\
+\midrule
+Projected HV & 2.837 & 5.590 \\
+Projected EU & -175.402 & -55.918 \\
+Coverage ratio & 0.283 & 0.557 \\
+Distinct policies & 3.667 & 3.000 \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Critical-risk semantic analysis for the objective-level ablation.}
+\label{tab:app-rq4-objective-semantic-analysis}
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcc@{}}
+\toprule
+Metric & 3-Obj.~S2 & 4-Obj.~S2 \\
+\midrule
+Ever critical breach & 0.987 & 0.000 \\
+Persistent breach & 0.646 & 0.000 \\
+Mean critical dwell & 54.744 & 0.000 \\
+High-conf. risk & 0.983 & 0.000 \\
+Tier~1 near-miss & 0.012 & 1.000 \\
+Tier~3 exposure & 0.646 & 0.000 \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Process-level objective ablation.}
+\label{tab:app-rq4-objective-process-analysis}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcc@{}}
+\toprule
+Metric & 3-Obj.~S2 & 4-Obj.~S2 \\
+\midrule
+Post-foothold drift & 0.675 & 0.002 \\
+Low-value deception loop & 0.471 & 0.000 \\
+Pre-critical restoration & 0.413 & 1.000 \\
+Pre-critical deception & 0.489 & 0.000 \\
+Critical-path focus & 0.295 & 1.000 \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
+
+These results support the representation claim in the main text:
+Critical-Asset Safety changes which operating points are treated as
+acceptable. Without the fourth objective, selected policies can appear
+competitive in conventional objective-space terms while repeatedly
+entering critical compromise under semantic analysis.
+
+\subsection{Held-Out Attacker Shift: Stress Test and Limitations}
+\label{app:attacker-shift}
+
+We perform an appendix-only stress test that trains under the default
+attacker process and reevaluates the learned archives under a held-out
+attacker process. This experiment is not treated as an additional main
+evaluation question because the paper does not claim broad attacker
+process generalization.
+
+\begin{table}[!htbp]
+\centering
+\caption{Held-out attacker-shift summary.}
+\label{tab:app-attacker-shift-summary}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrr@{}}
+\toprule
+Method & FR & Viol. & Crit. hosts \\
+\midrule
+DA-CPSL & 0.000 & 6.994 & 0.000 \\
+Stage~1 & 0.017 & 8.074 & 0.000 \\
+Unconstr. S2 & 0.025 & 6.409 & 0.000 \\
+WSum & 0.000 & 99.314 & 0.608 \\
+\bottomrule
+\end{tabular*}
+\endgroup
+\end{table}
+
+The attacker-shift probe is cautionary. All archive-based methods
+degrade sharply under the held-out attacker process, and DA-CPSL returns
+no acceptable assignment under the shifted protocol. This reinforces the
+scope boundary of the main claim: broader attacker variation remains a
+robustness challenge rather than a solved property of the current method.
+
+
+\end{document}
+
+
+

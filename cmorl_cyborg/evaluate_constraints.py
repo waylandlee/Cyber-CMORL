@@ -12,6 +12,34 @@ from .env import CybORGMORLEnv
 from cmorl_minicage.utils import load_json, save_json
 
 base.MiniCageMORLEnv = CybORGMORLEnv
+
+
+def _build_cyborg_env_from_metadata(metadata: dict[str, object]) -> CybORGMORLEnv:
+    env_config = dict(metadata.get("env", {})) if isinstance(metadata, dict) else {}
+    model_config = dict(metadata.get("model", {})) if isinstance(metadata, dict) else {}
+    shield_config = dict(metadata.get("shield", {})) if isinstance(metadata, dict) else {}
+    return CybORGMORLEnv(
+        num_envs=int(env_config.get("num_envs", 8)),
+        red_policy=str(env_config.get("red_policy", "bline")),
+        remove_bugs=bool(env_config.get("remove_bugs", True)),
+        max_steps=int(env_config.get("max_episode_steps", 100)),
+        seed=int(env_config.get("seed", 7)),
+        scenario_name=str(env_config.get("scenario_name", "Scenario2")),
+        scenario_profile=str(env_config.get("scenario_profile", "")),
+        gym_wrapper_name=str(env_config.get("gym_wrapper_name", "ChallengeWrapper")),
+        blue_agent_name=str(env_config.get("blue_agent_name", "Blue")),
+        red_agent_name=str(env_config.get("red_agent_name", "Red")),
+        obs_mode=str(env_config.get("obs_mode", "vector")),
+        state_mode=str(env_config.get("state_mode", "true")),
+        obj_dim=int(model_config.get("obj_dim", 3)),
+        critical_host_safety_mode=str(
+            model_config.get("critical_host_safety_mode", "v2_legacy")
+        ),
+        shield_mode=str(shield_config.get("mode", "disabled")),
+    )
+
+
+base._build_env_from_metadata = _build_cyborg_env_from_metadata
 compute_shared_thresholds = base.compute_shared_thresholds
 evaluate_constraints = base.evaluate_constraints
 

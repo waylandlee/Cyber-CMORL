@@ -1,0 +1,108 @@
+schema_version: 1
+last_reviewed: 2026-04-21
+notes:
+  - "This manifest is intentionally lightweight and human-edited."
+  - "It records the current official CybORG paper line and the active 4-objective candidate line."
+  - "Heavy run products remain in place for now; this file exists so they can be archived later without losing provenance."
+
+logical_layers:
+  official_report:
+    description: "Paper-facing exports, locked summaries, and top-level protocol files."
+  repro_input:
+    description: "Configs, shared references, per-seed summaries, and selected buffer anchors needed to regenerate an official report."
+  ephemeral_run:
+    description: "run_* trees, checkpoints, generated configs, logs, replay traces, and other live execution products."
+  archive_candidate:
+    description: "Useful historical lines that are no longer part of the main locked output surface."
+
+cyborg_lines:
+  locked_paper_3obj:
+    status: locked
+    paper_role: "Current manuscript line centered on Table A, Table B, Figure C, Figure D, and promoted appendix results."
+    canonical_configs:
+      - cmorl_cyborg/configs/paper/compare_suite_main.yaml
+      - cmorl_cyborg/configs/paper/table_b_suite_main.yaml
+      - cmorl_cyborg/configs/paper/export_tables_main.yaml
+    official_reports:
+      - cmorl_cyborg/outputs/paper_table_a/set_quality_table.csv
+      - cmorl_cyborg/outputs/paper_table_a/set_quality_table.json
+      - cmorl_cyborg/outputs/paper_table_a/set_quality_table.tex
+      - cmorl_cyborg/outputs/paper_table_a/table_a_summary.json
+      - cmorl_cyborg/outputs/paper_table_a/shared_reference.json
+      - cmorl_cyborg/outputs/paper_table_b/deployment_table.json
+      - cmorl_cyborg/outputs/paper_table_b/deployment_table.tex
+      - cmorl_cyborg/outputs/paper_table_b/table_b_summary.json
+      - cmorl_cyborg/outputs/fair_compare_eval/aggregated/tight_feasible_set_summary.json
+      - cmorl_cyborg/outputs/fair_compare_eval/aggregated/tight_feasible_set_quality.png
+      - cmorl_cyborg/outputs/paper_figure_c/preference_coverage.json
+      - cmorl_cyborg/outputs/paper_figure_c/preference_coverage.png
+      - cmorl_cyborg/outputs/paper_appendix/attacker_shift/attacker_shift_summary.json
+      - cmorl_cyborg/outputs/paper_appendix/attacker_shift/attacker_shift_summary.tex
+      - cmorl_cyborg/outputs/paper_appendix/business_cost_semantics/business_cost_semantics.json
+      - cmorl_cyborg/outputs/paper_appendix/business_cost_semantics/business_cost_semantics.tex
+      - cmorl_cyborg/outputs/paper_appendix/business_cost_semantics/business_cost_semantics.png
+    repro_inputs:
+      - cmorl_cyborg/outputs/paper_table_a/compare_suite_config.yaml
+      - cmorl_cyborg/outputs/paper_table_a/tables/export_summary.json
+      - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0007/metrics_shared_ref.json
+      - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0011/metrics_shared_ref.json
+      - cmorl_cyborg/outputs/paper_table_a/ours_stage2/seed_0019/metrics_shared_ref.json
+      - cmorl_cyborg/outputs/paper_table_a/stage1_only/seed_0007/metrics_shared_ref.json
+      - cmorl_cyborg/outputs/paper_table_a/stage1_only/seed_0011/metrics_shared_ref.json
+      - cmorl_cyborg/outputs/paper_table_a/stage1_only/seed_0019/metrics_shared_ref.json
+      - cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0007/metrics_shared_ref.json
+      - cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0011/metrics_shared_ref.json
+      - cmorl_cyborg/outputs/paper_table_a/weighted_sum/seed_0019/metrics_shared_ref.json
+    ephemeral_run_examples:
+      - cmorl_cyborg/outputs/paper_table_a/**/run_*
+      - cmorl_cyborg/outputs/paper_table_b/**/run_*
+      - cmorl_cyborg/outputs/paper_5seed_runner/*
+      - cmorl_cyborg/outputs/*_runner/generated_configs/*
+    archive_candidates:
+      - cmorl_cyborg/outputs/paper_table_a/ours_stage2_deployability
+      - cmorl_cyborg/outputs/paper_table_a/ours_stage2_deployability_v2
+      - cmorl_cyborg/outputs/paper_table_a/ours_stage2_deployability_v3
+
+  active_v2_4_4obj:
+    status: active
+    paper_role: "Active semantic-safety upgrade line; not yet the fully locked main manuscript protocol."
+    canonical_configs:
+      - cmorl_cyborg/configs/paper/compare_suite_main_4obj.yaml
+      - cmorl_cyborg/configs/paper/table_b_suite_main_4obj.yaml
+      - cmorl_cyborg/configs/paper/export_tables_main_4obj.yaml
+      - cmorl_cyborg/configs/paper/compare_suite_v2_4_row.yaml
+      - cmorl_cyborg/configs/paper/export_tables_v2_4_row.yaml
+    official_reports:
+      - cmorl_cyborg/outputs/paper_table_v2_4/table_a/compare_suite_config.yaml
+      - cmorl_cyborg/outputs/paper_table_v2_4/table_a/shared_reference.json
+      - cmorl_cyborg/outputs/paper_table_v2_4/table_a/table_a_summary.json
+      - cmorl_cyborg/outputs/paper_table_v2_4/table_b/aggregated/ours_stage2_v2_4.json
+      - cmorl_cyborg/outputs/paper_table_v2_4/tables/table_a_metrics.tex
+      - cmorl_cyborg/outputs/paper_table_v2_4/tables/table_b_constraints.tex
+      - paper/table/set_quality_4obj.tex
+      - paper/table/constrained_deployment_performance_4obj.tex
+    repro_inputs:
+      - cmorl_cyborg/outputs/paper_table_v2_4/table_a/ours_stage2_v2_4/seed_0007
+      - cmorl_cyborg/outputs/paper_table_v2_4/table_a/ours_stage2_v2_4/seed_0011
+      - cmorl_cyborg/outputs/paper_table_v2_4/table_a/ours_stage2_v2_4/seed_0019
+      - cmorl_cyborg/outputs/paper_table_v2_4/tables/export_summary.json
+    open_decisions:
+      - "Whether V2.4 Table B should become the main Table B line or remain a candidate row."
+      - "Whether 4-objective Table A should replace the old 3-objective main table or remain a supplemental table."
+    archive_candidates:
+      - cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_1_4obj_analysis
+      - cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_2_4obj_analysis
+      - cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_3_4obj_analysis
+      - cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_4_4obj_analysis
+      - cmorl_cyborg/outputs/paper_appendix/critical_safe_v2_4obj_analysis
+
+minicage_reference_line:
+  status: historical_reference
+  paper_role: "Algorithm migration history, dense-front exploration, and baseline context."
+  official_reports:
+    - cmorl_minicage/outputs/paper_table_a
+    - cmorl_minicage/outputs/paper_table_b
+    - cmorl_minicage/outputs/paper_appendix
+    - cmorl_minicage/outputs/plots
+  archive_candidates:
+    - "Nested run_* checkpoint trees after their summaries and plots are frozen elsewhere."
