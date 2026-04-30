@@ -1,0 +1,43 @@
+# Semantic Risk Summary: stage2_ext_001_obj_0
+
+- Candidate: `objective_selected` / `stage2_ext_001_obj_0`
+- Trace dir: `/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/paper_appendix/semantic_repair_traces/phase0_objective_selected/ours_stage2_fair/seed_0019/objective_selected__stage2_ext_001_obj_0`
+- Tight thresholds: `business >= -125.0` `cost >= -22.0`
+- Audit verdict: `Red`
+
+## Core Metrics
+
+- Mean returns: `security=-672.3583` `business=-115.9873` `cost=-22.3921`
+- Env-run feasible rate: `0.1250`
+- Per-env violation rate: `business=0.3750` `cost=0.7083`
+- Critical breach: `ever=0.9167` `persistent=0.8333`
+- Mean critical dwell steps: `56.6250`
+- Mean `Op_Server0` impact count: `54.4583`
+
+## Risk Tiers
+
+- `Tier 0 Safe`: count=`0` rate=`0.0000`
+- `Tier 1 Near-Miss`: count=`2` rate=`0.0833`
+- `Tier 2 Transient Critical Breach`: count=`2` rate=`0.0833`
+- `Tier 3 Persistent Critical Breach`: count=`20` rate=`0.8333`
+
+## Questionable Defense Actions
+
+- High-confidence events: `count=548` `env_run_rate=0.9167`
+- Medium-confidence events: `count=159` `env_run_rate=0.9583`
+- `Q1_sleep_during_critical_breach`: `events=5` `env_runs=5`
+- `Q2_user_action_during_critical_breach`: `events=541` `env_runs=22`
+- `Q3_missed_immediate_response_to_critical_hit`: `events=2` `env_runs=2`
+- `Q4_user_focus_after_enterprise_foothold`: `events=132` `env_runs=23`
+- `Q5_repeated_low_value_decoy_loop`: `events=27` `env_runs=21`
+
+## Audit Comparison
+
+| Audit | env-runs | feasible_rate | ever_critical | persistent_critical | high_conf_env_rate | verdict |
+| --- | --- | --- | --- | --- | --- | --- |
+| 3-episode audit | 24 | 0.1250 | 0.9167 | 0.8333 | 0.9167 | Red |
+| 20-episode confirmatory audit | 160 | 0.1562 | 0.9625 | 0.8750 | 0.9500 | Red |
+
+## Final Diagnosis
+
+- `constraint-feasible but semantically fragile`

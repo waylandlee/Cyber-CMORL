@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.2.0",
+  "method_name": "lagrangian_ppo_4obj",
+  "model_type": "actor_critic",
+  "policy_id": "lagrangian_ppo_final",
+  "checkpoint_path": "cmorl_cyborg/outputs/paper_4obj/lagrangian_ppo_4obj_smoke/seed_0007/run_f3445f6a/policy_final.pt",
+  "final_objective_vector": [
+    -714.75,
+    -161.9250030517578,
+    -21.094999313354492,
+    -1.5689901113510132
+  ],
+  "env": {
+    "num_envs": 2,
+    "red_policy": "bline",
+    "remove_bugs": true,
+    "max_episode_steps": 100,
+    "seed": 7,
+    "scenario_name": "Scenario2",
+    "scenario_profile": "",
+    "gym_wrapper_name": "ChallengeWrapper",
+    "blue_agent_name": "Blue",
+    "red_agent_name": "Red",
+    "obs_mode": "vector",
+    "state_mode": "True"
+  },
+  "model": {
+    "hidden_size": 128,
+    "obj_dim": 4,
+    "critical_host_safety_enabled": true,
+    "critical_host_safety_mode": "v2_1_dense_persistent"
+  },
+  "rollout": {
+    "num_steps": 16
+  },
+  "evaluation": {
+    "eval_episodes": 1,
+    "preference_step": 0.1
+  },
+  "training": {
+    "seed": 7,
+    "total_timesteps": 512,
+    "num_updates": 16,
+    "dual_lr": 0.05,
+    "thresholds_path": "cmorl_cyborg/outputs/paper_4obj/table_b/shared_thresholds.json",
+    "thresholds": {
+      "d_business": -27.781768798828125,
+      "d_cost": -24.6200008392334
+    },
+    "final_lambdas": {
+      "business": 0.0,
+      "cost": 0.0
+    },
+    "objective_form": "sec_plus_crit_with_biz_cost_constraints",
+    "output_dir": "cmorl_cyborg/outputs/paper_4obj/lagrangian_ppo_4obj_smoke/seed_0007"
+  }
+}

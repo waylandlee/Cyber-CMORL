@@ -1,0 +1,1211 @@
+{
+  "schema_version": "0.3.0",
+  "metadata": {
+    "schema_version": "0.3.0",
+    "stage": "stage2",
+    "env": {
+      "num_envs": 2,
+      "red_policy": "bline",
+      "remove_bugs": true,
+      "max_episode_steps": 20,
+      "seed": 19,
+      "scenario_name": "Scenario2",
+      "scenario_profile": "",
+      "gym_wrapper_name": "ChallengeWrapper",
+      "blue_agent_name": "Blue",
+      "red_agent_name": "Red",
+      "obs_mode": "vector",
+      "state_mode": true
+    },
+    "model": {
+      "hidden_size": 64,
+      "obj_dim": 3
+    },
+    "rollout": {
+      "num_steps": 16
+    },
+    "optimizer": {
+      "clip_param": 0.2,
+      "ppo_epochs": 4,
+      "num_mini_batch": 4,
+      "value_loss_coef": 0.5,
+      "entropy_coef": 0.01,
+      "learning_rate": 0.0003,
+      "max_grad_norm": 0.5,
+      "barrier_coef": 20.0,
+      "beta": 0.9,
+      "gamma": 0.995,
+      "gae_lambda": 0.95,
+      "eps": 1e-08
+    },
+    "evaluation": {
+      "eval_episodes": 1,
+      "preference_step": 0.5
+    },
+    "seed": 19,
+    "stage1_buffer": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/solution_buffer.json",
+    "num_extension_policies": 2,
+    "extension_rounds": 1,
+    "constrained_updates": 1,
+    "max_consecutive_constraint_failures": 1,
+    "constraint_tolerance": 1e-06,
+    "total_timesteps_per_update": 256,
+    "selection_mode": "adaptive",
+    "selection_pool_mode": "pareto_plus_deployability",
+    "selection_weights": {
+      "crowding": 0.2,
+      "expansion": 0.2,
+      "low_risk": 0.1,
+      "coverage": 0.1,
+      "semantic_low_risk": 0.4
+    },
+    "selection_utility_tolerance": 0.02,
+    "selection_keep_extremes": true,
+    "selection_near_frontier_quota": 2,
+    "selection_strict_frontier_quota": 2,
+    "extension_mode": "constrained",
+    "beta_mode": "dynamic",
+    "beta_min": 0.85,
+    "beta_max": 0.95,
+    "beta_schedule_weights": {
+      "crowding": 0.25,
+      "expansion": 0.35,
+      "low_risk": 0.2,
+      "progress": 0.2
+    },
+    "round_summaries": [
+      {
+        "round_index": 0,
+        "num_records_before_round": 9,
+        "pareto_size_before_round": 4,
+        "selection_pool_size": 5,
+        "selection_mode": "adaptive",
+        "selection_pool_mode": "pareto_plus_deployability",
+        "beta_schedule_mode": "dynamic",
+        "deployability_frontier_sizes": {
+          "value_frontier": 4,
+          "near_frontier": 2,
+          "strict_frontier": 0
+        },
+        "deployability_frontiers": {
+          "value_frontier_policy_ids": [
+            "stage1_pref_000_ckpt_008",
+            "stage1_pref_000_ckpt_015",
+            "stage1_pref_001_ckpt_008",
+            "stage1_pref_002_ckpt_008"
+          ],
+          "near_frontier_policy_ids": [
+            "stage1_pref_002_ckpt_015",
+            "stage1_pref_002_ckpt_008"
+          ],
+          "strict_frontier_policy_ids": []
+        },
+        "selection_pool_policy_ids": [
+          "stage1_pref_000_ckpt_008",
+          "stage1_pref_000_ckpt_015",
+          "stage1_pref_001_ckpt_008",
+          "stage1_pref_002_ckpt_008",
+          "stage1_pref_002_ckpt_015"
+        ],
+        "strict_profile": {
+          "name": "stage2_deployability",
+          "business_min": -125.0,
+          "cost_min": -22.0,
+          "mean_violation_max": 0.5,
+          "final_critical_max": 0.25,
+          "high_disruption_max": 0.5
+        },
+        "support_shell_thresholds": {
+          "S0": {
+            "business_min": -16.772999572753907,
+            "cost_min": -3.959999990463257,
+            "mean_violation_max": 0.0,
+            "high_disruption_max": 0.825
+          },
+          "S1": {
+            "business_min": -16.607250213623047,
+            "cost_min": -3.886999988555908,
+            "mean_violation_max": 0.0,
+            "high_disruption_max": 0.8049999999999999
+          },
+          "S2": {
+            "business_min": -16.35675048828125,
+            "cost_min": -3.83100004196167,
+            "mean_violation_max": 0.0,
+            "high_disruption_max": 0.765
+          }
+        },
+        "selected_policy_ids": [
+          "stage1_pref_000_ckpt_015",
+          "stage1_pref_002_ckpt_008"
+        ],
+        "selected_policy_crowding": {
+          "stage1_pref_000_ckpt_015": Infinity,
+          "stage1_pref_002_ckpt_008": Infinity
+        },
+        "selected_policy_scores": {
+          "stage1_pref_000_ckpt_015": 0.6893333275318146,
+          "stage1_pref_002_ckpt_008": 0.7628474742770195
+        },
+        "selected_policy_components": {
+          "stage1_pref_000_ckpt_015": {
+            "crowding_score": 1.0,
+            "expansion_potential": 0.26999998092651367,
+            "target_expansion_by_objective": [
+              0.0,
+              0.0,
+              0.26999998092651367
+            ],
+            "constraint_risk": 1.0,
+            "low_risk_score": 0.0,
+            "utility_coverage_gain": 0.8333333134651184,
+            "semantic_risk": 0.12,
+            "semantic_low_risk_score": 0.88,
+            "semantic_metrics": {
+              "business_return": -22.642499923706055,
+              "cost_return": -4.244999885559082,
+              "mean_violation": 0.0,
+              "high_disruption_action_rate": 0.9,
+              "final_critical_compromised_hosts": 1.0
+            }
+          },
+          "stage1_pref_002_ckpt_008": {
+            "crowding_score": 1.0,
+            "expansion_potential": 0.7115414142608643,
+            "target_expansion_by_objective": [
+              0.5772356986999512,
+              0.7115414142608643,
+              0.0
+            ],
+            "constraint_risk": 0.5712747573852539,
+            "low_risk_score": 0.4287252426147461,
+            "utility_coverage_gain": 0.1666666716337204,
+            "semantic_risk": 0.09750000000000003,
+            "semantic_low_risk_score": 0.9025,
+            "semantic_metrics": {
+              "business_return": -16.732500076293945,
+              "cost_return": -3.9149999618530273,
+              "mean_violation": 0.0,
+              "high_disruption_action_rate": 0.825,
+              "final_critical_compromised_hosts": 0.5
+            }
+          }
+        },
+        "extension_results": [
+          {
+            "parent_policy_id": "stage1_pref_000_ckpt_015",
+            "target_objective": 0,
+            "generated_policy_id": "stage2_ext_000_obj_0",
+            "successful_constrained_updates": 1,
+            "terminated_due_to_constraints": false,
+            "selection_score": 0.6893333275318146,
+            "selection_rank": 2,
+            "dynamic_beta": 0.9249999999999999,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.0,
+              "low_risk": 0.0,
+              "progress": 0.0,
+              "strictness": 0.25
+            },
+            "last_constraint_margins": [
+              0.6066875457763672,
+              0.039749860763549805
+            ],
+            "objective_improvement": 31.87500762939453,
+            "ipo_stats": {
+              "value_loss": 675.7283687591553,
+              "action_loss": 40.77204704284668,
+              "objective_surrogate": -128.7470531463623,
+              "barrier_bonus": -1.842068076133728,
+              "min_constraint_margin": -8.866443037986755,
+              "feasible_ratio": 0.0,
+              "entropy": 4.257896840572357,
+              "beta_used": 0.9249999999999999
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_000_ckpt_015",
+            "target_objective": 1,
+            "generated_policy_id": null,
+            "successful_constrained_updates": 0,
+            "terminated_due_to_constraints": true,
+            "selection_score": 0.6893333275318146,
+            "selection_rank": 2,
+            "dynamic_beta": 0.9249999999999999,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.0,
+              "low_risk": 0.0,
+              "progress": 0.0,
+              "strictness": 0.25
+            },
+            "max_consecutive_constraint_failures": 1,
+            "consecutive_constraint_failures": 1,
+            "last_constraint_margins": [
+              -52.473121643066406,
+              -0.48025035858154297
+            ],
+            "ipo_stats": {
+              "value_loss": 511.07521629333496,
+              "action_loss": 6.4299624264240265,
+              "objective_surrogate": -20.007462978363037,
+              "barrier_bonus": -1.842068076133728,
+              "min_constraint_margin": -39.71159791946411,
+              "feasible_ratio": 0.0,
+              "entropy": 4.453323841094971,
+              "beta_used": 0.9249999999999999
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_000_ckpt_015",
+            "target_objective": 2,
+            "generated_policy_id": null,
+            "successful_constrained_updates": 0,
+            "terminated_due_to_constraints": true,
+            "selection_score": 0.6893333275318146,
+            "selection_rank": 2,
+            "dynamic_beta": 0.915550000667572,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.26999998092651367,
+              "low_risk": 0.0,
+              "progress": 0.0,
+              "strictness": 0.3444999933242798
+            },
+            "max_consecutive_constraint_failures": 1,
+            "consecutive_constraint_failures": 1,
+            "last_constraint_margins": [
+              -34.504486083984375,
+              -8.824118614196777
+            ],
+            "ipo_stats": {
+              "value_loss": 685.6975936889648,
+              "action_loss": 2.118090443313122,
+              "objective_surrogate": -6.3880903124809265,
+              "barrier_bonus": -1.842068076133728,
+              "min_constraint_margin": -48.812625885009766,
+              "feasible_ratio": 0.0,
+              "entropy": 4.353403061628342,
+              "beta_used": 0.915550000667572
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_002_ckpt_008",
+            "target_objective": 0,
+            "generated_policy_id": null,
+            "successful_constrained_updates": 0,
+            "terminated_due_to_constraints": true,
+            "selection_score": 0.7628474742770195,
+            "selection_rank": 1,
+            "dynamic_beta": 0.8962222456932067,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.5772356986999512,
+              "low_risk": 0.4287252426147461,
+              "progress": 0.0,
+              "strictness": 0.5377775430679321
+            },
+            "max_consecutive_constraint_failures": 1,
+            "consecutive_constraint_failures": 1,
+            "last_constraint_margins": [
+              5.056344985961914,
+              -0.6101112365722656
+            ],
+            "ipo_stats": {
+              "value_loss": 277.1695137023926,
+              "action_loss": 24.88017463684082,
+              "objective_surrogate": -150.13017559051514,
+              "barrier_bonus": -1.842068076133728,
+              "min_constraint_margin": -7.669950485229492,
+              "feasible_ratio": 0.0,
+              "entropy": 4.624194473028183,
+              "beta_used": 0.8962222456932067
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_002_ckpt_008",
+            "target_objective": 1,
+            "generated_policy_id": null,
+            "successful_constrained_updates": 0,
+            "terminated_due_to_constraints": true,
+            "selection_score": 0.7628474742770195,
+            "selection_rank": 1,
+            "dynamic_beta": 0.8915215456485748,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.7115414142608643,
+              "low_risk": 0.4287252426147461,
+              "progress": 0.0,
+              "strictness": 0.5847845435142518
+            },
+            "max_consecutive_constraint_failures": 1,
+            "consecutive_constraint_failures": 1,
+            "last_constraint_margins": [
+              -38.386924743652344,
+              -0.3839137554168701
+            ],
+            "ipo_stats": {
+              "value_loss": 440.36711502075195,
+              "action_loss": 5.758260205388069,
+              "objective_surrogate": -25.35451090335846,
+              "barrier_bonus": -1.842068076133728,
+              "min_constraint_margin": -43.39303016662598,
+              "feasible_ratio": 0.0,
+              "entropy": 4.633609175682068,
+              "beta_used": 0.8915215456485748
+            }
+          },
+          {
+            "parent_policy_id": "stage1_pref_002_ckpt_008",
+            "target_objective": 2,
+            "generated_policy_id": null,
+            "successful_constrained_updates": 0,
+            "terminated_due_to_constraints": true,
+            "selection_score": 0.7628474742770195,
+            "selection_rank": 1,
+            "dynamic_beta": 0.916425495147705,
+            "beta_components": {
+              "crowding": 1.0,
+              "target_expansion": 0.0,
+              "low_risk": 0.4287252426147461,
+              "progress": 0.0,
+              "strictness": 0.33574504852294923
+            },
+            "max_consecutive_constraint_failures": 1,
+            "consecutive_constraint_failures": 1,
+            "last_constraint_margins": [
+              -34.26771545410156,
+              -3.5414962768554688
+            ],
+            "ipo_stats": {
+              "value_loss": 626.132022857666,
+              "action_loss": 1.8625508025288582,
+              "objective_surrogate": -5.862550795078278,
+              "barrier_bonus": -1.842068076133728,
+              "min_constraint_margin": -48.804076194763184,
+              "feasible_ratio": 0.0,
+              "entropy": 4.579645961523056,
+              "beta_used": 0.916425495147705
+            }
+          }
+        ],
+        "num_records_after_round": 10,
+        "pareto_size_after_round": 1
+      }
+    ],
+    "deployability_frontiers": {
+      "value_frontier_policy_ids": [
+        "stage2_ext_000_obj_0"
+      ],
+      "near_frontier_policy_ids": [
+        "stage1_pref_002_ckpt_015",
+        "stage1_pref_002_ckpt_008"
+      ],
+      "strict_frontier_policy_ids": []
+    },
+    "parent_buffer_metadata": {
+      "schema_version": "0.3.0",
+      "stage": "stage1",
+      "env": {
+        "num_envs": 2,
+        "red_policy": "bline",
+        "remove_bugs": true,
+        "max_episode_steps": 20,
+        "seed": 7,
+        "scenario_name": "Scenario2",
+        "scenario_profile": "",
+        "gym_wrapper_name": "ChallengeWrapper",
+        "blue_agent_name": "Blue",
+        "red_agent_name": "Red",
+        "obs_mode": "vector",
+        "state_mode": true
+      },
+      "model": {
+        "hidden_size": 64,
+        "obj_dim": 3
+      },
+      "rollout": {
+        "num_steps": 16
+      },
+      "optimizer": {
+        "clip_param": 0.2,
+        "ppo_epochs": 4,
+        "num_mini_batch": 4,
+        "value_loss_coef": 0.5,
+        "entropy_coef": 0.01,
+        "learning_rate": 0.0003,
+        "max_grad_norm": 0.5,
+        "gamma": 0.995,
+        "gae_lambda": 0.95
+      },
+      "evaluation": {
+        "eval_episodes": 1,
+        "preference_step": 0.5
+      },
+      "seed": 7,
+      "num_policies": 3,
+      "preference_strategy": "explicit",
+      "preference_step": 0.5,
+      "preference_dirichlet_alpha": 1.0,
+      "explicit_preferences": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "preferences": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "total_timesteps": 512,
+      "timesteps_per_policy": 512,
+      "total_stage_timesteps": 1536,
+      "stage1_summary": [
+        {
+          "preference_index": 0,
+          "preference": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "num_updates": 16,
+          "save_every": 8,
+          "timesteps_per_policy": 512,
+          "num_saved_checkpoints": 3,
+          "final_policy_id": "stage1_pref_000_ckpt_015",
+          "final_objective_vector": [
+            -87.97500610351562,
+            -13.577500343322754,
+            -4.269999980926514
+          ],
+          "best_policy_id": "stage1_pref_000_ckpt_015",
+          "best_scalarized_utility": -87.97500610351562,
+          "preference_seed": 7,
+          "env_seed": 7,
+          "protocol_name": "cyborg_migration",
+          "execution_mode": "serial"
+        },
+        {
+          "preference_index": 1,
+          "preference": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "num_updates": 16,
+          "save_every": 8,
+          "timesteps_per_policy": 512,
+          "num_saved_checkpoints": 3,
+          "final_policy_id": "stage1_pref_001_ckpt_015",
+          "final_objective_vector": [
+            -151.5500030517578,
+            -21.69124984741211,
+            -4.5
+          ],
+          "best_policy_id": "stage1_pref_001_ckpt_000",
+          "best_scalarized_utility": -19.78999900817871,
+          "preference_seed": 7,
+          "env_seed": 7,
+          "protocol_name": "cyborg_migration",
+          "execution_mode": "serial"
+        },
+        {
+          "preference_index": 2,
+          "preference": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "num_updates": 16,
+          "save_every": 8,
+          "timesteps_per_policy": 512,
+          "num_saved_checkpoints": 3,
+          "final_policy_id": "stage1_pref_002_ckpt_015",
+          "final_objective_vector": [
+            -152.5500030517578,
+            -22.0362491607666,
+            -4.675000190734863
+          ],
+          "best_policy_id": "stage1_pref_002_ckpt_008",
+          "best_scalarized_utility": -4.0,
+          "preference_seed": 7,
+          "env_seed": 7,
+          "protocol_name": "cyborg_migration",
+          "execution_mode": "serial"
+        }
+      ],
+      "stage1_protocol_name": "cyborg_migration",
+      "reseed_mode": "shared",
+      "independent_env_per_preference": false,
+      "preference_seed_stride": 1000,
+      "env_seed_stride": 1000,
+      "parallel_workers": 1,
+      "parallel_backend": "process",
+      "merge_order": "preference_index"
+    }
+  },
+  "records": [
+    {
+      "policy_id": "stage1_pref_000_ckpt_000",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/policy_pref_000_ckpt_000.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -149.0500030517578,
+        -21.333749771118164,
+        -4.264999866485596
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 32,
+        "rollout_return_estimate": [
+          -57.375,
+          -9.477500915527344,
+          -3.065000534057617
+        ],
+        "scalarized_utility": -149.0500030517578,
+        "trainer_stats": {
+          "value_loss": 437.340726852417,
+          "action_loss": 30.458597660064697,
+          "entropy": 4.972447723150253
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true,
+        "deployability": {
+          "business_return": -20.71875,
+          "cost_return": -4.204999923706055,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.925,
+          "final_critical_compromised_hosts": 1.0,
+          "strict_margin": -0.75,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.8725
+        }
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_008",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/policy_pref_000_ckpt_008.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -107.94999694824219,
+        -16.956249237060547,
+        -4.264999866485596
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 288,
+        "rollout_return_estimate": [
+          -81.64999389648438,
+          -13.473751068115234,
+          -3.005000352859497
+        ],
+        "scalarized_utility": -107.94999694824219,
+        "trainer_stats": {
+          "value_loss": 768.5242958068848,
+          "action_loss": 45.37096643447876,
+          "entropy": 4.945461839437485
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true,
+        "deployability": {
+          "business_return": -16.918750762939453,
+          "cost_return": -4.220000267028809,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.9,
+          "final_critical_compromised_hosts": 0.5,
+          "strict_margin": -0.4,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.88
+        }
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_015",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/policy_pref_000_ckpt_015.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -87.97500610351562,
+        -13.577500343322754,
+        -4.269999980926514
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -55.64999771118164,
+          -11.387499809265137,
+          -3.6150002479553223
+        ],
+        "scalarized_utility": -87.97500610351562,
+        "trainer_stats": {
+          "value_loss": 356.02649688720703,
+          "action_loss": 28.132943272590637,
+          "entropy": 4.641386568546295
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": true,
+        "deployability": {
+          "business_return": -22.642499923706055,
+          "cost_return": -4.244999885559082,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.9,
+          "final_critical_compromised_hosts": 1.0,
+          "strict_margin": -0.75,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.88
+        }
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_000",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/policy_pref_001_ckpt_000.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -143.0,
+        -19.78999900817871,
+        -4.070000171661377
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 32,
+        "rollout_return_estimate": [
+          -48.024993896484375,
+          -8.268749237060547,
+          -3.2300002574920654
+        ],
+        "scalarized_utility": -19.78999900817871,
+        "trainer_stats": {
+          "value_loss": 387.5340042114258,
+          "action_loss": 4.348567940294743,
+          "entropy": 4.972372084856033
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 3,
+        "is_nondominated_after_save": true,
+        "deployability": {
+          "business_return": -16.106250762939453,
+          "cost_return": -4.144999980926514,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.9,
+          "final_critical_compromised_hosts": 0.5,
+          "strict_margin": -0.4,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.88
+        }
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_008",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/policy_pref_001_ckpt_008.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -120.1500015258789,
+        -21.671249389648438,
+        -4.175000190734863
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 288,
+        "rollout_return_estimate": [
+          -82.64999389648438,
+          -14.095001220703125,
+          -3.2850003242492676
+        ],
+        "scalarized_utility": -21.671249389648438,
+        "trainer_stats": {
+          "value_loss": 792.9118232727051,
+          "action_loss": 7.6639686822891235,
+          "entropy": 4.891104876995087
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": true,
+        "deployability": {
+          "business_return": -18.823749542236328,
+          "cost_return": -3.990000009536743,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.825,
+          "final_critical_compromised_hosts": 1.0,
+          "strict_margin": -0.75,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.9025
+        }
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_015",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/policy_pref_001_ckpt_015.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -151.5500030517578,
+        -21.69124984741211,
+        -4.5
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -46.05000305175781,
+          -8.980000495910645,
+          -3.210000514984131
+        ],
+        "scalarized_utility": -21.69124984741211,
+        "trainer_stats": {
+          "value_loss": 223.97641277313232,
+          "action_loss": 4.552671909332275,
+          "entropy": 4.481803297996521
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": false,
+        "deployability": {
+          "business_return": -19.642499923706055,
+          "cost_return": -4.184999942779541,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.875,
+          "final_critical_compromised_hosts": 1.0,
+          "strict_margin": -0.75,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.8875
+        }
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_000",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/policy_pref_002_ckpt_000.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -104.74999237060547,
+        -16.477500915527344,
+        -4.275000095367432
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 32,
+        "rollout_return_estimate": [
+          -30.725000381469727,
+          -6.239999771118164,
+          -3.65000057220459
+        ],
+        "scalarized_utility": -4.275000095367432,
+        "trainer_stats": {
+          "value_loss": 117.82105243206024,
+          "action_loss": 1.4873619601130486,
+          "entropy": 4.9720423221588135
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": false,
+        "deployability": {
+          "business_return": -20.856250762939453,
+          "cost_return": -4.144999980926514,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.9,
+          "final_critical_compromised_hosts": 1.0,
+          "strict_margin": -0.75,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.88
+        }
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_008",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/policy_pref_002_ckpt_008.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -125.25,
+        -19.596250534057617,
+        -4.0
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 288,
+        "rollout_return_estimate": [
+          -71.64999389648438,
+          -13.821249008178711,
+          -3.270000457763672
+        ],
+        "scalarized_utility": -4.0,
+        "trainer_stats": {
+          "value_loss": 600.5604915618896,
+          "action_loss": 1.3492042683064938,
+          "entropy": 4.869484901428223
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": true,
+        "deployability": {
+          "business_return": -16.732500076293945,
+          "cost_return": -3.9149999618530273,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.825,
+          "final_critical_compromised_hosts": 0.5,
+          "strict_margin": -0.32499999999999996,
+          "passed_strict": false,
+          "support_shell_reached": "S0",
+          "deployability_score": 0.9025
+        }
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_015",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage1_repro/run_7c6d995d/policy_pref_002_ckpt_015.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -152.5500030517578,
+        -22.0362491607666,
+        -4.675000190734863
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -32.92500305175781,
+          -6.43625020980835,
+          -2.9150002002716064
+        ],
+        "scalarized_utility": -4.675000190734863,
+        "trainer_stats": {
+          "value_loss": 157.6304030418396,
+          "action_loss": 1.2366766706109047,
+          "entropy": 4.697681665420532
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": false,
+        "deployability": {
+          "business_return": -16.799999237060547,
+          "cost_return": -3.7750000953674316,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.725,
+          "final_critical_compromised_hosts": 0.5,
+          "strict_margin": -0.25,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.9325
+        }
+      }
+    },
+    {
+      "policy_id": "stage2_ext_000_obj_0",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage2_deployability/run_55e51760/policy_stage2_000.pt",
+      "preference": null,
+      "objective_vector": [
+        -56.099998474121094,
+        -11.952500343322754,
+        -3.9100000858306885
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_000_ckpt_015",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -87.97500610351562,
+        -13.577500343322754,
+        -4.269999980926514
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6893333275318146,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.26999998092651367,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.8333333134651184,
+        "dynamic_beta": 0.9249999999999999,
+        "beta_mode": "dynamic",
+        "extension_mode": "constrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.0,
+          "progress": 0.0,
+          "strictness": 0.25
+        },
+        "successful_constrained_updates": 1,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": 1e-06,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": [
+          0.6066875457763672,
+          0.039749860763549805
+        ],
+        "objective_improvement": 31.87500762939453,
+        "ipo_stats": {
+          "value_loss": 675.7283687591553,
+          "action_loss": 40.77204704284668,
+          "objective_surrogate": -128.7470531463623,
+          "barrier_bonus": -1.842068076133728,
+          "min_constraint_margin": -8.866443037986755,
+          "feasible_ratio": 0.0,
+          "entropy": 4.257896840572357,
+          "beta_used": 0.9249999999999999
+        },
+        "deployability": {
+          "business_return": -21.186248779296875,
+          "cost_return": -4.105000019073486,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.95,
+          "final_critical_compromised_hosts": 1.0,
+          "strict_margin": -0.75,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.865
+        },
+        "deployability_acceptance": {
+          "accepted_without_shell_gain": true,
+          "strict_margin_delta": 0.0,
+          "deployability_score_delta": -0.015000000000000013,
+          "support_shell_before": "NONE",
+          "support_shell_after": "NONE"
+        },
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true
+      }
+    }
+  ],
+  "pareto_front": [
+    {
+      "policy_id": "stage2_ext_000_obj_0",
+      "checkpoint_path": "/home/waylandlee/CMORL2/Cyber-CMORL/cmorl_cyborg/outputs/smoke/stage2_deployability/run_55e51760/policy_stage2_000.pt",
+      "preference": null,
+      "objective_vector": [
+        -56.099998474121094,
+        -11.952500343322754,
+        -3.9100000858306885
+      ],
+      "stage": "stage2",
+      "source": "stage2",
+      "parent_policy_id": "stage1_pref_000_ckpt_015",
+      "target_objective": 0,
+      "base_objective_vector": [
+        -87.97500610351562,
+        -13.577500343322754,
+        -4.269999980926514
+      ],
+      "update_index": 0,
+      "notes": {
+        "extension_round": 0,
+        "selection_score": 0.6893333275318146,
+        "selection_rank": 2,
+        "crowding_score": 1.0,
+        "expansion_potential": 0.26999998092651367,
+        "constraint_risk": 1.0,
+        "utility_coverage_gain": 0.8333333134651184,
+        "dynamic_beta": 0.9249999999999999,
+        "beta_mode": "dynamic",
+        "extension_mode": "constrained",
+        "beta_components": {
+          "crowding": 1.0,
+          "target_expansion": 0.0,
+          "low_risk": 0.0,
+          "progress": 0.0,
+          "strictness": 0.25
+        },
+        "successful_constrained_updates": 1,
+        "terminated_due_to_constraints": false,
+        "constraint_tolerance": 1e-06,
+        "max_consecutive_constraint_failures": 1,
+        "consecutive_constraint_failures": 0,
+        "last_constraint_margins": [
+          0.6066875457763672,
+          0.039749860763549805
+        ],
+        "objective_improvement": 31.87500762939453,
+        "ipo_stats": {
+          "value_loss": 675.7283687591553,
+          "action_loss": 40.77204704284668,
+          "objective_surrogate": -128.7470531463623,
+          "barrier_bonus": -1.842068076133728,
+          "min_constraint_margin": -8.866443037986755,
+          "feasible_ratio": 0.0,
+          "entropy": 4.257896840572357,
+          "beta_used": 0.9249999999999999
+        },
+        "deployability": {
+          "business_return": -21.186248779296875,
+          "cost_return": -4.105000019073486,
+          "mean_violation": 0.0,
+          "high_disruption_action_rate": 0.95,
+          "final_critical_compromised_hosts": 1.0,
+          "strict_margin": -0.75,
+          "passed_strict": false,
+          "support_shell_reached": "NONE",
+          "deployability_score": 0.865
+        },
+        "deployability_acceptance": {
+          "accepted_without_shell_gain": true,
+          "strict_margin_delta": 0.0,
+          "deployability_score_delta": -0.015000000000000013,
+          "support_shell_before": "NONE",
+          "support_shell_after": "NONE"
+        },
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,717 @@
+{
+  "schema_version": "0.3.0",
+  "metadata": {
+    "schema_version": "0.3.0",
+    "stage": "stage1",
+    "env": {
+      "num_envs": 2,
+      "red_policy": "bline",
+      "remove_bugs": true,
+      "max_episode_steps": 20,
+      "seed": 7,
+      "scenario_name": "Scenario2",
+      "scenario_profile": "",
+      "gym_wrapper_name": "ChallengeWrapper",
+      "blue_agent_name": "Blue",
+      "red_agent_name": "Red",
+      "obs_mode": "vector",
+      "state_mode": true
+    },
+    "model": {
+      "hidden_size": 64,
+      "obj_dim": 3
+    },
+    "rollout": {
+      "num_steps": 16
+    },
+    "optimizer": {
+      "clip_param": 0.2,
+      "ppo_epochs": 4,
+      "num_mini_batch": 4,
+      "value_loss_coef": 0.5,
+      "entropy_coef": 0.01,
+      "learning_rate": 0.0003,
+      "max_grad_norm": 0.5,
+      "gamma": 0.995,
+      "gae_lambda": 0.95
+    },
+    "evaluation": {
+      "eval_episodes": 1,
+      "preference_step": 0.5
+    },
+    "seed": 7,
+    "num_policies": 3,
+    "preference_strategy": "explicit",
+    "preference_step": 0.5,
+    "preference_dirichlet_alpha": 1.0,
+    "explicit_preferences": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "preferences": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "total_timesteps": 512,
+    "timesteps_per_policy": 512,
+    "total_stage_timesteps": 1536,
+    "stage1_summary": [
+      {
+        "preference_index": 0,
+        "preference": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "num_updates": 16,
+        "save_every": 8,
+        "timesteps_per_policy": 512,
+        "num_saved_checkpoints": 3,
+        "final_policy_id": "stage1_pref_000_ckpt_015",
+        "final_objective_vector": [
+          -87.97500610351562,
+          -13.577500343322754,
+          -4.269999980926514
+        ],
+        "best_policy_id": "stage1_pref_000_ckpt_015",
+        "best_scalarized_utility": -87.97500610351562,
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial"
+      },
+      {
+        "preference_index": 1,
+        "preference": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "num_updates": 16,
+        "save_every": 8,
+        "timesteps_per_policy": 512,
+        "num_saved_checkpoints": 3,
+        "final_policy_id": "stage1_pref_001_ckpt_015",
+        "final_objective_vector": [
+          -151.5500030517578,
+          -21.69124984741211,
+          -4.5
+        ],
+        "best_policy_id": "stage1_pref_001_ckpt_000",
+        "best_scalarized_utility": -19.78999900817871,
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial"
+      },
+      {
+        "preference_index": 2,
+        "preference": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "num_updates": 16,
+        "save_every": 8,
+        "timesteps_per_policy": 512,
+        "num_saved_checkpoints": 3,
+        "final_policy_id": "stage1_pref_002_ckpt_015",
+        "final_objective_vector": [
+          -152.5500030517578,
+          -22.0362491607666,
+          -4.675000190734863
+        ],
+        "best_policy_id": "stage1_pref_002_ckpt_008",
+        "best_scalarized_utility": -4.0,
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial"
+      }
+    ],
+    "stage1_protocol_name": "cyborg_migration",
+    "reseed_mode": "shared",
+    "independent_env_per_preference": false,
+    "preference_seed_stride": 1000,
+    "env_seed_stride": 1000,
+    "parallel_workers": 1,
+    "parallel_backend": "process",
+    "merge_order": "preference_index"
+  },
+  "records": [
+    {
+      "policy_id": "stage1_pref_000_ckpt_000",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_000_ckpt_000.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -149.0500030517578,
+        -21.333749771118164,
+        -4.264999866485596
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 32,
+        "rollout_return_estimate": [
+          -57.375,
+          -9.477500915527344,
+          -3.065000534057617
+        ],
+        "scalarized_utility": -149.0500030517578,
+        "trainer_stats": {
+          "value_loss": 437.340726852417,
+          "action_loss": 30.458597660064697,
+          "entropy": 4.972447723150253
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_008",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_000_ckpt_008.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -107.94999694824219,
+        -16.956249237060547,
+        -4.264999866485596
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 288,
+        "rollout_return_estimate": [
+          -81.64999389648438,
+          -13.473751068115234,
+          -3.005000352859497
+        ],
+        "scalarized_utility": -107.94999694824219,
+        "trainer_stats": {
+          "value_loss": 768.5242958068848,
+          "action_loss": 45.37096643447876,
+          "entropy": 4.945461839437485
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_015",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_000_ckpt_015.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -87.97500610351562,
+        -13.577500343322754,
+        -4.269999980926514
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -55.64999771118164,
+          -11.387499809265137,
+          -3.6150002479553223
+        ],
+        "scalarized_utility": -87.97500610351562,
+        "trainer_stats": {
+          "value_loss": 356.02649688720703,
+          "action_loss": 28.132943272590637,
+          "entropy": 4.641386568546295
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_000",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_001_ckpt_000.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -143.0,
+        -19.78999900817871,
+        -4.070000171661377
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 32,
+        "rollout_return_estimate": [
+          -48.024993896484375,
+          -8.268749237060547,
+          -3.2300002574920654
+        ],
+        "scalarized_utility": -19.78999900817871,
+        "trainer_stats": {
+          "value_loss": 387.5340042114258,
+          "action_loss": 4.348567940294743,
+          "entropy": 4.972372084856033
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 3,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_008",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_001_ckpt_008.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -120.1500015258789,
+        -21.671249389648438,
+        -4.175000190734863
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 288,
+        "rollout_return_estimate": [
+          -82.64999389648438,
+          -14.095001220703125,
+          -3.2850003242492676
+        ],
+        "scalarized_utility": -21.671249389648438,
+        "trainer_stats": {
+          "value_loss": 792.9118232727051,
+          "action_loss": 7.6639686822891235,
+          "entropy": 4.891104876995087
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_015",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_001_ckpt_015.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -151.5500030517578,
+        -21.69124984741211,
+        -4.5
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -46.05000305175781,
+          -8.980000495910645,
+          -3.210000514984131
+        ],
+        "scalarized_utility": -21.69124984741211,
+        "trainer_stats": {
+          "value_loss": 223.97641277313232,
+          "action_loss": 4.552671909332275,
+          "entropy": 4.481803297996521
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_000",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_002_ckpt_000.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -104.74999237060547,
+        -16.477500915527344,
+        -4.275000095367432
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 0,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 0,
+        "timesteps_seen": 32,
+        "rollout_return_estimate": [
+          -30.725000381469727,
+          -6.239999771118164,
+          -3.65000057220459
+        ],
+        "scalarized_utility": -4.275000095367432,
+        "trainer_stats": {
+          "value_loss": 117.82105243206024,
+          "action_loss": 1.4873619601130486,
+          "entropy": 4.9720423221588135
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": false
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_008",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_002_ckpt_008.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -125.25,
+        -19.596250534057617,
+        -4.0
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 288,
+        "rollout_return_estimate": [
+          -71.64999389648438,
+          -13.821249008178711,
+          -3.270000457763672
+        ],
+        "scalarized_utility": -4.0,
+        "trainer_stats": {
+          "value_loss": 600.5604915618896,
+          "action_loss": 1.3492042683064938,
+          "entropy": 4.869484901428223
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_015",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_002_ckpt_015.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -152.5500030517578,
+        -22.0362491607666,
+        -4.675000190734863
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -32.92500305175781,
+          -6.43625020980835,
+          -2.9150002002716064
+        ],
+        "scalarized_utility": -4.675000190734863,
+        "trainer_stats": {
+          "value_loss": 157.6304030418396,
+          "action_loss": 1.2366766706109047,
+          "entropy": 4.697681665420532
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": false
+      }
+    }
+  ],
+  "pareto_front": [
+    {
+      "policy_id": "stage1_pref_000_ckpt_008",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_000_ckpt_008.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -107.94999694824219,
+        -16.956249237060547,
+        -4.264999866485596
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 288,
+        "rollout_return_estimate": [
+          -81.64999389648438,
+          -13.473751068115234,
+          -3.005000352859497
+        ],
+        "scalarized_utility": -107.94999694824219,
+        "trainer_stats": {
+          "value_loss": 768.5242958068848,
+          "action_loss": 45.37096643447876,
+          "entropy": 4.945461839437485
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 1,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_000_ckpt_015",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_000_ckpt_015.pt",
+      "preference": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "objective_vector": [
+        -87.97500610351562,
+        -13.577500343322754,
+        -4.269999980926514
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 15,
+      "notes": {
+        "preference_index": 0,
+        "save_index_within_policy": 2,
+        "timesteps_seen": 512,
+        "rollout_return_estimate": [
+          -55.64999771118164,
+          -11.387499809265137,
+          -3.6150002479553223
+        ],
+        "scalarized_utility": -87.97500610351562,
+        "trainer_stats": {
+          "value_loss": 356.02649688720703,
+          "action_loss": 28.132943272590637,
+          "entropy": 4.641386568546295
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 2,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_001_ckpt_008",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_001_ckpt_008.pt",
+      "preference": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "objective_vector": [
+        -120.1500015258789,
+        -21.671249389648438,
+        -4.175000190734863
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 1,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 288,
+        "rollout_return_estimate": [
+          -82.64999389648438,
+          -14.095001220703125,
+          -3.2850003242492676
+        ],
+        "scalarized_utility": -21.671249389648438,
+        "trainer_stats": {
+          "value_loss": 792.9118232727051,
+          "action_loss": 7.6639686822891235,
+          "entropy": 4.891104876995087
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": true
+      }
+    },
+    {
+      "policy_id": "stage1_pref_002_ckpt_008",
+      "checkpoint_path": "cmorl_cyborg/outputs/smoke/stage1/run_3e009db4/policy_pref_002_ckpt_008.pt",
+      "preference": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "objective_vector": [
+        -125.25,
+        -19.596250534057617,
+        -4.0
+      ],
+      "stage": "stage1",
+      "source": "stage1",
+      "parent_policy_id": null,
+      "target_objective": null,
+      "base_objective_vector": null,
+      "update_index": 8,
+      "notes": {
+        "preference_index": 2,
+        "save_index_within_policy": 1,
+        "timesteps_seen": 288,
+        "rollout_return_estimate": [
+          -71.64999389648438,
+          -13.821249008178711,
+          -3.270000457763672
+        ],
+        "scalarized_utility": -4.0,
+        "trainer_stats": {
+          "value_loss": 600.5604915618896,
+          "action_loss": 1.3492042683064938,
+          "entropy": 4.869484901428223
+        },
+        "preference_seed": 7,
+        "env_seed": 7,
+        "protocol_name": "cyborg_migration",
+        "execution_mode": "serial",
+        "pareto_size_after_save": 4,
+        "is_nondominated_after_save": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "scenario_name": "Scenario2",
+  "scenario_profile": "Scenario2",
+  "subnets": [
+    {
+      "name": "Enterprise",
+      "hosts": [
+        "Enterprise0",
+        "Enterprise1",
+        "Enterprise2",
+        "Defender"
+      ],
+      "size": 3
+    },
+    {
+      "name": "Operational",
+      "hosts": [
+        "Op_Server0",
+        "Op_Host0",
+        "Op_Host1",
+        "Op_Host2"
+      ],
+      "size": 4
+    },
+    {
+      "name": "User",
+      "hosts": [
+        "User0",
+        "User1",
+        "User2",
+        "User3",
+        "User4"
+      ],
+      "size": 5
+    }
+  ],
+  "hosts": {
+    "Defender": {
+      "hostname": "Defender",
+      "subnet": "Enterprise",
+      "role_group": "defender",
+      "image": "Velociraptor_Server",
+      "is_critical": false,
+      "security_weight": 0.65,
+      "business_weight": 0.35
+    },
+    "Enterprise0": {
+      "hostname": "Enterprise0",
+      "subnet": "Enterprise",
+      "role_group": "enterprise",
+      "image": "Gateway",
+      "is_critical": false,
+      "security_weight": 0.7,
+      "business_weight": 0.25
+    },
+    "Enterprise1": {
+      "hostname": "Enterprise1",
+      "subnet": "Enterprise",
+      "role_group": "enterprise",
+      "image": "Internal",
+      "is_critical": false,
+      "security_weight": 0.7,
+      "business_weight": 0.25
+    },
+    "Enterprise2": {
+      "hostname": "Enterprise2",
+      "subnet": "Enterprise",
+      "role_group": "enterprise",
+      "image": "Internal",
+      "is_critical": false,
+      "security_weight": 0.85,
+      "business_weight": 0.45
+    },
+    "Op_Host0": {
+      "hostname": "Op_Host0",
+      "subnet": "Operational",
+      "role_group": "operational",
+      "image": "Gateway",
+      "is_critical": false,
+      "security_weight": 1.0,
+      "business_weight": 0.7
+    },
+    "Op_Host1": {
+      "hostname": "Op_Host1",
+      "subnet": "Operational",
+      "role_group": "operational",
+      "image": "Gateway",
+      "is_critical": false,
+      "security_weight": 1.0,
+      "business_weight": 0.7
+    },
+    "Op_Host2": {
+      "hostname": "Op_Host2",
+      "subnet": "Operational",
+      "role_group": "operational",
+      "image": "Gateway",
+      "is_critical": false,
+      "security_weight": 1.0,
+      "business_weight": 0.7
+    },
+    "Op_Server0": {
+      "hostname": "Op_Server0",
+      "subnet": "Operational",
+      "role_group": "mission_critical",
+      "image": "OP_Server",
+      "is_critical": true,
+      "security_weight": 1.4,
+      "business_weight": 1.0
+    },
+    "User0": {
+      "hostname": "User0",
+      "subnet": "User",
+      "role_group": "user",
+      "image": "windows_user_host1",
+      "is_critical": false,
+      "security_weight": 0.4,
+      "business_weight": 0.05
+    },
+    "User1": {
+      "hostname": "User1",
+      "subnet": "User",
+      "role_group": "user",
+      "image": "windows_user_host1",
+      "is_critical": false,
+      "security_weight": 0.4,
+      "business_weight": 0.05
+    },
+    "User2": {
+      "hostname": "User2",
+      "subnet": "User",
+      "role_group": "user",
+      "image": "windows_user_host2",
+      "is_critical": false,
+      "security_weight": 0.4,
+      "business_weight": 0.05
+    },
+    "User3": {
+      "hostname": "User3",
+      "subnet": "User",
+      "role_group": "user",
+      "image": "linux_user_host1",
+      "is_critical": false,
+      "security_weight": 0.4,
+      "business_weight": 0.05
+    },
+    "User4": {
+      "hostname": "User4",
+      "subnet": "User",
+      "role_group": "user",
+      "image": "linux_user_host2",
+      "is_critical": false,
+      "security_weight": 0.4,
+      "business_weight": 0.05
+    }
+  },
+  "host_to_subnet": {
+    "Enterprise0": "Enterprise",
+    "Enterprise1": "Enterprise",
+    "Enterprise2": "Enterprise",
+    "Defender": "Enterprise",
+    "Op_Server0": "Operational",
+    "Op_Host0": "Operational",
+    "Op_Host1": "Operational",
+    "Op_Host2": "Operational",
+    "User0": "User",
+    "User1": "User",
+    "User2": "User",
+    "User3": "User",
+    "User4": "User"
+  }
+}

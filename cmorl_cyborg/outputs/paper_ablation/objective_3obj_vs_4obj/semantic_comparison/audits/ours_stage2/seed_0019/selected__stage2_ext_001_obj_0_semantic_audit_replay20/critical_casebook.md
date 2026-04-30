@@ -1,0 +1,158 @@
+# Critical Casebook
+
+## Earliest Critical Breach
+
+- Basic info: `episode_id=episode_012` `env_idx=0` `env_seed=31` `risk_tier=Tier 3 Persistent Critical Breach`
+- Returns: `security=-1223.3000` `business=-117.6975` `cost=-22.4300`
+- Key times: `enterprise_foothold_step=5` `first_critical_hit_step=12` `first_relevant_blue_response=7`
+
+Key sequence:
+- step 0: Blue `DecoyHarakaSMPT` -> `Enterprise1`; Red `DiscoverRemoteSystems` -> `User`; new=-; recovered=-; critical_after=-
+- step 4: Blue `DecoyTomcat` -> `User3`; Red `DiscoverNetworkServices` -> `-`; new=-; recovered=-; critical_after=-
+- step 5: Blue `DecoyTomcat` -> `User3`; Red `ExploitRemoteService` -> `-`; new=Enterprise0; recovered=-; critical_after=-
+- step 6: Blue `DecoyHarakaSMPT` -> `User4`; Red `PrivilegeEscalate` -> `Enterprise0`; new=-; recovered=-; critical_after=-
+- step 7: Blue `Restore` -> `Enterprise0`; Red `DiscoverRemoteSystems` -> `Enterprise`; new=-; recovered=Enterprise0; critical_after=-
+- step 8: Blue `DecoyApache` -> `User1`; Red `DiscoverNetworkServices` -> `-`; new=-; recovered=-; critical_after=-
+- step 11: Blue `DecoyApache` -> `Op_Host2`; Red `DiscoverNetworkServices` -> `-`; new=-; recovered=-; critical_after=-
+- step 12: Blue `Restore` -> `Enterprise0`; Red `ExploitRemoteService` -> `-`; new=Op_Server0; recovered=-; critical_after=Op_Server0
+- step 13: Blue `DecoyTomcat` -> `User3`; Red `PrivilegeEscalate` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 14: Blue `DecoyFemitter` -> `Enterprise2`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 15: Blue `Analyse` -> `Defender`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 99: Blue `Restore` -> `Enterprise2`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+
+Conclusion:
+- 最终 `Op_Server0` 仍处于 critical compromised 状态，说明该 env-run 属于持久打穿而不是短暂失守。
+- 红方真正完成突破的关键节点是 step 14 对 `Op_Server0` 的 `Impact`。
+- critical hit 后蓝方首次 relevant response 的延迟为 `2` step。
+- 蓝方最可疑的动作规则是：`Q2_user_action_during_critical_breach`，以及 `Q2_user_action_during_critical_breach`。
+
+## Worst Business Return
+
+- Basic info: `episode_id=episode_007` `env_idx=3` `env_seed=3026` `risk_tier=Tier 3 Persistent Critical Breach`
+- Returns: `security=-644.0500` `business=-171.4425` `cost=-21.5800`
+- Key times: `enterprise_foothold_step=5` `first_critical_hit_step=12` `first_relevant_blue_response=6`
+
+Key sequence:
+- step 0: Blue `DecoyTomcat` -> `User3`; Red `DiscoverRemoteSystems` -> `User`; new=-; recovered=-; critical_after=-
+- step 4: Blue `DecoyTomcat` -> `User3`; Red `DiscoverNetworkServices` -> `-`; new=-; recovered=-; critical_after=-
+- step 5: Blue `DecoyVsftpd` -> `User3`; Red `ExploitRemoteService` -> `-`; new=Enterprise1; recovered=-; critical_after=-
+- step 6: Blue `Restore` -> `Enterprise2`; Red `PrivilegeEscalate` -> `Enterprise1`; new=-; recovered=-; critical_after=-
+- step 7: Blue `DecoyApache` -> `Op_Host2`; Red `DiscoverRemoteSystems` -> `Enterprise`; new=-; recovered=-; critical_after=-
+- step 11: Blue `DecoyFemitter` -> `Enterprise2`; Red `DiscoverNetworkServices` -> `-`; new=-; recovered=-; critical_after=-
+- step 12: Blue `Sleep` -> `-`; Red `ExploitRemoteService` -> `-`; new=Op_Server0; recovered=-; critical_after=Op_Server0
+- step 13: Blue `Remove` -> `User3`; Red `PrivilegeEscalate` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 14: Blue `DecoyTomcat` -> `Op_Host1`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 15: Blue `DecoyTomcat` -> `Op_Host2`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 99: Blue `DecoyVsftpd` -> `Enterprise0`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+
+Conclusion:
+- 最终 `Op_Server0` 仍处于 critical compromised 状态，说明该 env-run 属于持久打穿而不是短暂失守。
+- 红方真正完成突破的关键节点是 step 14 对 `Op_Server0` 的 `Impact`。
+- critical hit 后蓝方首次 relevant response 的延迟为 `5` step。
+- 蓝方最可疑的动作规则是：`Q3_missed_immediate_response_to_critical_hit`，以及 `Q2_user_action_during_critical_breach`。
+
+## Worst Security Return
+
+- Basic info: `episode_id=episode_012` `env_idx=3` `env_seed=3031` `risk_tier=Tier 3 Persistent Critical Breach`
+- Returns: `security=-1458.5500` `business=-167.3700` `cost=-21.1100`
+- Key times: `enterprise_foothold_step=5` `first_critical_hit_step=12` `first_relevant_blue_response=6`
+
+Key sequence:
+- step 0: Blue `DecoySmss` -> `Defender`; Red `DiscoverRemoteSystems` -> `User`; new=-; recovered=-; critical_after=-
+- step 4: Blue `DecoyFemitter` -> `Enterprise2`; Red `DiscoverNetworkServices` -> `-`; new=-; recovered=-; critical_after=-
+- step 5: Blue `DecoyVsftpd` -> `Enterprise1`; Red `ExploitRemoteService` -> `-`; new=Enterprise1; recovered=-; critical_after=-
+- step 6: Blue `DecoyFemitter` -> `Enterprise2`; Red `PrivilegeEscalate` -> `Enterprise1`; new=-; recovered=-; critical_after=-
+- step 7: Blue `DecoyVsftpd` -> `Enterprise0`; Red `DiscoverRemoteSystems` -> `Enterprise`; new=-; recovered=-; critical_after=-
+- step 11: Blue `DecoyHarakaSMPT` -> `Enterprise1`; Red `DiscoverNetworkServices` -> `-`; new=-; recovered=-; critical_after=-
+- step 12: Blue `DecoyHarakaSMPT` -> `Enterprise1`; Red `ExploitRemoteService` -> `-`; new=Op_Server0; recovered=-; critical_after=Op_Server0
+- step 13: Blue `DecoyVsftpd` -> `Op_Server0`; Red `PrivilegeEscalate` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 14: Blue `DecoyTomcat` -> `User3`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 15: Blue `DecoyVsftpd` -> `Op_Server0`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 99: Blue `DecoyFemitter` -> `Enterprise2`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+
+Conclusion:
+- 最终 `Op_Server0` 仍处于 critical compromised 状态，说明该 env-run 属于持久打穿而不是短暂失守。
+- 红方真正完成突破的关键节点是 step 14 对 `Op_Server0` 的 `Impact`。
+- critical hit 后蓝方首次 relevant response 的延迟为 `1` step。
+- 蓝方最可疑的动作规则是：`Q2_user_action_during_critical_breach`，以及 `Q2_user_action_during_critical_breach`。
+
+## Max Critical Dwell
+
+- Basic info: `episode_id=episode_006` `env_idx=1` `env_seed=1025` `risk_tier=Tier 3 Persistent Critical Breach`
+- Returns: `security=-1385.9500` `business=-141.9625` `cost=-22.8100`
+- Key times: `enterprise_foothold_step=5` `first_critical_hit_step=12` `first_relevant_blue_response=6`
+
+Key sequence:
+- step 0: Blue `Remove` -> `User3`; Red `DiscoverRemoteSystems` -> `User`; new=-; recovered=-; critical_after=-
+- step 4: Blue `DecoySmss` -> `Op_Server0`; Red `DiscoverNetworkServices` -> `-`; new=-; recovered=-; critical_after=-
+- step 5: Blue `DecoyVsftpd` -> `Op_Host0`; Red `ExploitRemoteService` -> `-`; new=Enterprise1; recovered=-; critical_after=-
+- step 6: Blue `Restore` -> `Enterprise0`; Red `PrivilegeEscalate` -> `Enterprise1`; new=-; recovered=-; critical_after=-
+- step 7: Blue `DecoyApache` -> `User1`; Red `DiscoverRemoteSystems` -> `Enterprise`; new=-; recovered=-; critical_after=-
+- step 11: Blue `DecoySSHD` -> `User4`; Red `DiscoverNetworkServices` -> `-`; new=-; recovered=-; critical_after=-
+- step 12: Blue `Remove` -> `User3`; Red `ExploitRemoteService` -> `-`; new=Op_Server0; recovered=-; critical_after=Op_Server0
+- step 13: Blue `Restore` -> `Enterprise0`; Red `PrivilegeEscalate` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 14: Blue `DecoyFemitter` -> `Enterprise2`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 15: Blue `DecoyHarakaSMPT` -> `Enterprise1`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+- step 99: Blue `DecoyVsftpd` -> `User2`; Red `Impact` -> `Op_Server0`; new=-; recovered=-; critical_after=Op_Server0
+
+Conclusion:
+- 最终 `Op_Server0` 仍处于 critical compromised 状态，说明该 env-run 属于持久打穿而不是短暂失守。
+- 红方真正完成突破的关键节点是 step 14 对 `Op_Server0` 的 `Impact`。
+- critical hit 后蓝方首次 relevant response 的延迟为 `1` step。
+- 蓝方最可疑的动作规则是：`Q2_user_action_during_critical_breach`，以及 `Q2_user_action_during_critical_breach`。
+
+## Best Tier 0 Safe Sample
+
+No matching env-run was available for this case.
+
+## Critical-Step Action Summary
+
+### Critical-step top action families
+
+- `decoy`: `7536` critical-present steps
+- `restore`: `1062` critical-present steps
+- `remove`: `741` critical-present steps
+- `analyse`: `281` critical-present steps
+- `other`: `44` critical-present steps
+
+### Critical-step recovery counts
+
+- `Restore -> Enterprise2`: `121` recovery steps
+- `Restore -> Enterprise0`: `33` recovery steps
+- `Restore -> User2`: `7` recovery steps
+- `Restore -> User1`: `5` recovery steps
+- `Restore -> Enterprise1`: `3` recovery steps
+
+### Critical-step no-recovery top actions
+
+- `DecoyVsftpd -> Op_Server0`: `1259` no-recovery steps
+- `DecoyTomcat -> User3`: `1218` no-recovery steps
+- `DecoyFemitter -> Enterprise2`: `942` no-recovery steps
+- `Restore -> Enterprise0`: `729` no-recovery steps
+- `Remove -> User3`: `687` no-recovery steps
+
+## Pre-critical containment summary
+
+### Pre-critical top action families
+
+- `decoy`: `3672` pre-critical steps
+- `restore`: `710` pre-critical steps
+- `remove`: `367` pre-critical steps
+- `analyse`: `150` pre-critical steps
+- `other`: `20` pre-critical steps
+
+### Pre-critical compromised-target recovery counts
+
+- `Restore -> Enterprise0`: `169` containment steps
+- `Restore -> Op_Server0`: `94` containment steps
+- `Restore -> Enterprise2`: `71` containment steps
+- `Analyse -> Enterprise1`: `6` containment steps
+- `Restore -> Enterprise1`: `4` containment steps
+
+### Pre-critical no-containment top actions
+
+- `DecoyVsftpd -> Op_Server0`: `573` no-containment steps
+- `DecoyTomcat -> User3`: `556` no-containment steps
+- `DecoyFemitter -> Enterprise2`: `415` no-containment steps
+- `Remove -> User3`: `342` no-containment steps
+- `DecoyVsftpd -> Enterprise0`: `334` no-containment steps
